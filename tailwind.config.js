@@ -2,7 +2,7 @@ const colors = require('tailwindcss/colors');
 
 module.exports = (isProd) => ({
     prefix: '',
-    important: '#placeos',
+    important: '#p',
     future: {
         removeDeprecatedGapUtilities: true,
         purgeLayersByDefault: true,

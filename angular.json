@@ -53,6 +53,11 @@
                         "assets": [
                             "apps/map-builder/src/favicon.ico",
                             "apps/map-builder/src/assets",
+                            {
+                                "glob": "**",
+                                "input": "shared/assets",
+                                "output": "/assets/"
+                            },
                             "apps/map-builder/src/manifest.webmanifest"
                         ],
                         "styles": [
