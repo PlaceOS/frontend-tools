@@ -15,7 +15,8 @@
         "skipDefaultLibCheck": true,
         "baseUrl": ".",
         "paths": {
-            "@placeos-tools/common": ["libs/common/src/index.ts"]
+            "@placeos-tools/common": ["libs/common/src/index.ts"],
+            "@placeos-tools/components": ["libs/components/src/index.ts"]
         }
     },
     "exclude": ["node_modules", "tmp"]

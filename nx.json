@@ -23,6 +23,7 @@
             "tags": [],
             "implicitDependencies": ["map-builder"]
         },
-        "common": { "tags": [] }
+        "common": { "tags": [] },
+        "components": { "tags": [] }
     }
 }
