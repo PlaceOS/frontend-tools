@@ -1,10 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, ViewEncapsulation } from '@angular/core';
 
 @Component({
-  selector: 'placeos-tools-root',
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css'],
+    selector: 'placeos-tools-root',
+    template: ` <router-outlet></router-outlet> `,
+    styles: [],
 })
-export class AppComponent {
-  title = 'map-builder';
-}
+export class AppComponent {}

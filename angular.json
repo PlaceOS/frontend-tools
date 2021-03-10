@@ -1,153 +1,181 @@
 {
-  "version": 1,
-  "cli": {
-    "defaultCollection": "@nrwl/angular"
-  },
-  "defaultProject": "map-builder",
-  "schematics": {
-    "@nrwl/angular": {
-      "application": {
-        "linter": "eslint"
-      },
-      "library": {
-        "linter": "eslint"
-      },
-      "storybook-configuration": {
-        "linter": "eslint"
-      }
+    "version": 1,
+    "cli": {
+        "defaultCollection": "@nrwl/angular"
     },
-    "@nrwl/angular:application": {
-      "style": "css",
-      "linter": "eslint",
-      "unitTestRunner": "jest",
-      "e2eTestRunner": "cypress"
+    "defaultProject": "map-builder",
+    "schematics": {
+        "@nrwl/angular": {
+            "application": {
+                "linter": "eslint"
+            },
+            "library": {
+                "linter": "eslint"
+            },
+            "storybook-configuration": {
+                "linter": "eslint"
+            }
+        },
+        "@nrwl/angular:application": {
+            "style": "css",
+            "linter": "eslint",
+            "unitTestRunner": "jest",
+            "e2eTestRunner": "cypress"
+        },
+        "@nrwl/angular:library": {
+            "style": "css",
+            "linter": "eslint",
+            "unitTestRunner": "jest"
+        },
+        "@nrwl/angular:component": {
+            "style": "css"
+        }
     },
-    "@nrwl/angular:library": {
-      "style": "css",
-      "linter": "eslint",
-      "unitTestRunner": "jest"
-    },
-    "@nrwl/angular:component": {
-      "style": "css"
-    }
-  },
-  "projects": {
-    "map-builder": {
-      "projectType": "application",
-      "root": "apps/map-builder",
-      "sourceRoot": "apps/map-builder/src",
-      "prefix": "placeos-tools",
-      "architect": {
-        "build": {
-          "builder": "@angular-devkit/build-angular:browser",
-          "options": {
-            "outputPath": "dist/apps/map-builder",
-            "index": "apps/map-builder/src/index.html",
-            "main": "apps/map-builder/src/main.ts",
-            "polyfills": "apps/map-builder/src/polyfills.ts",
-            "tsConfig": "apps/map-builder/tsconfig.app.json",
-            "aot": true,
-            "assets": [
-              "apps/map-builder/src/favicon.ico",
-              "apps/map-builder/src/assets",
-              "apps/map-builder/src/manifest.webmanifest"
-            ],
-            "styles": ["./node_modules/@angular/material/prebuilt-themes/pink-bluegrey.css", "apps/map-builder/src/styles.css"],
-            "scripts": []
-          },
-          "configurations": {
-            "production": {
-              "fileReplacements": [
-                {
-                  "replace": "apps/map-builder/src/environments/environment.ts",
-                  "with": "apps/map-builder/src/environments/environment.prod.ts"
-                }
-              ],
-              "optimization": true,
-              "outputHashing": "all",
-              "sourceMap": false,
-              "namedChunks": false,
-              "extractLicenses": true,
-              "vendorChunk": false,
-              "buildOptimizer": true,
-              "budgets": [
-                {
-                  "type": "initial",
-                  "maximumWarning": "2mb",
-                  "maximumError": "5mb"
+    "projects": {
+        "map-builder": {
+            "projectType": "application",
+            "root": "apps/map-builder",
+            "sourceRoot": "apps/map-builder/src",
+            "prefix": "placeos-tools",
+            "architect": {
+                "build": {
+                    "builder": "@angular-builders/custom-webpack:browser",
+                    "options": {
+                        "customWebpackConfig": {
+                            "path": "webpack.config.js"
+                        },
+                        "outputPath": "dist/apps/map-builder",
+                        "index": "apps/map-builder/src/index.html",
+                        "main": "apps/map-builder/src/main.ts",
+                        "polyfills": "apps/map-builder/src/polyfills.ts",
+                        "tsConfig": "apps/map-builder/tsconfig.app.json",
+                        "aot": true,
+                        "assets": [
+                            "apps/map-builder/src/favicon.ico",
+                            "apps/map-builder/src/assets",
+                            "apps/map-builder/src/manifest.webmanifest"
+                        ],
+                        "styles": [
+                            "apps/map-builder/src/styles.css",
+                            "shared/styles/application.css",
+                            "shared/styles/custom-elements.css",
+                            "shared/styles/native-elements.css"
+                        ],
+                        "scripts": []
+                    },
+                    "configurations": {
+                        "staging": {
+                            "fileReplacements": [
+                                {
+                                    "replace": "apps/map-builder/src/environments/environment.ts",
+                                    "with": "apps/map-builder/src/environments/environment.prod.ts"
+                                }
+                            ],
+                            "optimization": true,
+                            "outputHashing": "all",
+                            "sourceMap": true,
+                            "namedChunks": false,
+                            "extractLicenses": false,
+                            "vendorChunk": false,
+                            "buildOptimizer": true,
+                            "serviceWorker": true,
+                            "ngswConfigPath": "apps/map-builder/ngsw-config.json"
+                        },
+                        "production": {
+                            "fileReplacements": [
+                                {
+                                    "replace": "apps/map-builder/src/environments/environment.ts",
+                                    "with": "apps/map-builder/src/environments/environment.prod.ts"
+                                }
+                            ],
+                            "optimization": true,
+                            "outputHashing": "all",
+                            "sourceMap": false,
+                            "namedChunks": false,
+                            "extractLicenses": true,
+                            "vendorChunk": false,
+                            "buildOptimizer": true,
+                            "budgets": [
+                                {
+                                    "type": "initial",
+                                    "maximumWarning": "2mb",
+                                    "maximumError": "5mb"
+                                },
+                                {
+                                    "type": "anyComponentStyle",
+                                    "maximumWarning": "6kb",
+                                    "maximumError": "10kb"
+                                }
+                            ],
+                            "serviceWorker": true,
+                            "ngswConfigPath": "apps/map-builder/ngsw-config.json"
+                        }
+                    }
                 },
-                {
-                  "type": "anyComponentStyle",
-                  "maximumWarning": "6kb",
-                  "maximumError": "10kb"
+                "serve": {
+                    "builder": "@angular-builders/custom-webpack:dev-server",
+                    "options": {
+                        "browserTarget": "map-builder:build",
+                        "proxyConfig": "config/proxy.conf.js"
+                    },
+                    "configurations": {
+                        "production": {
+                            "browserTarget": "map-builder:build:production"
+                        }
+                    }
+                },
+                "extract-i18n": {
+                    "builder": "@angular-devkit/build-angular:extract-i18n",
+                    "options": {
+                        "browserTarget": "map-builder:build"
+                    }
+                },
+                "lint": {
+                    "builder": "@nrwl/linter:eslint",
+                    "options": {
+                        "lintFilePatterns": [
+                            "apps/map-builder/src/**/*.ts",
+                            "apps/map-builder/src/**/*.html"
+                        ]
+                    }
+                },
+                "test": {
+                    "builder": "@nrwl/jest:jest",
+                    "outputs": ["coverage/apps/map-builder"],
+                    "options": {
+                        "jestConfig": "apps/map-builder/jest.config.js",
+                        "passWithNoTests": true
+                    }
                 }
-              ],
-              "serviceWorker": true,
-              "ngswConfigPath": "apps/map-builder/ngsw-config.json"
             }
-          }
         },
-        "serve": {
-          "builder": "@angular-devkit/build-angular:dev-server",
-          "options": {
-            "browserTarget": "map-builder:build"
-          },
-          "configurations": {
-            "production": {
-              "browserTarget": "map-builder:build:production"
+        "map-builder-e2e": {
+            "root": "apps/map-builder-e2e",
+            "sourceRoot": "apps/map-builder-e2e/src",
+            "projectType": "application",
+            "architect": {
+                "e2e": {
+                    "builder": "@nrwl/cypress:cypress",
+                    "options": {
+                        "cypressConfig": "apps/map-builder-e2e/cypress.json",
+                        "tsConfig": "apps/map-builder-e2e/tsconfig.e2e.json",
+                        "devServerTarget": "map-builder:serve"
+                    },
+                    "configurations": {
+                        "production": {
+                            "devServerTarget": "map-builder:serve:production"
+                        }
+                    }
+                },
+                "lint": {
+                    "builder": "@nrwl/linter:eslint",
+                    "options": {
+                        "lintFilePatterns": [
+                            "apps/map-builder-e2e/**/*.{js,ts}"
+                        ]
+                    }
+                }
             }
-          }
-        },
-        "extract-i18n": {
-          "builder": "@angular-devkit/build-angular:extract-i18n",
-          "options": {
-            "browserTarget": "map-builder:build"
-          }
-        },
-        "lint": {
-          "builder": "@nrwl/linter:eslint",
-          "options": {
-            "lintFilePatterns": [
-              "apps/map-builder/src/**/*.ts",
-              "apps/map-builder/src/**/*.html"
-            ]
-          }
-        },
-        "test": {
-          "builder": "@nrwl/jest:jest",
-          "outputs": ["coverage/apps/map-builder"],
-          "options": {
-            "jestConfig": "apps/map-builder/jest.config.js",
-            "passWithNoTests": true
-          }
         }
-      }
-    },
-    "map-builder-e2e": {
-      "root": "apps/map-builder-e2e",
-      "sourceRoot": "apps/map-builder-e2e/src",
-      "projectType": "application",
-      "architect": {
-        "e2e": {
-          "builder": "@nrwl/cypress:cypress",
-          "options": {
-            "cypressConfig": "apps/map-builder-e2e/cypress.json",
-            "tsConfig": "apps/map-builder-e2e/tsconfig.e2e.json",
-            "devServerTarget": "map-builder:serve"
-          },
-          "configurations": {
-            "production": {
-              "devServerTarget": "map-builder:serve:production"
-            }
-          }
-        },
-        "lint": {
-          "builder": "@nrwl/linter:eslint",
-          "options": {
-            "lintFilePatterns": ["apps/map-builder-e2e/**/*.{js,ts}"]
-          }
-        }
-      }
     }
-  }
 }
