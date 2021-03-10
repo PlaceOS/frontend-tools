@@ -11,9 +11,10 @@ import { AppComponent } from './app.component';
 import { environment } from '../environments/environment';
 import { AppRoutingModule } from './app-routing.module';
 import { HomeComponent } from './home.component';
+import { EditorComponent } from './editor/editor.component';
 
 @NgModule({
-    declarations: [AppComponent, HomeComponent],
+    declarations: [AppComponent, HomeComponent, EditorComponent],
     imports: [
         BrowserModule,
         AppRoutingModule,
@@ -22,7 +23,7 @@ import { HomeComponent } from './home.component';
         }),
         BrowserAnimationsModule,
         MatButtonModule,
-        ComponentsModule
+        ComponentsModule,
     ],
     providers: [],
     bootstrap: [AppComponent],
