@@ -77,6 +77,18 @@ export function randomInt(ceil: number, floor: number = 0) {
     return Math.floor(Math.random() * (ceil - floor)) + floor;
 }
 
+const CHARS = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+
+/**
+ * Generate a random string of characters
+ * @param length Length of the string to generate
+ * @param chars Available characters to allow in the string
+ */
+export function randomString(length: number = 10, chars: string = CHARS) {
+    if (length < 1) return '';
+    return new Array(length).fill(0).map(_ => chars[randomInt(chars.length)]).join('');
+}
+
 /**
  * Parse raw CSV data into a JSON object
  * @param csv CSV data to parse
