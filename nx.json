@@ -1,34 +1,28 @@
 {
-  "implicitDependencies": {
-    "angular.json": "*",
-    "package.json": {
-      "dependencies": "*",
-      "devDependencies": "*"
+    "implicitDependencies": {
+        "angular.json": "*",
+        "package.json": { "dependencies": "*", "devDependencies": "*" },
+        "tsconfig.base.json": "*",
+        "tslint.json": "*",
+        ".eslintrc.json": "*",
+        "nx.json": "*"
     },
-    "tsconfig.base.json": "*",
-    "tslint.json": "*",
-    ".eslintrc.json": "*",
-    "nx.json": "*"
-  },
-  "affected": {
-    "defaultBase": "master"
-  },
-  "npmScope": "placeos-tools",
-  "tasksRunnerOptions": {
-    "default": {
-      "runner": "@nrwl/workspace/tasks-runners/default",
-      "options": {
-        "cacheableOperations": ["build", "lint", "test", "e2e"]
-      }
-    }
-  },
-  "projects": {
-    "map-builder": {
-      "tags": []
+    "affected": { "defaultBase": "master" },
+    "npmScope": "placeos-tools",
+    "tasksRunnerOptions": {
+        "default": {
+            "runner": "@nrwl/workspace/tasks-runners/default",
+            "options": {
+                "cacheableOperations": ["build", "lint", "test", "e2e"]
+            }
+        }
     },
-    "map-builder-e2e": {
-      "tags": [],
-      "implicitDependencies": ["map-builder"]
+    "projects": {
+        "map-builder": { "tags": [] },
+        "map-builder-e2e": {
+            "tags": [],
+            "implicitDependencies": ["map-builder"]
+        },
+        "common": { "tags": [] }
     }
-  }
 }

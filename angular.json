@@ -176,6 +176,31 @@
                     }
                 }
             }
+        },
+        "common": {
+            "projectType": "library",
+            "root": "libs/common",
+            "sourceRoot": "libs/common/src",
+            "prefix": "placeos-tools",
+            "architect": {
+                "lint": {
+                    "builder": "@nrwl/linter:eslint",
+                    "options": {
+                        "lintFilePatterns": [
+                            "libs/common/src/**/*.ts",
+                            "libs/common/src/**/*.html"
+                        ]
+                    }
+                },
+                "test": {
+                    "builder": "@nrwl/jest:jest",
+                    "outputs": ["coverage/libs/common"],
+                    "options": {
+                        "jestConfig": "libs/common/jest.config.js",
+                        "passWithNoTests": true
+                    }
+                }
+            }
         }
     }
 }
