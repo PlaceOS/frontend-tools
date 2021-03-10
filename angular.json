@@ -49,9 +49,10 @@
             "aot": true,
             "assets": [
               "apps/map-builder/src/favicon.ico",
-              "apps/map-builder/src/assets"
+              "apps/map-builder/src/assets",
+              "apps/map-builder/src/manifest.webmanifest"
             ],
-            "styles": ["apps/map-builder/src/styles.css"],
+            "styles": ["./node_modules/@angular/material/prebuilt-themes/pink-bluegrey.css", "apps/map-builder/src/styles.css"],
             "scripts": []
           },
           "configurations": {
@@ -80,7 +81,9 @@
                   "maximumWarning": "6kb",
                   "maximumError": "10kb"
                 }
-              ]
+              ],
+              "serviceWorker": true,
+              "ngswConfigPath": "apps/map-builder/ngsw-config.json"
             }
           }
         },
