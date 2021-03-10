@@ -24,6 +24,11 @@
             "implicitDependencies": ["map-builder"]
         },
         "common": { "tags": [] },
-        "components": { "tags": [] }
+        "components": { "tags": [] },
+        "map-regions": { "tags": [] },
+        "map-regions-e2e": {
+            "tags": [],
+            "implicitDependencies": ["map-regions"]
+        }
     }
 }
