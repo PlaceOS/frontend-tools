@@ -22,3 +22,7 @@
     --font: 'Helvetica Neue', Roboto, Helvetica, sans-serif;
     --heading-font: Georgia, 'Times New Roman', Times, serif;
 }
+
+.text-shadow {
+    text-shadow: black 1px 1px;
+}

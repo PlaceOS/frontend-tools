@@ -13,6 +13,7 @@ import { Component } from '@angular/core';
                 <mat-form-field appearance="outline">
                     <input
                         matInput
+                        name="map-url"
                         [(ngModel)]="url"
                         [ngModelOptions]="{ standalone: true }"
                         placeholder="SVG URL e.g. https://my.domain/path/to/file.svg"
