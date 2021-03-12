@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Clipboard } from '@angular/cdk/clipboard';
-import { downloadFile, randomString } from '@placeos-tools/common';
+import { downloadFile, isChildFrame, randomString, retrieveData, sendMessage } from '@placeos-tools/common';
 import { Point } from '@placeos/svg-viewer';
 import { BehaviorSubject } from 'rxjs';
 
@@ -25,7 +25,7 @@ export const COLOURS = [
     '#f4511e',
 ];
 
-const formatRegion = (r, idx) => {
+const formatRegion = (r) => {
     const updated = {
         id: `${r.name.toLowerCase().split(' ').join('-')}`,
         type: 'Feature',
@@ -47,6 +47,8 @@ const formatRegion = (r, idx) => {
 })
 export class EditorStateService {
     private _map_url = new BehaviorSubject<string>('');
+    private _map_width = new BehaviorSubject<number>(100);
+    private _map_height = new BehaviorSubject<number>(100);
     private _embeded = new BehaviorSubject<boolean>(false);
     private _map_regions = new BehaviorSubject<MapRegion[]>([]);
     private _active_region = new BehaviorSubject<MapRegion>(null);
@@ -61,8 +63,14 @@ export class EditorStateService {
     public readonly embeded = this._embeded.asObservable();
     /** Region currently being worked on */
     public readonly active_region = this._active_region.asObservable();
+    /** Height of the active map */
+    public readonly height = this._map_height.asObservable();
+    /** Width of the active map */
+    public readonly width = this._map_width.asObservable();
 
-    constructor(private _clipboard: Clipboard) {}
+    constructor(private _clipboard: Clipboard) {
+        this.loadRegionData();
+    }
 
     /** Update the map URL */
     public setURL(url: string) {
@@ -72,6 +80,18 @@ export class EditorStateService {
     /** Update the active region */
     public setActiveRegion(region: MapRegion) {
         this._active_region.next(region);
+    }
+
+    public setWidth(w: number) {
+        this._map_width.next(w);
+    }
+
+    public setHeight(h: number) {
+        this._map_height.next(h);
+    }
+
+    public setRatio(r: number) {
+        this._map_height.next(Math.floor((this._map_width.getValue() * r) * 100) / 100);
     }
 
     public handleMapClick(event: 'start' | 'move' | 'end', point: Point) {
@@ -128,7 +148,7 @@ export class EditorStateService {
         }
     }
 
-    public saveMetadata() {
+    public async saveMetadata() {
         const embeded = this._embeded.getValue();
         const data = {
             url: this._map_url.getValue(),
@@ -137,7 +157,12 @@ export class EditorStateService {
             areas: this._map_regions.getValue().map(formatRegion),
         };
         if (embeded) {
-            // TODO: Add comms for backoffice
+            await sendMessage({
+                type: 'backoffice',
+                action: 'update',
+                name: 'map_region',
+                content: data
+            });
         } else {
             downloadFile('map-region-data.json', JSON.stringify(data));
         }
@@ -151,6 +176,38 @@ export class EditorStateService {
             areas: this._map_regions.getValue().map(formatRegion),
         };
         this._clipboard.copy(JSON.stringify(data, null, 4));
+    }
+
+    private async loadRegionData() {
+        const is_child = isChildFrame();
+        this._embeded.next(is_child);
+        if (!is_child) return;
+        const data = await retrieveData('map_regions');
+        const map_data = {
+            height: data.height,
+            width: data.width,
+            areas: (data.areas || []).map(
+                (i, idx) =>
+                    ({
+                        id: i.id,
+                        color: COLOURS[idx % COLOURS.length],
+                        name: i.properties.name,
+                        capacity: i.properties.capacity,
+                        points: i.geometry.coordinates,
+                        height: Math.abs(
+                            i.geometry.coordinates[0][1] -
+                                i.geometry.coordinates[2][1]
+                        ),
+                        width: Math.abs(
+                            i.geometry.coordinates[0][0] -
+                                i.geometry.coordinates[2][0]
+                        ),
+                    } as any)
+            ),
+        };
+        this.setHeight(map_data.height);
+        this.setWidth(map_data.width);
+        this._map_regions.next(map_data.areas);
     }
 
     private replaceRegion(id: string, new_data: MapRegion) {

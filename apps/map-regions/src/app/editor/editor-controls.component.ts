@@ -9,11 +9,11 @@ import { EditorStateService } from './editor-state.service';
                 <h3>Map Settings</h3>
                 <label>Width:</label>
                 <mat-form-field appearance="outline" class="w-full h-12">
-                    <input matInput type="number" placeholder="Map Width" />
+                    <input matInput type="number" placeholder="Map Width" [ngModel]="width | async" (ngModelChange)="setWidth($event)"/>
                 </mat-form-field>
                 <label>Height:</label>
                 <mat-form-field appearance="outline" class="w-full h-12">
-                    <input matInput type="number" placeholder="Map Height" />
+                    <input matInput type="number" placeholder="Map Height" [ngModel]="height | async" (ngModelChange)="setWidth($event)" />
                 </mat-form-field>
             </div>
             <div class="w-full bg-white rounded shadow flex-1">
@@ -115,10 +115,16 @@ export class EditorControlsComponent {
     public readonly embeded = this._state.embeded;
     /** Map regions for active map URL */
     public readonly active_region = this._state.active_region;
+    /** Map regions for active map URL */
+    public readonly height = this._state.height;
+    /** Map regions for active map URL */
+    public readonly width = this._state.width;
 
     public readonly setActiveRegion = (r) => this._state.setActiveRegion(r);
     public readonly newRegion = () => this._state.newRegion();
     public readonly removeRegion = (r) => this._state.removeRegion(r);
+    public readonly setHeight = (h) => this._state.setHeight(h);
+    public readonly setWidth = (w) => this._state.setWidth(w);
     public readonly saveMetadata = () => this._state.saveMetadata();
     public readonly copyMetadata = () => this._state.copyMetadata();
 

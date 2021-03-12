@@ -20,7 +20,7 @@ import { EditorStateService } from './editor-state.service';
                 [features]="regions"
                 [actions]="actions"
                 [options]="{ disable_pan: true, disable_zoon: true }"
-                (aspect_ratio)="ratio = $event"
+                (aspect_ratio)="setRatio($event)"
             ></i-map>
         </div>
     `,
@@ -54,6 +54,7 @@ export class EditorComponent extends BaseClass implements OnInit {
 
     /** Handler for click events on the map */
     public readonly clicked = (n) => (_, p) => this._state.handleMapClick(n, p);
+    public readonly setRatio = (r) => {this._state.setRatio(r); this.ratio = r}
 
     constructor(
         private _state: EditorStateService,
@@ -71,13 +72,18 @@ export class EditorComponent extends BaseClass implements OnInit {
             { id: '*', action: 'touchmove', callback: this.clicked('move') },
             { id: '*', action: 'touchend', callback: this.clicked('end') },
         ];
+        const handle_params = (params) => {
+            if (params.has('src')) {
+                this._state.setURL(params.get('src'));
+            }
+        }
+        this.subscription(
+            'route.query',
+            this._route.queryParamMap.subscribe(handle_params)
+        );
         this.subscription(
             'route.params',
-            this._route.paramMap.subscribe((params) => {
-                if (params.has('id')) {
-                    this._state.setURL(params.get('id'));
-                }
-            })
+            this._route.paramMap.subscribe(handle_params)
         );
 
         this._state.regions

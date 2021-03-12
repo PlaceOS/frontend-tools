@@ -10,7 +10,11 @@ const routes: Routes = [
         component: BootstrapComponent,
     },
     {
-        path: 'editor/:id',
+        path: 'editor',
+        component: EditorComponent,
+    },
+    {
+        path: 'editor/:src',
         component: EditorComponent,
     },
     { path: '**', redirectTo: '' },
