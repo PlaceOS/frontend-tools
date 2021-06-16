@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { BaseClass } from '@placeos-tools/common';
+import { BaseClass, HashMap } from '@placeos-tools/common';
 import { MapPolygonComponent } from '@placeos-tools/components';
 
 import { filter, map } from 'rxjs/operators';
@@ -38,7 +38,7 @@ import { EditorStateService } from './editor-state.service';
             }
 
             [controls] {
-                width: 20rem;
+                width: 24rem;
             }
         `,
     ],
@@ -54,7 +54,10 @@ export class EditorComponent extends BaseClass implements OnInit {
 
     /** Handler for click events on the map */
     public readonly clicked = (n) => (_, p) => this._state.handleMapClick(n, p);
-    public readonly setRatio = (r) => {this._state.setRatio(r); this.ratio = r}
+    public readonly setRatio = (r) => {
+        this._state.setRatio(r);
+        this.ratio = r;
+    };
 
     constructor(
         private _state: EditorStateService,
@@ -76,7 +79,7 @@ export class EditorComponent extends BaseClass implements OnInit {
             if (params.has('src')) {
                 this._state.setURL(params.get('src'));
             }
-        }
+        };
         this.subscription(
             'route.query',
             this._route.queryParamMap.subscribe(handle_params)
@@ -89,21 +92,39 @@ export class EditorComponent extends BaseClass implements OnInit {
         this._state.regions
             .pipe(
                 map((l) =>
-                    l.map((_) => ({
-                        location: {
-                            x: _.points[0][0],
-                            y: _.points[0][1],
-                        },
-                        content: MapPolygonComponent,
-                        data: {
-                            ..._,
-                            ratio: this.ratio,
-                            data$: this._state.regions.pipe(
-                                map((list) => list.find((r) => r.id === _.id)),
-                                filter((_) => !!_)
-                            ),
-                        },
-                    }))
+                    l.map((_) => {
+                        const diff: HashMap<number> = _.points.reduce(
+                            (m, [x, y]) => ({
+                                x_min: x < m.x_min ? x : m.x_min,
+                                x_max: x > m.x_max ? x : m.x_max,
+                                y_min: y < m.y_min ? y : m.y_min,
+                                y_max: y > m.y_max ? y : m.y_max,
+                            }),
+                            {
+                                x_min: 100,
+                                x_max: -100,
+                                y_min: 100,
+                                y_max: -100,
+                            }
+                        );
+                        return {
+                            location: {
+                                x: diff.x_min + (diff.x_max - diff.x_min) / 2,
+                                y: diff.y_min + (diff.y_max - diff.y_min) / 2,
+                            },
+                            content: MapPolygonComponent,
+                            data: {
+                                ..._,
+                                ratio: this.ratio,
+                                data$: this._state.regions.pipe(
+                                    map((list) =>
+                                        list.find((r) => r.id === _.id)
+                                    ),
+                                    filter((_) => !!_)
+                                ),
+                            },
+                        };
+                    })
                 )
             )
             .subscribe((_) => {

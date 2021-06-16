@@ -1,6 +1,12 @@
 import { Injectable } from '@angular/core';
 import { Clipboard } from '@angular/cdk/clipboard';
-import { downloadFile, isChildFrame, randomString, retrieveData, sendMessage } from '@placeos-tools/common';
+import {
+    downloadFile,
+    isChildFrame,
+    randomString,
+    retrieveData,
+    sendMessage,
+} from '@placeos-tools/common';
 import { Point } from '@placeos/svg-viewer';
 import { BehaviorSubject } from 'rxjs';
 
@@ -91,12 +97,19 @@ export class EditorStateService {
     }
 
     public setRatio(r: number) {
-        this._map_height.next(Math.floor((this._map_width.getValue() * r) * 100) / 100);
+        this._map_height.next(
+            Math.floor(this._map_width.getValue() * r * 100) / 100
+        );
     }
 
     public handleMapClick(event: 'start' | 'move' | 'end', point: Point) {
         const active_region = this._active_region.getValue();
-        if (!active_region || !point || (event === 'move' && !this._start_point)) return;
+        if (
+            !active_region ||
+            !point ||
+            (event === 'move' && !this._start_point)
+        )
+            return;
         switch (event) {
             case 'start':
                 this._start_point = point;
@@ -107,9 +120,10 @@ export class EditorStateService {
                 break;
             case 'end':
                 this._end_point = point;
-                setTimeout(() => this._start_point = null, 20);
+                setTimeout(() => (this._start_point = null), 20);
                 break;
         }
+        if (!this._start_point || !this._end_point) return;
         this.replaceRegion(active_region.id, {
             ...active_region,
             points: [
@@ -161,7 +175,7 @@ export class EditorStateService {
                 type: 'backoffice',
                 action: 'update',
                 name: 'map_region',
-                content: data
+                content: data,
             });
         } else {
             downloadFile('map-region-data.json', JSON.stringify(data));

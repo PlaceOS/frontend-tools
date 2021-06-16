@@ -9,15 +9,31 @@ import { EditorStateService } from './editor-state.service';
                 <h3>Map Settings</h3>
                 <label>Width:</label>
                 <mat-form-field appearance="outline" class="w-full h-12">
-                    <input matInput type="number" placeholder="Map Width" [ngModel]="width | async" (ngModelChange)="setWidth($event)"/>
+                    <input
+                        matInput
+                        type="number"
+                        placeholder="Map Width"
+                        [ngModel]="width | async"
+                        (ngModelChange)="setWidth($event)"
+                    />
                 </mat-form-field>
                 <label>Height:</label>
                 <mat-form-field appearance="outline" class="w-full h-12">
-                    <input matInput type="number" placeholder="Map Height" [ngModel]="height | async" (ngModelChange)="setWidth($event)" />
+                    <input
+                        matInput
+                        type="number"
+                        placeholder="Map Height"
+                        [ngModel]="height | async"
+                        (ngModelChange)="setWidth($event)"
+                    />
                 </mat-form-field>
             </div>
             <div class="w-full bg-white rounded shadow flex-1">
-                <button mat-button class="clear w-full m-0" (click)="newRegion()">
+                <button
+                    mat-button
+                    class="clear w-full m-0"
+                    (click)="newRegion()"
+                >
                     <div class="flex items-center">
                         <app-icon class="mr-4">add</app-icon>
                         New Region
@@ -62,7 +78,39 @@ import { EditorStateService } from './editor-state.service';
                                 [(ngModel)]="region.name"
                             />
                         </mat-form-field>
-                        <button mat-icon-button (click)="removeRegion(region); $event.stopPropagation()">
+                        <button mat-icon-button [matMenuTriggerFor]="menu">
+                            <app-icon>{{
+                                region.type === 'polygon'
+                                    ? 'change_history'
+                                    : 'aspect_ratio'
+                            }}</app-icon>
+                        </button>
+                        <mat-menu #menu="matMenu">
+                            <button
+                                mat-menu-item
+                                (click)="region.type = 'rectangle'"
+                            >
+                                <div class="flex items-center space-x-2">
+                                    <app-icon>aspect_ratio</app-icon>
+                                    <span>Rectangle</span>
+                                </div>
+                            </button>
+                            <button
+                                mat-menu-item
+                                (click)="region.type = 'polygon'"
+                            >
+                                <div class="flex items-center space-x-2">
+                                    <app-icon>change_history</app-icon>
+                                    <span>Polygon</span>
+                                </div>
+                            </button>
+                        </mat-menu>
+                        <button
+                            mat-icon-button
+                            (click)="
+                                removeRegion(region); $event.stopPropagation()
+                            "
+                        >
                             <app-icon>close</app-icon>
                         </button>
                     </div>
@@ -71,7 +119,11 @@ import { EditorStateService } from './editor-state.service';
             </div>
 
             <div class="w-full bg-white rounded shadow">
-                <button mat-button class="clear w-full m-0" (click)="saveMetadata()">
+                <button
+                    mat-button
+                    class="clear w-full m-0"
+                    (click)="saveMetadata()"
+                >
                     <div class="flex items-center">
                         <app-icon class="mr-4">save_alt</app-icon>
                         {{ (embeded | async) ? 'Save' : 'Download' }} Metadata
@@ -80,7 +132,11 @@ import { EditorStateService } from './editor-state.service';
             </div>
 
             <div class="w-full bg-white rounded shadow">
-                <button mat-button class="clear w-full m-0" (click)="copyMetadata()">
+                <button
+                    mat-button
+                    class="clear w-full m-0"
+                    (click)="copyMetadata()"
+                >
                     <div class="flex items-center">
                         <app-icon class="mr-4">content_copy</app-icon>
                         Copy Metadata
@@ -89,7 +145,9 @@ import { EditorStateService } from './editor-state.service';
             </div>
         </div>
         <ng-template #empty_state>
-            <p class="p-4 border-t border-gray-300 text-center">No regions for map</p>
+            <p class="p-4 border-t border-gray-300 text-center">
+                No regions for map
+            </p>
         </ng-template>
     `,
     styles: [

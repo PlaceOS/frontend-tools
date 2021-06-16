@@ -11,6 +11,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatMenuModule } from '@angular/material/menu';
 import { ClipboardModule } from '@angular/cdk/clipboard';
 
 import { AppComponent } from './app.component';
@@ -40,6 +41,7 @@ import { EditorControlsComponent } from './editor/editor-controls.component';
         MatInputModule,
         MatRippleModule,
         MatTooltipModule,
+        MatMenuModule,
         ComponentsModule,
         ClipboardModule,
     ],
