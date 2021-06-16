@@ -1,13 +1,18 @@
 {
     "implicitDependencies": {
         "angular.json": "*",
-        "package.json": { "dependencies": "*", "devDependencies": "*" },
+        "package.json": {
+            "dependencies": "*",
+            "devDependencies": "*"
+        },
         "tsconfig.base.json": "*",
         "tslint.json": "*",
         ".eslintrc.json": "*",
         "nx.json": "*"
     },
-    "affected": { "defaultBase": "master" },
+    "affected": {
+        "defaultBase": "master"
+    },
     "npmScope": "placeos-tools",
     "tasksRunnerOptions": {
         "default": {
@@ -18,14 +23,22 @@
         }
     },
     "projects": {
-        "map-builder": { "tags": [] },
+        "map-builder": {
+            "tags": []
+        },
         "map-builder-e2e": {
             "tags": [],
             "implicitDependencies": ["map-builder"]
         },
-        "common": { "tags": [] },
-        "components": { "tags": [] },
-        "map-regions": { "tags": [] },
+        "common": {
+            "tags": []
+        },
+        "components": {
+            "tags": []
+        },
+        "map-regions": {
+            "tags": []
+        },
         "map-regions-e2e": {
             "tags": [],
             "implicitDependencies": ["map-regions"]
