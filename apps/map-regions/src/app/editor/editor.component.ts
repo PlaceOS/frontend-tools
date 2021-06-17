@@ -11,7 +11,7 @@ import { EditorStateService } from './editor-state.service';
     selector: '[map-regions-editor]',
     template: `
         <div controls class="relative h-full">
-            <editor-controls></editor-controls>
+            <editor-options></editor-options>
         </div>
         <div class="relative h-full flex-1">
             <i-map
@@ -22,6 +22,9 @@ import { EditorStateService } from './editor-state.service';
                 [options]="{ disable_pan: true, disable_zoon: true }"
                 (aspect_ratio)="setRatio($event)"
             ></i-map>
+            <editor-controls
+                class="absolute top-1/2 left-0 transform -translate-y-1/2"
+            ></editor-controls>
         </div>
     `,
     styles: [

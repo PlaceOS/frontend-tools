@@ -4,187 +4,55 @@ import { EditorStateService } from './editor-state.service';
 @Component({
     selector: 'editor-controls',
     template: `
-        <div class="flex flex-col items-center p-4 space-y-4 h-full">
-            <div class="w-full bg-white rounded p-2 shadow">
-                <h3>Map Settings</h3>
-                <label>Width:</label>
-                <mat-form-field appearance="outline" class="w-full h-12">
-                    <input
-                        matInput
-                        type="number"
-                        placeholder="Map Width"
-                        [ngModel]="width | async"
-                        (ngModelChange)="setWidth($event)"
-                    />
-                </mat-form-field>
-                <label>Height:</label>
-                <mat-form-field appearance="outline" class="w-full h-12">
-                    <input
-                        matInput
-                        type="number"
-                        placeholder="Map Height"
-                        [ngModel]="height | async"
-                        (ngModelChange)="setWidth($event)"
-                    />
-                </mat-form-field>
-            </div>
-            <div class="w-full bg-white rounded shadow flex-1">
-                <button
-                    mat-button
-                    class="clear w-full m-0"
-                    (click)="newRegion()"
-                >
-                    <div class="flex items-center">
-                        <app-icon class="mr-4">add</app-icon>
-                        New Region
-                    </div>
-                </button>
-                <div
-                    *ngIf="(regions | async)?.length; else empty_state"
-                    class="border-t border-gray-300"
-                >
-                    <div
-                        *ngFor="let region of regions | async; let i = index"
-                        class="p-2 border-b border-gray-100 hover:bg-gray-100 flex items-center space-x-1 cursor-pointer"
-                        (click)="setActiveRegion(region)"
-                        matRipple
-                    >
-                        <div
-                            counter
-                            class="w-6 h-6 flex items-center justify-center rounded-full"
-                            [class.bg-success]="
-                                (active_region | async)?.id === region.id
-                            "
-                            [class.text-white]="
-                                (active_region | async)?.id === region.id
-                            "
-                        >
-                            {{ i + 1 }}
-                        </div>
-                        <mat-form-field appearance="outline" class="w-16">
-                            <input
-                                matInput
-                                type="number"
-                                [(ngModel)]="region.capacity"
-                                placeholder="Capacity"
-                            />
-                        </mat-form-field>
-                        <input type="color" [(ngModel)]="region.color" />
-                        <mat-form-field appearance="outline" class="flex-1">
-                            <input
-                                matInput
-                                type="text"
-                                placeholder="Region ID"
-                                [(ngModel)]="region.name"
-                            />
-                        </mat-form-field>
-                        <button mat-icon-button [matMenuTriggerFor]="menu">
-                            <app-icon>{{
-                                region.type === 'polygon'
-                                    ? 'change_history'
-                                    : 'aspect_ratio'
-                            }}</app-icon>
-                        </button>
-                        <mat-menu #menu="matMenu">
-                            <button
-                                mat-menu-item
-                                (click)="region.type = 'rectangle'"
-                            >
-                                <div class="flex items-center space-x-2">
-                                    <app-icon>aspect_ratio</app-icon>
-                                    <span>Rectangle</span>
-                                </div>
-                            </button>
-                            <button
-                                mat-menu-item
-                                (click)="region.type = 'polygon'"
-                            >
-                                <div class="flex items-center space-x-2">
-                                    <app-icon>change_history</app-icon>
-                                    <span>Polygon</span>
-                                </div>
-                            </button>
-                        </mat-menu>
-                        <button
-                            mat-icon-button
-                            (click)="
-                                removeRegion(region); $event.stopPropagation()
-                            "
-                        >
-                            <app-icon>close</app-icon>
-                        </button>
-                    </div>
-                    <div></div>
-                </div>
-            </div>
-
-            <div class="w-full bg-white rounded shadow">
-                <button
-                    mat-button
-                    class="clear w-full m-0"
-                    (click)="saveMetadata()"
-                >
-                    <div class="flex items-center">
-                        <app-icon class="mr-4">save_alt</app-icon>
-                        {{ (embeded | async) ? 'Save' : 'Download' }} Metadata
-                    </div>
-                </button>
-            </div>
-
-            <div class="w-full bg-white rounded shadow">
-                <button
-                    mat-button
-                    class="clear w-full m-0"
-                    (click)="copyMetadata()"
-                >
-                    <div class="flex items-center">
-                        <app-icon class="mr-4">content_copy</app-icon>
-                        Copy Metadata
-                    </div>
-                </button>
-            </div>
+        <div
+            class="flex flex-col items-center bg-white rounded overflow-hidden shadow"
+        >
+            <button
+                mat-icon-button
+                [class.bg-primary]="action === 'rect'"
+                [class.text-white]="action === 'rect'"
+                matTooltip="Draw Rectangle"
+                matTooltipPosition="right"
+                (click)="setAction('rect')"
+            >
+                <app-icon>aspect_ratio</app-icon>
+            </button>
+            <button
+                mat-icon-button
+                [class.bg-primary]="action === 'add_points'"
+                [class.text-white]="action === 'add_points'"
+                matTooltip="Add Points"
+                matTooltipPosition="right"
+                (click)="setAction('add_points')"
+            >
+                <app-icon>add_circle</app-icon>
+            </button>
+            <button
+                mat-icon-button
+                [class.bg-primary]="action === 'remove_points'"
+                [class.text-white]="action === 'remove_points'"
+                matTooltip="Remove Points"
+                matTooltipPosition="right"
+                (click)="setAction('remove_points')"
+            >
+                <app-icon>remove_circle</app-icon>
+            </button>
         </div>
-        <ng-template #empty_state>
-            <p class="p-4 border-t border-gray-300 text-center">
-                No regions for map
-            </p>
-        </ng-template>
     `,
     styles: [
         `
-            [type='color'] {
-                width: 1.5rem;
-                min-width: 1.5rem;
-            }
-            mat-form-field {
-                min-width: 4rem;
-                height: 3rem;
-            }
-            [counter] {
-                transition: color 200ms, background-color 200ms;
+            button {
+                border-radius: 0;
             }
         `,
     ],
 })
 export class EditorControlsComponent {
-    /** Map regions for active map URL */
-    public readonly regions = this._state.regions;
-    /** Map regions for active map URL */
-    public readonly embeded = this._state.embeded;
-    /** Map regions for active map URL */
-    public readonly active_region = this._state.active_region;
-    /** Map regions for active map URL */
-    public readonly height = this._state.height;
-    /** Map regions for active map URL */
-    public readonly width = this._state.width;
+    public get action() {
+        return this._state.action;
+    }
 
-    public readonly setActiveRegion = (r) => this._state.setActiveRegion(r);
-    public readonly newRegion = () => this._state.newRegion();
-    public readonly removeRegion = (r) => this._state.removeRegion(r);
-    public readonly setHeight = (h) => this._state.setHeight(h);
-    public readonly setWidth = (w) => this._state.setWidth(w);
-    public readonly saveMetadata = () => this._state.saveMetadata();
-    public readonly copyMetadata = () => this._state.copyMetadata();
+    public readonly setAction = (a) => this._state.setAction(a);
 
     constructor(private _state: EditorStateService) {}
 }

@@ -35,8 +35,8 @@ export interface MapPolygonData {
                 />
                 <circle
                     *ngFor="let point of point_list"
-                    [attr.cx]="point[0]"
-                    [attr.cy]="point[1]"
+                    [attr.cx]="point[0] || 0"
+                    [attr.cy]="point[1] || 0"
                     [attr.r]="4"
                     [style.stroke]="'#000'"
                     [style.fill]="'#fffd'"
@@ -135,7 +135,6 @@ export class MapPolygonComponent extends BaseClass implements OnInit {
                 y_max: -100,
             }
         );
-        console.log('Offset:', this.offset_x, this.offset_y, diff);
         this.offset_x = diff.x_min * 100;
         this.offset_y = diff.y_min * 100;
         const range = {
@@ -165,7 +164,6 @@ export class MapPolygonComponent extends BaseClass implements OnInit {
         ]);
         this.width = this.width + this.padding + 8;
         this.height = this.height + this.padding + 8;
-        console.log('Points:', this.point_list, this.points);
         this._cdr.detectChanges();
     }
 }
