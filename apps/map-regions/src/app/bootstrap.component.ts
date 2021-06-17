@@ -19,13 +19,15 @@ import { Component } from '@angular/core';
                         placeholder="SVG URL e.g. https://my.domain/path/to/file.svg"
                     />
                 </mat-form-field>
-                <a button mat-button
+                <a
+                    button
+                    mat-button
                     class="w-32"
                     [disabled]="!url"
                     [routerLink]="['/editor', url]"
                 >
                     View Map
-</a>
+                </a>
             </form>
         </div>
     `,
