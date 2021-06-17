@@ -39,17 +39,13 @@
             "prefix": "placeos-tools",
             "architect": {
                 "build": {
-                    "builder": "@angular-builders/custom-webpack:browser",
+                    "builder": "@angular-devkit/build-angular:browser",
                     "options": {
-                        "customWebpackConfig": {
-                            "path": "webpack.config.js"
-                        },
                         "outputPath": "dist/apps/map-builder",
                         "index": "apps/map-builder/src/index.html",
                         "main": "apps/map-builder/src/main.ts",
                         "polyfills": "apps/map-builder/src/polyfills.ts",
                         "tsConfig": "apps/map-builder/tsconfig.app.json",
-                        "aot": true,
                         "assets": [
                             "apps/map-builder/src/favicon.ico",
                             "apps/map-builder/src/assets",
@@ -62,11 +58,17 @@
                         ],
                         "styles": [
                             "apps/map-builder/src/styles.css",
-                            "shared/styles/application.css",
-                            "shared/styles/custom-elements.css",
-                            "shared/styles/native-elements.css"
+                            "shared/styles/application.scss",
+                            "shared/styles/custom-elements.scss",
+                            "shared/styles/native-elements.scss"
                         ],
-                        "scripts": []
+                        "scripts": [],
+                        "vendorChunk": true,
+                        "extractLicenses": false,
+                        "buildOptimizer": false,
+                        "sourceMap": true,
+                        "optimization": false,
+                        "namedChunks": true
                     },
                     "configurations": {
                         "staging": {
@@ -78,9 +80,7 @@
                             ],
                             "optimization": true,
                             "outputHashing": "all",
-                            "sourceMap": true,
                             "namedChunks": false,
-                            "extractLicenses": false,
                             "vendorChunk": false,
                             "buildOptimizer": true,
                             "serviceWorker": true,
@@ -115,10 +115,11 @@
                             "serviceWorker": true,
                             "ngswConfigPath": "apps/map-builder/ngsw-config.json"
                         }
-                    }
+                    },
+                    "defaultConfiguration": ""
                 },
                 "serve": {
-                    "builder": "@angular-builders/custom-webpack:dev-server",
+                    "builder": "@angular-devkit/build-angular:dev-server",
                     "options": {
                         "browserTarget": "map-builder:build",
                         "proxyConfig": "config/proxy.conf.js"
@@ -239,17 +240,13 @@
             "prefix": "placeos-tools",
             "architect": {
                 "build": {
-                    "builder": "@angular-builders/custom-webpack:browser",
+                    "builder": "@angular-devkit/build-angular:browser",
                     "options": {
-                        "customWebpackConfig": {
-                            "path": "webpack.config.js"
-                        },
                         "outputPath": "dist/apps/map-regions",
                         "index": "apps/map-regions/src/index.html",
                         "main": "apps/map-regions/src/main.ts",
                         "polyfills": "apps/map-regions/src/polyfills.ts",
                         "tsConfig": "apps/map-regions/tsconfig.app.json",
-                        "aot": true,
                         "assets": [
                             "apps/map-regions/src/favicon.ico",
                             "apps/map-regions/src/assets",
@@ -262,11 +259,17 @@
                         ],
                         "styles": [
                             "apps/map-regions/src/styles.css",
-                            "shared/styles/application.css",
-                            "shared/styles/custom-elements.css",
-                            "shared/styles/native-elements.css"
+                            "shared/styles/application.scss",
+                            "shared/styles/custom-elements.scss",
+                            "shared/styles/native-elements.scss"
                         ],
-                        "scripts": []
+                        "scripts": [],
+                        "vendorChunk": true,
+                        "extractLicenses": false,
+                        "buildOptimizer": false,
+                        "sourceMap": true,
+                        "optimization": false,
+                        "namedChunks": true
                     },
                     "configurations": {
                         "production": {
@@ -298,10 +301,11 @@
                             "serviceWorker": true,
                             "ngswConfigPath": "apps/map-regions/ngsw-config.json"
                         }
-                    }
+                    },
+                    "defaultConfiguration": ""
                 },
                 "serve": {
-                    "builder": "@angular-builders/custom-webpack:dev-server",
+                    "builder": "@angular-devkit/build-angular:dev-server",
                     "options": {
                         "browserTarget": "map-regions:build"
                     },

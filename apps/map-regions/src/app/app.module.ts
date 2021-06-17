@@ -11,13 +11,16 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatMenuModule } from '@angular/material/menu';
 import { ClipboardModule } from '@angular/cdk/clipboard';
 
 import { AppComponent } from './app.component';
+import { AppRoutingModule } from './app-routing.module';
 import { environment } from '../environments/environment';
+
 import { BootstrapComponent } from './bootstrap.component';
 import { EditorComponent } from './editor/editor.component';
-import { AppRoutingModule } from './app-routing.module';
+import { EditorOptionsComponent } from './editor/editor-options.component';
 import { EditorControlsComponent } from './editor/editor-controls.component';
 
 @NgModule({
@@ -25,6 +28,7 @@ import { EditorControlsComponent } from './editor/editor-controls.component';
         AppComponent,
         BootstrapComponent,
         EditorComponent,
+        EditorOptionsComponent,
         EditorControlsComponent,
     ],
     imports: [
@@ -40,6 +44,7 @@ import { EditorControlsComponent } from './editor/editor-controls.component';
         MatInputModule,
         MatRippleModule,
         MatTooltipModule,
+        MatMenuModule,
         ComponentsModule,
         ClipboardModule,
     ],
