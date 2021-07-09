@@ -172,7 +172,7 @@ export class EditorStateService {
         const location_map = await retrieveData('sensor-locations');
         const location_list = [];
         for (const id in location_map) {
-            sensor_list.push({
+            location_list.push({
                 ...location_map[id],
                 id,
             });
