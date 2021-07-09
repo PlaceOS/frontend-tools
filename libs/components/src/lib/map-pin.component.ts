@@ -29,7 +29,7 @@ export interface MapPinData {
                 enable-background="new 0 0 380 560"
                 xml:space="preserve"
                 [class.action]="action"
-                (click)="action()"
+                (click)="action ? action() : ''"
             >
                 <g>
                     <path
@@ -74,7 +74,7 @@ export interface MapPinData {
             @keyframes fade-in-top {
                 0% {
                     opacity: 0;
-                    transform: translateY(-100%)
+                    transform: translateY(-100%);
                 }
                 100% {
                     opacity: 1;
@@ -94,8 +94,8 @@ export class MapPinComponent {
     /** Action to perform when clicking pin */
     public readonly action = this._details.action || null;
 
-    public show: boolean;
-    public show_message: boolean;
+    public show = false;
+    public show_message = false;
 
     constructor(@Inject(MAP_FEATURE_DATA) private _details: MapPinData) {}
 

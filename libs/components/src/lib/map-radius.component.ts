@@ -68,8 +68,8 @@ export class MapRadiusComponent implements OnInit {
     /** Stroke colour for the pin SVG */
     public readonly stroke = this._details.stroke || '#e53935';
 
-    public show: boolean;
-    public show_message: boolean;
+    public show = false;
+    public show_message = false;
 
     constructor(@Inject(MAP_FEATURE_DATA) private _details: MapRadiusData) {}
 

@@ -55,7 +55,7 @@ export class HotkeyService {
                 return;
             if (this.last_down !== code) {
                 if (!this.keydown_states[code]) {
-                    this.keydown_states[code] = new BehaviorSubject(null);
+                    this.keydown_states[code] = new BehaviorSubject(-1);
                     this.keydown_observers[code] = this.keydown_states[
                         code
                     ].asObservable();
@@ -70,9 +70,9 @@ export class HotkeyService {
 
         window.addEventListener('keyup', (event: KeyboardEvent) => {
             const code = this.mapKey((event.code || '').toLowerCase());
-            this.keydown_states[code].next(null);
+            this.keydown_states[code].next(-1);
             if (this.last_down === code) {
-                this.last_down = null;
+                this.last_down = '';
             }
         });
     }
