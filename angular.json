@@ -380,6 +380,7 @@
                     "builder": "@angular-devkit/build-angular:browser",
                     "outputs": ["{options.outputPath}"],
                     "options": {
+                        "baseHref": ".",
                         "outputPath": "dist/apps/sensor-map",
                         "index": "apps/sensor-map/src/index.html",
                         "main": "apps/sensor-map/src/main.ts",
