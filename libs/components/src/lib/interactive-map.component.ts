@@ -2,16 +2,16 @@ import {
     AfterViewInit,
     Component,
     ElementRef,
-    EventEmitter,
     InjectionToken,
     Injector,
     Input,
     OnChanges,
     OnDestroy,
     OnInit,
-    Output,
     QueryList,
     SimpleChanges,
+    TemplateRef,
+    Type,
     ViewChild,
     ViewChildren,
 } from '@angular/core';
@@ -22,14 +22,17 @@ import {
     createViewer,
     getViewer,
     Point,
+    Viewer,
     removeViewer,
     updateViewer,
     ViewAction,
     ViewerFeature,
     ViewerLabel,
     ViewerStyles,
-    ViewerOptions,
+    listenToViewerChanges,
 } from '@placeos/svg-viewer';
+import { BehaviorSubject } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 export const MAP_FEATURE_DATA = new InjectionToken('Data for Map Features');
 
@@ -39,24 +42,44 @@ export const MAP_FEATURE_DATA = new InjectionToken('Data for Map Features');
         <div #outlet tabindex="0" role="map" class="absolute inset-0"></div>
         <mat-spinner
             *ngIf="!viewer || loading"
-            class="center"
+            class="absolute"
             [diameter]="48"
         ></mat-spinner>
         <div hidden *ngIf="injectors?.length">
-            <ng-container *ngFor="let element of features; let i = index">
+            <ng-container
+                *ngFor="
+                    let element of features;
+                    let i = index;
+                    trackBy: element?.location
+                "
+            >
                 <div *ngIf="element">
                     <div
                         #feature
                         class="pointer-events-none"
                         [attr.el-id]="element.location"
                         [attr.view-id]="viewer"
+                        [ngSwitch]="type(element.content)"
                     >
-                        <ng-container
-                            *ngComponentOutlet="
-                                element.content;
-                                injector: injectors[i]
-                            "
-                        ></ng-container>
+                        <ng-container *ngSwitchCase="'component'">
+                            <ng-container
+                                *ngComponentOutlet="
+                                    element.content;
+                                    injector: injectors[i]
+                                "
+                            ></ng-container>
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'html'">
+                            <div [innerHTML]="element.content | sanitize"></div>
+                        </ng-container>
+                        <ng-container *ngSwitchDefault>
+                            <ng-container
+                                *ngTemplateOutlet="
+                                    element.content;
+                                    context: element.data
+                                "
+                            ></ng-container>
+                        </ng-container>
                     </div>
                 </div>
             </ng-container>
@@ -68,12 +91,18 @@ export const MAP_FEATURE_DATA = new InjectionToken('Data for Map Features');
                 height: 100%;
                 width: 100%;
             }
+
+            mat-spinner {
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+            }
         `,
     ],
 })
 export class InteractiveMapComponent
     extends BaseClass
-    implements OnInit, OnChanges, OnDestroy, AfterViewInit {
+    implements AfterViewInit, OnChanges, OnInit, OnDestroy {
     /** URL to the SVG file */
     @Input() public src: string;
     /** Custom CSS styles to apply to the SVG file */
@@ -89,9 +118,9 @@ export class InteractiveMapComponent
     /** List of available user actions for the SVG */
     @Input() public actions: ViewAction[];
 
-    @Input() public options: ViewerOptions;
+    @Input() public options: any;
 
-    @Output() public aspect_ratio = new EventEmitter();
+    @Input() public focus: string;
 
     public loading: boolean;
 
@@ -99,18 +128,29 @@ export class InteractiveMapComponent
 
     /** ID of the active SVG Viewer */
     public viewer: string;
+    /** Observable for changes on the SVG viewer */
+    private _on_changes: BehaviorSubject<Viewer> = new BehaviorSubject(null);
 
     @ViewChild('outlet') private _outlet_el: ElementRef<HTMLDivElement>;
     @ViewChildren('feature') private _feature_list: QueryList<
         ElementRef<HTMLDivElement>
     >;
 
+    public type(
+        content: string | TemplateRef<any> | Type<any>
+    ): 'html' | 'template' | 'component' {
+        return typeof content === 'string'
+            ? 'html'
+            : content instanceof TemplateRef
+            ? 'template'
+            : 'component';
+    }
+
     public get feature_list() {
         return (this.features || [])
             .map((f, idx) => ({
                 ...f,
                 content: this._feature_list.toArray()[idx]?.nativeElement,
-                data: undefined
             }))
             .filter((f) => f.content);
     }
@@ -133,8 +173,29 @@ export class InteractiveMapComponent
         if (changes.src && this.src) {
             this.createView();
         }
+        if (changes.features) {
+            this.injectors = (this.features || []).map((f: any) =>
+                Injector.create({
+                    providers: [
+                        {
+                            provide: MAP_FEATURE_DATA,
+                            useValue: {
+                                ...f.data,
+                                zoom: this._on_changes.pipe(map((_) => _.zoom)),
+                                position: this._on_changes.pipe(
+                                    map((_) => _.center)
+                                ),
+                            },
+                        },
+                    ],
+                    parent: this._injector,
+                })
+            );
+        }
         if (this.viewer) {
-            if (changes.zoom || changes.center) {
+            if (changes.focus && this.focus) {
+                this.focusOn(this.focus);
+            } else if (changes.zoom || changes.center) {
                 this.updateDisplay();
             }
             if (
@@ -143,17 +204,6 @@ export class InteractiveMapComponent
                 changes.labels ||
                 changes.actions
             ) {
-                this.injectors = (this.features || []).map((f: any) =>
-                    Injector.create({
-                        providers: [
-                            {
-                                provide: MAP_FEATURE_DATA,
-                                useValue: { ...f.data },
-                            },
-                        ],
-                        parent: this._injector,
-                    })
-                );
                 this.timeout('update_view', () => this.updateView(), 100);
             }
         }
@@ -176,7 +226,6 @@ export class InteractiveMapComponent
                 actions: this.actions,
                 options: this.options,
             });
-            this.aspect_ratio.emit(getViewer(this.viewer)?.ratio);
         } catch (e) {}
     }
 
@@ -189,11 +238,10 @@ export class InteractiveMapComponent
             desired_center: this.center,
             options: this.options,
         });
-        this.aspect_ratio.emit(getViewer(this.viewer)?.ratio);
     }
 
     private async createView() {
-        if (this.src && this._outlet_el?.nativeElement) {
+        if (this.src && this._outlet_el?.nativeElement && !this.loading) {
             this.loading = true;
             if (this.viewer) {
                 removeViewer(this.viewer);
@@ -208,16 +256,32 @@ export class InteractiveMapComponent
                 features: this.feature_list,
                 labels: this.labels,
                 actions: this.actions,
+                options: this.options,
             });
-            this.timeout(
-                'update_view',
-                () => {
-                    this.updateView();
-                    this.updateDisplay();
-                },
-                100
-            );
             this.loading = false;
+            this.subscription(
+                'view_changes',
+                listenToViewerChanges(this.viewer)?.subscribe((v) =>
+                    this._on_changes.next(v)
+                )
+            );
+        } else if (
+            (this.src && !this._outlet_el?.nativeElement) ||
+            this.loading
+        ) {
+            this.timeout('create_view', () => this.createView());
         }
+    }
+
+    private focusOn(id: string) {
+        const viewer: Viewer = getViewer(this.viewer);
+        if (!viewer) return;
+        const rect = viewer.mappings[id];
+        if (!rect) return;
+        this.center = {
+            x: 1 - (rect.x + rect.w / 2),
+            y: 1 - (rect.y + rect.h / 2),
+        };
+        this.updateDisplay();
     }
 }

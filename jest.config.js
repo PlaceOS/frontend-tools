@@ -4,5 +4,6 @@ module.exports = {
         '<rootDir>/libs/common',
         '<rootDir>/libs/components',
         '<rootDir>/apps/map-regions',
+        '<rootDir>/apps/sensor-map',
     ],
 };
