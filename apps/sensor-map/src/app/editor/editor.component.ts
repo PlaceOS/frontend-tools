@@ -99,5 +99,6 @@ export class EditorComponent extends BaseClass implements OnInit {
             'route.params',
             this._route.paramMap.subscribe(handle_params)
         );
+        this._state.loadSensorLocations();
     }
 }

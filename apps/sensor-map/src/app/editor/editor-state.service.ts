@@ -39,17 +39,9 @@ export class EditorStateService {
     private _active_sensor = new BehaviorSubject<PlaceSensor>(null);
     private _embeded = new BehaviorSubject<boolean>(false);
 
-    private _sensor_locations = new BehaviorSubject<PlaceSensorLocation[]>([
-        { id: 'sensor-0', x: 0.5, y: 0.5 },
-    ]);
+    private _sensor_locations = new BehaviorSubject<PlaceSensorLocation[]>([]);
 
-    private _sensor_list = new BehaviorSubject(
-        new Array(30).fill(0).map((_, idx) => ({
-            id: `sensor-${idx}`,
-            name: `Sensor ${idx + 1}`,
-            type: TYPES[randomInt(TYPES.length)],
-        }))
-    );
+    private _sensor_list = new BehaviorSubject([]);
 
     public readonly sensor_details = combineLatest([
         this._sensor_list,
