@@ -132,7 +132,7 @@ export class EditorStateService {
         if (embeded) {
             await sendMessage({
                 type: 'backoffice',
-                action: 'update',
+                action: 'metadata',
                 name: 'sensor-locations',
                 content: this.locationsToMap(),
             });
