@@ -58,8 +58,8 @@ export class EditorComponent extends BaseClass implements OnInit {
     /** Handler for click events on the map */
     public readonly clicked = (n) => (_, p) => this._state.handleMapClick(n, p);
     public readonly setRatio = (r) => {
-        this._state.setRatio(r);
         this.ratio = r;
+        this._state.setRatio(r);
     };
 
     constructor(
@@ -132,7 +132,11 @@ export class EditorComponent extends BaseClass implements OnInit {
             )
             .subscribe((_) => {
                 const str = JSON.stringify(
-                    _.map((_) => ({ location: _.location, id: _.data.id }))
+                    _.map((_) => ({
+                        location: _.location,
+                        id: _.data.id,
+                        ratio: _.data.ratio,
+                    }))
                 );
                 if (this.region_string !== str) {
                     this.regions = _;

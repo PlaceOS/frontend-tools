@@ -176,7 +176,9 @@ export class InteractiveMapComponent
                 actions: this.actions,
                 options: this.options,
             });
-            this.aspect_ratio.emit(getViewer(this.viewer)?.ratio);
+            this.timeout('aspect', () =>
+                this.aspect_ratio.emit(getViewer(this.viewer)?.ratio)
+            );
         } catch (e) {}
     }
 
@@ -189,7 +191,9 @@ export class InteractiveMapComponent
             desired_center: this.center,
             options: this.options,
         });
-        this.aspect_ratio.emit(getViewer(this.viewer)?.ratio);
+        this.timeout('aspect', () =>
+            this.aspect_ratio.emit(getViewer(this.viewer)?.ratio)
+        );
     }
 
     private async createView() {

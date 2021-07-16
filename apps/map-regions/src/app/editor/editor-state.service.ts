@@ -105,6 +105,10 @@ export class EditorStateService {
         this._map_height.next(
             Math.floor(this._map_width.getValue() * r * 100) / 100
         );
+        setTimeout(
+            () => this._map_regions.next(this._map_regions.getValue()),
+            200
+        );
     }
 
     public setAction(action: 'rect' | 'add_points' | 'remove_points') {
@@ -242,8 +246,8 @@ export class EditorStateService {
         if (embeded) {
             await sendMessage({
                 type: 'backoffice',
-                action: 'update',
-                name: 'map_region',
+                action: 'metadata',
+                name: 'map_regions',
                 content: data,
             });
         } else {
