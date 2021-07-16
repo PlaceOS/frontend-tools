@@ -136,7 +136,7 @@ export class EditorStateService {
             ...active_region,
             points: [
                 ...active_region.points.filter(([x, y]) => x !== 0 || y !== 0),
-                [x, y],
+                [+x.toFixed(4), +y.toFixed(4)],
             ],
         });
         const updated_region = this._map_regions
@@ -146,6 +146,8 @@ export class EditorStateService {
     }
 
     private handleRemovePoint({ x, y }: Point) {
+        x = +x.toFixed(4);
+        y = +y.toFixed(4);
         const active_region = this._active_region.getValue();
         if (!active_region) return;
         let closest_point: [number, number] = null;

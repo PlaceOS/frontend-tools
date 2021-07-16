@@ -131,13 +131,14 @@ export class EditorComponent extends BaseClass implements OnInit {
                 )
             )
             .subscribe((_) => {
-                const str = JSON.stringify(
-                    _.map((_) => ({
-                        location: _.location,
-                        id: _.data.id,
-                        ratio: _.data.ratio,
-                    }))
-                );
+                console.log('Ratio:', this.ratio);
+                const str =
+                    JSON.stringify(
+                        _.map((_) => ({
+                            location: _.location,
+                            id: _.data.id,
+                        }))
+                    ) + `${this.ratio}`;
                 if (this.region_string !== str) {
                     this.regions = _;
                     this.region_string = str;
