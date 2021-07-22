@@ -68,8 +68,8 @@ export class EditorStateService {
             console.log('Locations:', locations, sensor);
             return locations.map((loc) => ({
                 location: {
-                    x: loc.x,
-                    y: loc.y,
+                    x: loc.x + randomInt(50) / 100000,
+                    y: loc.y + randomInt(50) / 100000,
                 },
                 content: MapPointComponent,
                 data: {
