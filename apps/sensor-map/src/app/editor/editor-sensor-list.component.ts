@@ -27,7 +27,10 @@ import { EditorStateService } from './editor-state.service';
                     (click)="setActive(sensor)"
                 >
                     <div details class="flex-1 w-1/2">
-                        <div class="">{{ sensor.name }}</div>
+                        <div class="w-full truncate" [title]="sensor.id">
+                            {{ sensor.id }}
+                            {{ sensor.name ? '(' + sensor.name + ')' : '' }}
+                        </div>
                         <div
                             class="text-xs opacity-60"
                             *ngIf="sensor.has_location; else no_location"

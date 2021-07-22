@@ -131,7 +131,6 @@ export class EditorComponent extends BaseClass implements OnInit {
                 )
             )
             .subscribe((_) => {
-                console.log('Ratio:', this.ratio);
                 const str =
                     JSON.stringify(
                         _.map((_) => ({
