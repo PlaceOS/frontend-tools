@@ -29,13 +29,9 @@ import { EditorStateService } from './editor-state.service';
                     <div details class="flex-1 w-1/2">
                         <div class="w-full truncate" [title]="sensor.id">
                             {{ sensor.id }}
-                            {{ sensor.name ? '(' + sensor.name + ')' : '' }}
                         </div>
-                        <div
-                            class="text-xs opacity-60"
-                            *ngIf="sensor.has_location; else no_location"
-                        >
-                            x: {{ sensor.x || '0' }} | y: {{ sensor.y || '0' }}
+                        <div class="text-xs opacity-60">
+                            {{ sensor.name || '[No Name]' }}
                         </div>
                         <ng-template #no_location>
                             <div class="text-xs opacity-60">No location</div>
