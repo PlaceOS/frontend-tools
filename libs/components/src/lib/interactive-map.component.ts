@@ -16,7 +16,7 @@ import {
     ViewChild,
     ViewChildren,
 } from '@angular/core';
-import { BaseClass } from '@placeos/common';
+import { BaseClass } from '@placeos-tools/common';
 
 import {
     applyGlobalStyles,
