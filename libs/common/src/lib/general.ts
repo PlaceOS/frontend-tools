@@ -47,9 +47,9 @@ export function log(
  * @param keys List of sub-keys to search for
  * @param map Object to search
  */
-export function getItemWithKeys(keys: string[], map: HashMap) {
-    const key = keys.shift();
-    if (map && map[key]) {
+export function getItemWithKeys(keys: string[], map: HashMap): any {
+    const key = keys.shift() || '';
+    if (map && key in map && map[key]) {
         return keys.length > 0 ? getItemWithKeys(keys, map[key]) : map[key];
     }
     return null;
@@ -95,7 +95,7 @@ export function randomString(length: number = 10, chars: string = CHARS) {
  */
 export function csvToJson(csv: string, delimiter: string = ','): HashMap[] {
     const objPattern = new RegExp(("(\\,|\\r?\\n|\\r|^)(?:\"([^\"]*(?:\"\"[^\"]*)*)\"|([^\\,\\r\\n]*))"),"gi");
-    let arrMatches = null, arrData = [[]];
+    let arrMatches: any = null, arrData: any = [[]];
     while (arrMatches = objPattern.exec(csv)){
         if (arrMatches[1].length && arrMatches[1] !== ",")arrData.push([]);
         arrData[arrData.length - 1].push(arrMatches[2] ?
@@ -103,8 +103,8 @@ export function csvToJson(csv: string, delimiter: string = ','): HashMap[] {
             arrMatches[3]);
     }
     const headers: string[] = arrData.splice(0, 1)[0];
-    const elements = arrData.map((row) => {
-        const element = {};
+    const elements = arrData.map((row: any) => {
+        const element: Record<string, string> = {};
         for (let i = 0; i < row.length; i++) {
             try {
                 element[headers[i]] = JSON.parse(row[i]);
@@ -193,7 +193,7 @@ export function flatten<T = any>(an_array: T[]) {
  * @param start2 Unix epoch in ms of the second period's start time
  * @param end2 Unix epoch in ms of the second period's end time
  */
-export function timePeriodsIntersect(start1, end1, start2, end2) {
+export function timePeriodsIntersect(start1: number, end1: number, start2: number, end2: number) {
     return (
         (start1 >= start2 && start1 < end2) ||
         (end1 > start2 && end1 < end2) ||
@@ -210,7 +210,7 @@ export function predictableRandomInt(ceil: number = 100, floor: number = 0) {
 }
 
 // https://stackoverflow.com/questions/521295/seeding-the-random-number-generator-in-javascript
-function xmur3(str) {
+function xmur3(str: string) {
     for (var i = 0, h = 1779033703 ^ str.length; i < str.length; i++)
         (h = Math.imul(h ^ str.charCodeAt(i), 3432918353)), (h = (h << 13) | (h >>> 19));
     return function () {
@@ -220,7 +220,7 @@ function xmur3(str) {
     };
 }
 
-function sfc32(a, b, c, d) {
+function sfc32(a: number, b: number, c: number, d: number) {
     return function () {
         a >>>= 0;
         b >>>= 0;
@@ -247,7 +247,7 @@ export function is24HourTime(): boolean {
     const date = new Date();
     const localeString = date
         .toLocaleTimeString(
-            document.querySelector('html').getAttribute('lang') || navigator.language
+            document.querySelector('html')?.getAttribute('lang') || navigator.language
         )
         .toLowerCase();
     return localeString.indexOf('am') < 0 && localeString.indexOf('pm') < 0;

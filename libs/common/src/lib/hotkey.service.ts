@@ -42,7 +42,7 @@ export class HotkeyService {
     /** Counter for the number of keydown events. Used for checking order of key presses */
     private counter = 0;
     /** Last key code to be pressed */
-    private last_down: string;
+    private last_down: string = '';
 
     constructor() {
         window.addEventListener('keydown', (event: KeyboardEvent) => {
@@ -82,7 +82,7 @@ export class HotkeyService {
      * @param combo Array of key codes to listen to or a hotkey string e.g. `Alt+Shift+KeyK`
      * @param next Callback for combination presses
      */
-    public listen(combo: string | string[], next: () => void): Subscription {
+    public listen(combo: string | string[], next: () => void): Subscription | null {
         combo = combo instanceof Array ? combo : combo.split('+');
         const combination: string[] = combo.map((i) =>
             this.mapKey(i.toLowerCase())
@@ -91,7 +91,7 @@ export class HotkeyService {
             this.registered_combos.push(combination);
             const last_key = combination[combination.length - 1];
             if (!this.keydown_states[last_key]) {
-                this.keydown_states[last_key] = new BehaviorSubject(null);
+                this.keydown_states[last_key] = new BehaviorSubject(NaN);
                 this.keydown_observers[last_key] = this.keydown_states[
                     last_key
                 ].asObservable();
@@ -145,7 +145,7 @@ export class HotkeyService {
      * Update the list of the last keys in combinations to allow for prevent default actions on pre-existing hotkeys
      */
     private updateCombinationEndList(): void {
-        const key_list = [];
+        const key_list: string[] = [];
         for (const combo of this.registered_combos) {
             this.combo_end.push(combo[combo.length - 1]);
         }

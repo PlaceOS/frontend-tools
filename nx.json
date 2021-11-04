@@ -49,6 +49,13 @@
         "sensor-map-e2e": {
             "tags": [],
             "implicitDependencies": ["sensor-map"]
+        },
+        "app-settings": {
+            "tags": []
+        },
+        "app-settings-e2e": {
+            "tags": [],
+            "implicitDependencies": ["app-settings"]
         }
     }
 }

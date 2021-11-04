@@ -55,7 +55,7 @@ export class BaseClass {
             this.clearTimeout(name);
             this._timers[name] = <any>setTimeout(() => {
                 fn();
-                this._timers[name] = null;
+                this._timers[name] = null as any;
             }, delay);
         } else {
             throw new Error(
@@ -71,7 +71,7 @@ export class BaseClass {
     protected clearTimeout(name: string) {
         if (this._timers[name]) {
             clearTimeout(this._timers[name]);
-            this._timers[name] = null;
+            this._timers[name] = null as any;
         }
     }
 
@@ -99,7 +99,7 @@ export class BaseClass {
     protected clearInterval(name: string) {
         if (this._intervals[name]) {
             clearInterval(this._intervals[name]);
-            this._intervals[name] = null;
+            this._intervals[name] = null as any;
         }
     }
 
@@ -122,7 +122,7 @@ export class BaseClass {
             this._subscriptions[name] instanceof Subscription
                 ? (this._subscriptions[name] as Subscription).unsubscribe()
                 : (this._subscriptions[name] as any)();
-            this._subscriptions[name] = null;
+            this._subscriptions[name] = null as any;
         }
     }
 }

@@ -18,7 +18,7 @@ export function retrieveData<T = HashMap>(
 ): Promise<T> {
     return new Promise((resolve, reject) => {
         if (isChildFrame()) {
-            const onMessage = (m) => {
+            const onMessage = (m: any) => {
                 if (typeof m.data !== 'string') return;
                 const parsed: FrameMessage = JSON.parse(m.data);
                 if (parsed && parsed.type === 'backoffice') {
@@ -47,7 +47,7 @@ export function sendMessage(msg: FrameMessage) {
     return new Promise<void>((resolve, reject) => {
         if (isChildFrame()) {
             window.parent.postMessage(JSON.stringify(msg), '*');
-            const onMessage = (m) => {
+            const onMessage = (m: any) => {
                 if (typeof m.data !== 'string') return;
                 const parsed: FrameMessage = JSON.parse(m.data);
                 if (parsed && parsed.type === 'backoffice') {
