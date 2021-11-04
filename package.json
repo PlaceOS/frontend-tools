@@ -64,7 +64,7 @@
     "@nrwl/linter": "12.3.6",
     "@nrwl/tao": "12.3.6",
     "@nrwl/workspace": "12.3.6",
-    "@placeos/svg-viewer": "^0.1.5-dev",
+    "@placeos/svg-viewer": "^0.3.5-dev",
     "@types/jest": "26.0.8",
     "@types/node": "14.14.33",
     "@typescript-eslint/eslint-plugin": "4.19.0",
