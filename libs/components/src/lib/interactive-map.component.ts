@@ -58,6 +58,7 @@ export const MAP_FEATURE_DATA = new InjectionToken('Data for Map Features');
                     <div
                         #feature
                         class="pointer-events-none"
+                        [attr.no-scale]="element.no_scale"
                         [attr.el-id]="element.location"
                         [attr.view-id]="viewer"
                         [ngSwitch]="type(element.content)"
@@ -189,9 +190,9 @@ export class InteractiveMapComponent
                             useValue: {
                                 ...f.data,
                                 ratio$: this._on_changes.pipe(
-                                    map((_) => _.ratio)
+                                    map((_) => _?.ratio || 1)
                                 ),
-                                zoom: this._on_changes.pipe(map((_) => _.zoom)),
+                                zoom: this._on_changes.pipe(map((_) => _?.zoom || 1)),
                                 position: this._on_changes.pipe(
                                     map((_) => _.center)
                                 ),
