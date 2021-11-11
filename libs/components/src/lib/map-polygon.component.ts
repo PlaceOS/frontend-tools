@@ -61,7 +61,7 @@ export interface MapPolygonData {
     styles: [
         `
             polygon {
-                stroke-width: 4;
+                stroke-width: 2;
             }
             circle {
                 stroke-width: 2;
