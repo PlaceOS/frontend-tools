@@ -13,7 +13,10 @@ export interface MapPolygonData {
     /**  */
     ratio?: number;
 
+    zoom_value?: number;
+
     ratio$?: Observable<number>;
+    zoom?: Observable<number>;
 
     data$?: Observable<MapPolygonData>;
 }
@@ -115,8 +118,15 @@ export class MapPolygonComponent extends BaseClass implements OnInit {
         if (this._details.ratio$) {
             this.subscription(
                 'ratio',
-                this._details.ratio$.subscribe((_) => {
+                this._details.ratio$?.subscribe((_) => {
                     this._details.ratio = _;
+                    this.processPoints(this._details.points);
+                })
+            );
+            this.subscription(
+                'zoom',
+                this._details.zoom?.subscribe((_) => {
+                    this._details.zoom_value = _;
                     this.processPoints(this._details.points);
                 })
             );
@@ -145,8 +155,9 @@ export class MapPolygonComponent extends BaseClass implements OnInit {
             x: diff.x_max - diff.x_min,
             y: diff.y_max - diff.y_min,
         };
-        this.width = range.x * 100 * this.scale;
-        this.height = range.y * 100 * (this._details?.ratio || 1) * this.scale;
+        const scale = this.scale * ( this._details.ratio || 1);
+        this.width = range.x * 100 * scale;
+        this.height = range.y * 100 * scale * .9;
         const edge_padding = this.padding / 2 + 8;
         this.width = Math.floor(this.width * 100) / 100;
         this.height = Math.floor(this.height * 100) / 100;
