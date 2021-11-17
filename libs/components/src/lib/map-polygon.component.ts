@@ -34,7 +34,7 @@ export interface MapPolygonData {
                 [style.height]="height + '%'"
             >
                 <svg
-                    [attr.viewBox]="'0 0 '+ this.width +' ' + this.height"
+                    [attr.viewBox]="'0 0 '+ this.width / 20 +' ' + this.height / 20"
                     preserveAspectRatio="none"
                     class="relative w-full h-full"
                 >
@@ -170,16 +170,16 @@ export class MapPolygonComponent extends BaseClass implements OnInit {
             .reduce(
                 (s, [x, y]) =>
                     `${s}${s ? ' ' : ''}${
-                        ((x - diff.x_min) / range.x) * this.width
+                        ((x - diff.x_min) / range.x) * this.width / 20
                     },${
-                        ((y - diff.y_min) / range.y) * this.height
+                        ((y - diff.y_min) / range.y) * this.height / 20
                     }`,
                 ''
             )
             .replace(/NaN/g, '0');
         this.point_list = points.map(([x, y]) => [
-            ((x - diff.x_min) / range.x) * this.width,
-            ((y - diff.y_min) / range.y) * this.height,
+            ((x - diff.x_min) / range.x) * this.width / 20,
+            ((y - diff.y_min) / range.y) * this.height / 20,
         ]);
         // this.width = this.width + this.padding + 8;
         // this.height = this.height + this.padding + 8;
