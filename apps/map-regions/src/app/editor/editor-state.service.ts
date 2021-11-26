@@ -61,6 +61,8 @@ export class EditorStateService {
 
     private _start_point: Point;
     private _end_point: Point;
+    private _shift: boolean;
+    private _move: boolean;
     private _action: 'rect' | 'add_points' | 'remove_points' = 'rect';
     /** URL of the map to be displayed */
     public readonly url = this._map_url.asObservable();
@@ -80,6 +82,8 @@ export class EditorStateService {
     }
 
     constructor(private _clipboard: Clipboard) {
+        document.addEventListener('keydown', (ev) => ev.key === 'Shift' ? this._shift = true: '');
+        document.addEventListener('keyup', (ev) => ev.key === 'Shift' ? this._shift = false: '');
         this.loadRegionData();
     }
 
@@ -113,12 +117,15 @@ export class EditorStateService {
 
     public setAction(action: 'rect' | 'add_points' | 'remove_points') {
         this._action = action;
+        this._cleanUpPoint();
     }
 
     public handleMapClick(event: 'start' | 'move' | 'end', point: Point) {
         switch (this._action) {
             case 'add_points':
-                event === 'end' ? this.handleAddPoints(point) : '';
+                event === 'move' 
+                    ? this.handleMovePoint(point) 
+                    : (event === 'end' ? this.handleAddPoints(point) : '');
                 break;
             case 'remove_points':
                 event === 'end' ? this.handleRemovePoint(point) : '';
@@ -128,14 +135,41 @@ export class EditorStateService {
         }
     }
 
+    private _cleanUpPoint() {
+        if (this._move) {
+            const active_region = this._active_region.getValue();
+            this.replaceRegion(active_region.id, {
+                ...active_region,
+                points: [
+                    ...active_region.points.slice(0, -1),
+                ],
+            });
+            const updated_region = this._map_regions
+                .getValue()
+                .find((_) => _.id === active_region.id);
+            this._active_region.next(updated_region);
+            this._move = false;
+        }
+    }
+
     private handleAddPoints({ x, y }: Point) {
+        console.log('Add Point');
         const active_region = this._active_region.getValue();
         if (!active_region) return;
-        console.log('Points:', active_region.points);
+        x = Math.floor(x * 200) / 200; 
+        y = Math.floor(y * 200) / 200;
+        if (this._shift && active_region.points?.length) {
+            const [x1, y1] = active_region.points[active_region.points.length - 1];
+            const angle = Math.atan2(y - y1, x - x1) / Math.PI * 180 + 90;
+            if ((angle >= 0 && angle < 30) || (angle >= 150 && angle < 210) || (angle >= 330)) x = x1;
+            else if ((angle >= 60 && angle < 120) || (angle >= 240 && angle < 300)) y = y1;
+            else x = x1 + (y - y1);
+        }
+        const len = active_region.points.length;
         this.replaceRegion(active_region.id, {
             ...active_region,
             points: [
-                ...active_region.points.filter(([x, y]) => x !== 0 || y !== 0),
+                ...active_region.points.slice(0, this._move ? -1 : len),
                 [+x.toFixed(4), +y.toFixed(4)],
             ],
         });
@@ -143,6 +177,34 @@ export class EditorStateService {
             .getValue()
             .find((_) => _.id === active_region.id);
         this._active_region.next(updated_region);
+        this._move = false;
+    }
+
+    private handleMovePoint({ x, y }: Point) {
+        const active_region = this._active_region.getValue();
+        if (!active_region) return;
+        x = Math.floor(x * 200) / 200; 
+        y = Math.floor(y * 200) / 200;
+        if (this._shift && active_region.points?.length) {
+            const [x1, y1] = active_region.points[active_region.points.length - 1];
+            const angle = Math.atan2(y - y1, x - x1) / Math.PI * 180 + 90;
+            if ((angle >= 0 && angle < 30) || (angle >= 150 && angle < 210) || (angle >= 330)) x = x1;
+            else if ((angle >= 60 && angle < 120) || (angle >= 240 && angle < 300)) y = y1;
+            else x = x1 + (y - y1);
+        }
+        const len = active_region.points.length;
+        this.replaceRegion(active_region.id, {
+            ...active_region,
+            points: [
+                ...active_region.points.slice(0, this._move ? -1 : len),
+                [+x.toFixed(4), +y.toFixed(4)],
+            ],
+        });
+        const updated_region = this._map_regions
+            .getValue()
+            .find((_) => _.id === active_region.id);
+        this._active_region.next(updated_region);
+        this._move = true;
     }
 
     private handleRemovePoint({ x, y }: Point) {
@@ -159,7 +221,6 @@ export class EditorStateService {
                 closest_dist = dist;
             }
         }
-        console.log('Point:', closest_point, closest_dist);
         if (!closest_point || closest_dist > 0.02) return;
         this.replaceRegion(active_region.id, {
             ...active_region,
@@ -173,14 +234,15 @@ export class EditorStateService {
         this._active_region.next(updated_region);
     }
 
-    private handleRect(event: 'start' | 'move' | 'end', point: Point) {
+    private handleRect(event: 'start' | 'move' | 'end', { x, y }: Point = {}) {
         const active_region = this._active_region.getValue();
         if (
             !active_region ||
-            !point ||
+            !x ||
             (event === 'move' && !this._start_point)
         )
             return;
+        const point = { x: Math.floor(x * 200) / 200, y: Math.floor(y * 200) / 200 };
         switch (event) {
             case 'start':
                 this._start_point = point;
@@ -238,6 +300,7 @@ export class EditorStateService {
     }
 
     public async saveMetadata() {
+        this._cleanUpPoint();
         const embeded = this._embeded.getValue();
         const data = {
             url: this._map_url.getValue(),
@@ -258,6 +321,7 @@ export class EditorStateService {
     }
 
     public copyMetadata() {
+        this._cleanUpPoint();
         const data = {
             url: this._map_url.getValue(),
             width: 0,
@@ -300,7 +364,6 @@ export class EditorStateService {
     }
 
     private replaceRegion(id: string, new_data: MapRegion) {
-        console.log('Replace Region:', id, new_data);
         const regions = [...this._map_regions.getValue()];
         const index = regions.findIndex((_) => _.id === id);
         if (index > -1) {

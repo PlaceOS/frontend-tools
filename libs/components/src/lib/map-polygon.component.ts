@@ -160,12 +160,11 @@ export class MapPolygonComponent extends BaseClass implements OnInit {
             y: diff.y_max - diff.y_min,
         };
         const { ratio, zoom_value } = this._details;
-        console.log('Ratio:', ratio);
         this.width = range.x * 100 * zoom_value;
         this.height = range.y * 100 * (ratio || 1) * zoom_value;
         const edge_padding = this.padding / 4;
-        this.width = Math.floor(this.width * 100);
-        this.height = Math.floor(this.height * 100);
+        this.width = Math.floor(this.width * 100) || 1;
+        this.height = Math.floor(this.height * 100) || 1;
         this.points = points
             .reduce(
                 (s, [x, y]) =>
