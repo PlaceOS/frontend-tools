@@ -280,7 +280,7 @@ export class EditorStateService {
         const new_region: MapRegion = {
             id: randomString(12),
             name: `Area ${regions.length + 1}`,
-            points: [[0, 0]],
+            points: [],
             color: COLOURS[regions.length % COLOURS.length],
             capacity: 64,
         };
