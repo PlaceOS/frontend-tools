@@ -28,7 +28,7 @@ import { EditorStateService } from './editor-state.service';
                     />
                 </mat-form-field>
             </div>
-            <div class="w-full bg-white rounded shadow flex-1">
+            <div class="w-full bg-white rounded shadow flex-1 flex flex-col h-1/2">
                 <button
                     mat-button
                     class="clear w-full m-0"
@@ -39,55 +39,60 @@ import { EditorStateService } from './editor-state.service';
                         New Region
                     </div>
                 </button>
-                <div
-                    *ngIf="(regions | async)?.length; else empty_state"
-                    class="border-t border-gray-300"
-                >
+                <div class="h-[50vh] flex-1 overflow-auto w-full">
                     <div
-                        *ngFor="let region of regions | async; let i = index"
-                        class="p-2 border-b border-gray-100 hover:bg-gray-100 flex items-center space-x-1 cursor-pointer"
-                        (click)="setActiveRegion(region)"
-                        matRipple
+                        *ngIf="(regions | async)?.length; else empty_state"
+                        class="border-t border-gray-300"
                     >
                         <div
-                            counter
-                            class="w-6 h-6 flex items-center justify-center rounded-full"
-                            [class.bg-success]="
-                                (active_region | async)?.id === region.id
+                            *ngFor="
+                                let region of regions | async;
+                                let i = index
                             "
-                            [class.text-white]="
-                                (active_region | async)?.id === region.id
-                            "
+                            class="p-2 border-b border-gray-100 hover:bg-gray-100 flex items-center space-x-1 cursor-pointer"
+                            (click)="setActiveRegion(region)"
+                            matRipple
                         >
-                            {{ i + 1 }}
+                            <div
+                                counter
+                                class="w-6 h-6 flex items-center justify-center rounded-full"
+                                [class.bg-success]="
+                                    (active_region | async)?.id === region.id
+                                "
+                                [class.text-white]="
+                                    (active_region | async)?.id === region.id
+                                "
+                            >
+                                {{ i + 1 }}
+                            </div>
+                            <mat-form-field appearance="outline" class="w-16">
+                                <input
+                                    matInput
+                                    type="number"
+                                    [(ngModel)]="region.capacity"
+                                    placeholder="Capacity"
+                                />
+                            </mat-form-field>
+                            <input type="color" [(ngModel)]="region.color" />
+                            <mat-form-field appearance="outline" class="flex-1">
+                                <input
+                                    matInput
+                                    type="text"
+                                    placeholder="Region ID"
+                                    [(ngModel)]="region.name"
+                                />
+                            </mat-form-field>
+                            <button
+                                mat-icon-button
+                                (click)="
+                                    removeRegion(region);
+                                    $event.stopPropagation()
+                                "
+                            >
+                                <app-icon>close</app-icon>
+                            </button>
                         </div>
-                        <mat-form-field appearance="outline" class="w-16">
-                            <input
-                                matInput
-                                type="number"
-                                [(ngModel)]="region.capacity"
-                                placeholder="Capacity"
-                            />
-                        </mat-form-field>
-                        <input type="color" [(ngModel)]="region.color" />
-                        <mat-form-field appearance="outline" class="flex-1">
-                            <input
-                                matInput
-                                type="text"
-                                placeholder="Region ID"
-                                [(ngModel)]="region.name"
-                            />
-                        </mat-form-field>
-                        <button
-                            mat-icon-button
-                            (click)="
-                                removeRegion(region); $event.stopPropagation()
-                            "
-                        >
-                            <app-icon>close</app-icon>
-                        </button>
                     </div>
-                    <div></div>
                 </div>
             </div>
 
