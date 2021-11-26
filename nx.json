@@ -18,44 +18,48 @@
         "default": {
             "runner": "@nrwl/workspace/tasks-runners/default",
             "options": {
-                "cacheableOperations": ["build", "lint", "test", "e2e"]
+                "cacheableOperations": ["build", "lint", "test", "e2e"],
+                "parallel": 1
             }
         }
     },
-    "projects": {
-        "map-builder": {
-            "tags": []
+    "targetDependencies": {
+        "build": [
+            {
+                "target": "build",
+                "projects": "dependencies"
+            }
+        ]
+    },
+    "cli": {
+        "defaultCollection": "@nrwl/angular"
+    },
+    "defaultProject": "map-builder",
+    "generators": {
+        "@nrwl/angular": {
+            "application": {
+                "linter": "eslint"
+            },
+            "library": {
+                "linter": "eslint"
+            },
+            "storybook-configuration": {
+                "linter": "eslint"
+            }
         },
-        "map-builder-e2e": {
-            "tags": [],
-            "implicitDependencies": ["map-builder"]
+        "@nrwl/angular:application": {
+            "style": "css",
+            "linter": "eslint",
+            "unitTestRunner": "jest",
+            "e2eTestRunner": "cypress"
         },
-        "common": {
-            "tags": []
+        "@nrwl/angular:library": {
+            "style": "css",
+            "linter": "eslint",
+            "unitTestRunner": "jest"
         },
-        "components": {
-            "tags": []
-        },
-        "map-regions": {
-            "tags": []
-        },
-        "map-regions-e2e": {
-            "tags": [],
-            "implicitDependencies": ["map-regions"]
-        },
-        "sensor-map": {
-            "tags": []
-        },
-        "sensor-map-e2e": {
-            "tags": [],
-            "implicitDependencies": ["sensor-map"]
-        },
-        "app-settings": {
-            "tags": []
-        },
-        "app-settings-e2e": {
-            "tags": [],
-            "implicitDependencies": ["app-settings"]
+        "@nrwl/angular:component": {
+            "style": "css"
         }
     }
 }

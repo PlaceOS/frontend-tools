@@ -1,37 +1,195 @@
 {
     "version": 1,
-    "cli": {
-        "defaultCollection": "@nrwl/angular"
-    },
-    "defaultProject": "map-builder",
-    "schematics": {
-        "@nrwl/angular": {
-            "application": {
-                "linter": "eslint"
-            },
-            "library": {
-                "linter": "eslint"
-            },
-            "storybook-configuration": {
-                "linter": "eslint"
-            }
-        },
-        "@nrwl/angular:application": {
-            "style": "css",
-            "linter": "eslint",
-            "unitTestRunner": "jest",
-            "e2eTestRunner": "cypress"
-        },
-        "@nrwl/angular:library": {
-            "style": "css",
-            "linter": "eslint",
-            "unitTestRunner": "jest"
-        },
-        "@nrwl/angular:component": {
-            "style": "css"
-        }
-    },
     "projects": {
+        "app-settings": {
+            "projectType": "application",
+            "root": "apps/app-settings",
+            "sourceRoot": "apps/app-settings/src",
+            "prefix": "placeos-tools",
+            "architect": {
+                "build": {
+                    "builder": "@angular-devkit/build-angular:browser",
+                    "outputs": ["{options.outputPath}"],
+                    "options": {
+                        "baseHref": ".",
+                        "outputPath": "dist/apps/app-settings",
+                        "index": "apps/app-settings/src/index.html",
+                        "main": "apps/app-settings/src/main.ts",
+                        "polyfills": "apps/app-settings/src/polyfills.ts",
+                        "tsConfig": "apps/app-settings/tsconfig.app.json",
+                        "assets": [
+                            "apps/app-settings/src/favicon.ico",
+                            "apps/app-settings/src/assets",
+                            "apps/app-settings/src/manifest.webmanifest"
+                        ],
+                        "styles": [
+                            "apps/app-settings/src/styles.css",
+                            "shared/styles/application.scss",
+                            "shared/styles/custom-elements.scss",
+                            "shared/styles/native-elements.scss",
+                            "./node_modules/@angular/material/prebuilt-themes/indigo-pink.css"
+                        ],
+                        "scripts": [],
+                        "serviceWorker": true,
+                        "ngswConfigPath": "apps/app-settings/ngsw-config.json"
+                    },
+                    "configurations": {
+                        "production": {
+                            "budgets": [
+                                {
+                                    "type": "initial",
+                                    "maximumWarning": "500kb",
+                                    "maximumError": "1mb"
+                                },
+                                {
+                                    "type": "anyComponentStyle",
+                                    "maximumWarning": "2kb",
+                                    "maximumError": "4kb"
+                                }
+                            ],
+                            "fileReplacements": [
+                                {
+                                    "replace": "apps/app-settings/src/environments/environment.ts",
+                                    "with": "apps/app-settings/src/environments/environment.prod.ts"
+                                }
+                            ],
+                            "outputHashing": "all"
+                        },
+                        "development": {
+                            "buildOptimizer": false,
+                            "optimization": false,
+                            "vendorChunk": true,
+                            "extractLicenses": false,
+                            "sourceMap": true,
+                            "namedChunks": true
+                        }
+                    },
+                    "defaultConfiguration": "production"
+                },
+                "serve": {
+                    "builder": "@angular-devkit/build-angular:dev-server",
+                    "configurations": {
+                        "production": {
+                            "browserTarget": "app-settings:build:production"
+                        },
+                        "development": {
+                            "browserTarget": "app-settings:build:development"
+                        }
+                    },
+                    "defaultConfiguration": "development"
+                },
+                "extract-i18n": {
+                    "builder": "@angular-devkit/build-angular:extract-i18n",
+                    "options": {
+                        "browserTarget": "app-settings:build"
+                    }
+                },
+                "lint": {
+                    "builder": "@nrwl/linter:eslint",
+                    "options": {
+                        "lintFilePatterns": [
+                            "apps/app-settings/src/**/*.ts",
+                            "apps/app-settings/src/**/*.html"
+                        ]
+                    },
+                    "outputs": ["{options.outputFile}"]
+                },
+                "test": {
+                    "builder": "@nrwl/jest:jest",
+                    "outputs": ["coverage/apps/app-settings"],
+                    "options": {
+                        "jestConfig": "apps/app-settings/jest.config.js",
+                        "passWithNoTests": true
+                    }
+                }
+            },
+            "tags": []
+        },
+        "app-settings-e2e": {
+            "root": "apps/app-settings-e2e",
+            "sourceRoot": "apps/app-settings-e2e/src",
+            "projectType": "application",
+            "architect": {
+                "e2e": {
+                    "builder": "@nrwl/cypress:cypress",
+                    "options": {
+                        "cypressConfig": "apps/app-settings-e2e/cypress.json",
+                        "tsConfig": "apps/app-settings-e2e/tsconfig.e2e.json",
+                        "devServerTarget": "app-settings:serve:development"
+                    },
+                    "configurations": {
+                        "production": {
+                            "devServerTarget": "app-settings:serve:production"
+                        }
+                    }
+                },
+                "lint": {
+                    "builder": "@nrwl/linter:eslint",
+                    "options": {
+                        "lintFilePatterns": [
+                            "apps/app-settings-e2e/**/*.{js,ts}"
+                        ]
+                    },
+                    "outputs": ["{options.outputFile}"]
+                }
+            },
+            "tags": [],
+            "implicitDependencies": ["app-settings"]
+        },
+        "common": {
+            "projectType": "library",
+            "root": "libs/common",
+            "sourceRoot": "libs/common/src",
+            "prefix": "placeos-tools",
+            "architect": {
+                "lint": {
+                    "builder": "@nrwl/linter:eslint",
+                    "options": {
+                        "lintFilePatterns": [
+                            "libs/common/src/**/*.ts",
+                            "libs/common/src/**/*.html"
+                        ]
+                    },
+                    "outputs": ["{options.outputFile}"]
+                },
+                "test": {
+                    "builder": "@nrwl/jest:jest",
+                    "outputs": ["coverage/libs/common"],
+                    "options": {
+                        "jestConfig": "libs/common/jest.config.js",
+                        "passWithNoTests": true
+                    }
+                }
+            },
+            "tags": []
+        },
+        "components": {
+            "projectType": "library",
+            "root": "libs/components",
+            "sourceRoot": "libs/components/src",
+            "prefix": "placeos-tools",
+            "architect": {
+                "lint": {
+                    "builder": "@nrwl/linter:eslint",
+                    "options": {
+                        "lintFilePatterns": [
+                            "libs/components/src/**/*.ts",
+                            "libs/components/src/**/*.html"
+                        ]
+                    },
+                    "outputs": ["{options.outputFile}"]
+                },
+                "test": {
+                    "builder": "@nrwl/jest:jest",
+                    "outputs": ["coverage/libs/components"],
+                    "options": {
+                        "jestConfig": "libs/components/jest.config.js",
+                        "passWithNoTests": true
+                    }
+                }
+            },
+            "tags": []
+        },
         "map-builder": {
             "projectType": "application",
             "root": "apps/map-builder",
@@ -144,7 +302,8 @@
                             "apps/map-builder/src/**/*.ts",
                             "apps/map-builder/src/**/*.html"
                         ]
-                    }
+                    },
+                    "outputs": ["{options.outputFile}"]
                 },
                 "test": {
                     "builder": "@nrwl/jest:jest",
@@ -154,7 +313,8 @@
                         "passWithNoTests": true
                     }
                 }
-            }
+            },
+            "tags": []
         },
         "map-builder-e2e": {
             "root": "apps/map-builder-e2e",
@@ -180,59 +340,12 @@
                         "lintFilePatterns": [
                             "apps/map-builder-e2e/**/*.{js,ts}"
                         ]
-                    }
+                    },
+                    "outputs": ["{options.outputFile}"]
                 }
-            }
-        },
-        "common": {
-            "projectType": "library",
-            "root": "libs/common",
-            "sourceRoot": "libs/common/src",
-            "prefix": "placeos-tools",
-            "architect": {
-                "lint": {
-                    "builder": "@nrwl/linter:eslint",
-                    "options": {
-                        "lintFilePatterns": [
-                            "libs/common/src/**/*.ts",
-                            "libs/common/src/**/*.html"
-                        ]
-                    }
-                },
-                "test": {
-                    "builder": "@nrwl/jest:jest",
-                    "outputs": ["coverage/libs/common"],
-                    "options": {
-                        "jestConfig": "libs/common/jest.config.js",
-                        "passWithNoTests": true
-                    }
-                }
-            }
-        },
-        "components": {
-            "projectType": "library",
-            "root": "libs/components",
-            "sourceRoot": "libs/components/src",
-            "prefix": "placeos-tools",
-            "architect": {
-                "lint": {
-                    "builder": "@nrwl/linter:eslint",
-                    "options": {
-                        "lintFilePatterns": [
-                            "libs/components/src/**/*.ts",
-                            "libs/components/src/**/*.html"
-                        ]
-                    }
-                },
-                "test": {
-                    "builder": "@nrwl/jest:jest",
-                    "outputs": ["coverage/libs/components"],
-                    "options": {
-                        "jestConfig": "libs/components/jest.config.js",
-                        "passWithNoTests": true
-                    }
-                }
-            }
+            },
+            "tags": [],
+            "implicitDependencies": ["map-builder"]
         },
         "map-regions": {
             "projectType": "application",
@@ -330,7 +443,8 @@
                             "apps/map-regions/src/**/*.ts",
                             "apps/map-regions/src/**/*.html"
                         ]
-                    }
+                    },
+                    "outputs": ["{options.outputFile}"]
                 },
                 "test": {
                     "builder": "@nrwl/jest:jest",
@@ -340,7 +454,8 @@
                         "passWithNoTests": true
                     }
                 }
-            }
+            },
+            "tags": []
         },
         "map-regions-e2e": {
             "root": "apps/map-regions-e2e",
@@ -366,9 +481,12 @@
                         "lintFilePatterns": [
                             "apps/map-regions-e2e/**/*.{js,ts}"
                         ]
-                    }
+                    },
+                    "outputs": ["{options.outputFile}"]
                 }
-            }
+            },
+            "tags": [],
+            "implicitDependencies": ["map-regions"]
         },
         "sensor-map": {
             "projectType": "application",
@@ -460,7 +578,8 @@
                             "apps/sensor-map/src/**/*.ts",
                             "apps/sensor-map/src/**/*.html"
                         ]
-                    }
+                    },
+                    "outputs": ["{options.outputFile}"]
                 },
                 "test": {
                     "builder": "@nrwl/jest:jest",
@@ -470,7 +589,8 @@
                         "passWithNoTests": true
                     }
                 }
-            }
+            },
+            "tags": []
         },
         "sensor-map-e2e": {
             "root": "apps/sensor-map-e2e",
@@ -494,139 +614,12 @@
                     "builder": "@nrwl/linter:eslint",
                     "options": {
                         "lintFilePatterns": ["apps/sensor-map-e2e/**/*.{js,ts}"]
-                    }
+                    },
+                    "outputs": ["{options.outputFile}"]
                 }
-            }
-        },
-        "app-settings": {
-            "projectType": "application",
-            "root": "apps/app-settings",
-            "sourceRoot": "apps/app-settings/src",
-            "prefix": "placeos-tools",
-            "architect": {
-                "build": {
-                    "builder": "@angular-devkit/build-angular:browser",
-                    "outputs": ["{options.outputPath}"],
-                    "options": {
-                        "baseHref": ".",
-                        "outputPath": "dist/apps/app-settings",
-                        "index": "apps/app-settings/src/index.html",
-                        "main": "apps/app-settings/src/main.ts",
-                        "polyfills": "apps/app-settings/src/polyfills.ts",
-                        "tsConfig": "apps/app-settings/tsconfig.app.json",
-                        "assets": [
-                            "apps/app-settings/src/favicon.ico",
-                            "apps/app-settings/src/assets",
-                            "apps/app-settings/src/manifest.webmanifest"
-                        ],
-                        "styles": [
-                            "apps/app-settings/src/styles.css",
-                            "shared/styles/application.scss",
-                            "shared/styles/custom-elements.scss",
-                            "shared/styles/native-elements.scss",
-                            "./node_modules/@angular/material/prebuilt-themes/indigo-pink.css"
-                        ],
-                        "scripts": [],
-                        "serviceWorker": true,
-                        "ngswConfigPath": "apps/app-settings/ngsw-config.json"
-                    },
-                    "configurations": {
-                        "production": {
-                            "budgets": [
-                                {
-                                    "type": "initial",
-                                    "maximumWarning": "500kb",
-                                    "maximumError": "1mb"
-                                },
-                                {
-                                    "type": "anyComponentStyle",
-                                    "maximumWarning": "2kb",
-                                    "maximumError": "4kb"
-                                }
-                            ],
-                            "fileReplacements": [
-                                {
-                                    "replace": "apps/app-settings/src/environments/environment.ts",
-                                    "with": "apps/app-settings/src/environments/environment.prod.ts"
-                                }
-                            ],
-                            "outputHashing": "all"
-                        },
-                        "development": {
-                            "buildOptimizer": false,
-                            "optimization": false,
-                            "vendorChunk": true,
-                            "extractLicenses": false,
-                            "sourceMap": true,
-                            "namedChunks": true
-                        }
-                    },
-                    "defaultConfiguration": "production"
-                },
-                "serve": {
-                    "builder": "@angular-devkit/build-angular:dev-server",
-                    "configurations": {
-                        "production": {
-                            "browserTarget": "app-settings:build:production"
-                        },
-                        "development": {
-                            "browserTarget": "app-settings:build:development"
-                        }
-                    },
-                    "defaultConfiguration": "development"
-                },
-                "extract-i18n": {
-                    "builder": "@angular-devkit/build-angular:extract-i18n",
-                    "options": {
-                        "browserTarget": "app-settings:build"
-                    }
-                },
-                "lint": {
-                    "builder": "@nrwl/linter:eslint",
-                    "options": {
-                        "lintFilePatterns": [
-                            "apps/app-settings/src/**/*.ts",
-                            "apps/app-settings/src/**/*.html"
-                        ]
-                    }
-                },
-                "test": {
-                    "builder": "@nrwl/jest:jest",
-                    "outputs": ["coverage/apps/app-settings"],
-                    "options": {
-                        "jestConfig": "apps/app-settings/jest.config.js",
-                        "passWithNoTests": true
-                    }
-                }
-            }
-        },
-        "app-settings-e2e": {
-            "root": "apps/app-settings-e2e",
-            "sourceRoot": "apps/app-settings-e2e/src",
-            "projectType": "application",
-            "architect": {
-                "e2e": {
-                    "builder": "@nrwl/cypress:cypress",
-                    "options": {
-                        "cypressConfig": "apps/app-settings-e2e/cypress.json",
-                        "tsConfig": "apps/app-settings-e2e/tsconfig.e2e.json",
-                        "devServerTarget": "app-settings:serve:development"
-                    },
-                    "configurations": {
-                        "production": {
-                            "devServerTarget": "app-settings:serve:production"
-                        }
-                    }
-                },
-                "lint": {
-                    "builder": "@nrwl/linter:eslint",
-                    "options": {
-                        "lintFilePatterns": [
-                            "apps/app-settings-e2e/**/*.{js,ts}"
-                        ]
-                    }
-                }
-            }
+            },
+            "tags": [],
+            "implicitDependencies": ["sensor-map"]
         }
     }
 }
