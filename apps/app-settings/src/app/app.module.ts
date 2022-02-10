@@ -1,21 +1,23 @@
 import { NgModule } from '@angular/core';
+import { Route, RouterModule } from '@angular/router';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { ServiceWorkerModule } from '@angular/service-worker';
 import { BrowserModule } from '@angular/platform-browser';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatButtonModule } from '@angular/material/button';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 import { AppComponent } from './app.component';
-import { Route, RouterModule } from '@angular/router';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { ServiceWorkerModule } from '@angular/service-worker';
 import { environment } from '../environments/environment';
 import { AppSharedComponent } from './shared/shared.component';
 import { AppWorkplaceComponent } from './workplace/workplace.component';
 import { AppConciergeComponent } from './concierge/concierge.component';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { SharedUIComponentsModule } from './components/components.module';
 
 const routes: Route[] = [
@@ -46,11 +48,13 @@ const routes: Route[] = [
             registrationStrategy: 'registerWhenStable:30000',
         }),
         SharedUIComponentsModule,
+        MatButtonModule,
         MatTabsModule,
         MatFormFieldModule,
         MatInputModule,
         MatSelectModule,
         MatCheckboxModule,
+        MatProgressSpinnerModule,
         FormsModule,
         ReactiveFormsModule
     ],

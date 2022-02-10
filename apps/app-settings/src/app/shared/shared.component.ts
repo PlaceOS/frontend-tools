@@ -4,7 +4,7 @@ import { SettingsStateService } from '../settings-state.service';
 @Component({
     selector: 'app-shared',
     template: `
-        <form [formGroup]="form">
+        <form [formGroup]="form" class="w-full">
             <div
                 class="flex flex-col w-full p-4 space-y-2"
                 formGroupName="shared"
@@ -69,16 +69,23 @@ import { SettingsStateService } from '../settings-state.service';
                 <color-list-field formControlName="css_variables"></color-list-field>
             </div>
         </form>
+        <button mat-button class="mx-auto w-32 my-2" (click)="save()">Save Changes</button>
     `,
     styles: [
         `
             label {
                 margin-bottom: 0.25rem;
             }
+        :host {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
         `,
     ],
 })
 export class AppSharedComponent {
     public readonly form = this._state.form;
+    public readonly save = () => this._state.saveSettings('settings');
     constructor(private _state: SettingsStateService) {}
 }

@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { SettingsStateService } from './settings-state.service';
 
 @Component({
     selector: 'placeos-tools-root',
@@ -22,6 +23,10 @@ import { Component } from '@angular/core';
                 </div>
             </div>
         </div>
+        <div class="absolute inset-0 bg-white/80 flex flex-col items-center justify-center" *ngIf="(loading | async)">
+            <mat-spinner diameter="32"></mat-spinner>
+            <p>{{ loading | async }}</p>
+        </div>
     `,
     styles: [``],
 })
@@ -32,4 +37,7 @@ export class AppComponent {
         { path: '/workplace', name: 'Workplace' },
         { path: '/concierge', name: 'Concierge' },
     ];
+    public readonly loading = this._state.loading;
+
+    constructor(private _state: SettingsStateService) {}
 }
