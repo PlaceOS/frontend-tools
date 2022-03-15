@@ -53,23 +53,29 @@ export function generateWorkplaceSettingsForm() {
         hide_contacts: new FormControl(false),
         can_deliver: new FormControl(false),
         general: generateGeneralSettingsForm(),
-        schedule: new FormGroup({ legend: new FormControl() }),
-        spaces: new FormGroup({ legend: new FormControl() }),
-        users: new FormGroup({
+        schedule: new FormGroup({ legend: new FormControl([
+            { name: 'Accepted', color: '#21A453' },
+            { name: 'Pending', color: '#ffbf1f' },
+            { name: 'Rejected', color: '#f44336' },
+        ]) }),
+        directory: new FormGroup({
             show_avatars: new FormControl(false),
             min_search_length: new FormControl(3),
         }),
         events: new FormGroup({
             has_catering: new FormControl(false),
             hide_user_actions: new FormControl(false),
+            can_book_for_others: new FormControl(false),
             multiple_spaces: new FormControl(false),
         }),
         desks: new FormGroup({
-            recurrence_allowed: new FormControl(),
-            allow_groups: new FormControl(),
-            needs_reason: new FormControl(),
-            allow_time_changes: new FormControl(),
-            available_period: new FormControl(),
+            recurrence_allowed: new FormControl(false),
+            allow_groups: new FormControl(false),
+            needs_reason: new FormControl(false),
+            allow_time_changes: new FormControl(false),
+            allow_all_day: new FormControl(false),
+            available_period: new FormControl(''),
+            auto_allocation: new FormControl(false),
         }),
         explore: new FormGroup({
             colors: new FormControl({}),

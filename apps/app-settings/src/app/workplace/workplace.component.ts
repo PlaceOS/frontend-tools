@@ -73,7 +73,7 @@ import { SettingsStateService } from '../settings-state.service';
                 <div class="flex flex-wrap pb-4">
                     <div
                         class="flex flex-col min-w-[40%] flex-1"
-                        formGroupName="users"
+                        formGroupName="directory"
                     >
                         <mat-checkbox formControlName="show_avatars">
                             Show User Avatars
@@ -123,11 +123,16 @@ import { SettingsStateService } from '../settings-state.service';
                     </div>
                     <div class="flex flex-col min-w-[40%] flex-1">
                         <mat-checkbox formGroupName="allow_time_changes">
-                            Allow intra-day desk bookings
+                            Enable selecting time for bookings
+                        </mat-checkbox>
+                    </div>
+                    <div class="flex flex-col min-w-[40%] flex-1">
+                        <mat-checkbox formGroupName="allow_all_day">
+                            Enable setting bookings as all day when time selection available
                         </mat-checkbox>
                     </div>
                 </div>
-                <h3 class="text-lg font-medium">Map Exlpore</h3>
+                <h3 class="text-lg font-medium">Map Explore</h3>
                 <div class="flex flex-wrap pb-4" formGroupName="explore">
                     <div class="flex flex-col min-w-[40%]">
                         <mat-checkbox formControlName="can_select_building">

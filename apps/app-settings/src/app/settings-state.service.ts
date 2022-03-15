@@ -25,13 +25,13 @@ export class SettingsStateService {
 
     public async saveSettings(type = 'settings') {
         const data = this.form.value;
-        console.log('Data:', data);
+        console.log('Data:', data[type] || data[type.replace('_app', '')] || data.shared || {});
         this._loading.next(`Saving changes to application metadata "${type}"...`);
         await sendMessage({
             type: 'backoffice',
             action: 'metadata',
             name: type,
-            content: data[type] || data.shared || {},
+            content: data[type] || data[type.replace('_app', '')] || data.shared || {},
         });
         this._loading.next(``);
     }
