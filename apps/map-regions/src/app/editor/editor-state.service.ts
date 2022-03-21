@@ -234,7 +234,7 @@ export class EditorStateService {
         this._active_region.next(updated_region);
     }
 
-    private handleRect(event: 'start' | 'move' | 'end', { x, y }: Point = {}) {
+    private handleRect(event: 'start' | 'move' | 'end', { x, y }: Point = { x: 0, y: 0 }) {
         const active_region = this._active_region.getValue();
         if (
             !active_region ||
