@@ -163,8 +163,8 @@ export class MapPolygonComponent extends BaseClass implements OnInit {
         this.width = range.x * 100 * zoom_value;
         this.height = range.y * 100 * (ratio || 1) * zoom_value;
         const edge_padding = this.padding / 4;
-        this.width = Math.floor(this.width * 100) || 1;
-        this.height = Math.floor(this.height * 100) || 1;
+        this.width = Math.abs(Math.floor(this.width * 100) || 1);
+        this.height = Math.abs(Math.floor(this.height * 100) || 1);
         this.points = points
             .reduce(
                 (s, [x, y]) =>
