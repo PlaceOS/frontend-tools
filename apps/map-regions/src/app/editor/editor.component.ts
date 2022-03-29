@@ -95,7 +95,7 @@ export class EditorComponent extends BaseClass implements OnInit {
         this._state.regions
             .pipe(
                 map((l) =>
-                    l.map((_) => {
+                    l.map((_, idx) => {
                         const diff: HashMap<number> = _.points.reduce(
                             (m, [x, y]) => ({
                                 x_min: x < m.x_min ? x : m.x_min,
@@ -115,6 +115,7 @@ export class EditorComponent extends BaseClass implements OnInit {
                                 x: diff.x_min + (diff.x_max - diff.x_min) / 2,
                                 y: diff.y_min + (diff.y_max - diff.y_min) / 2,
                             },
+                            track_id: `area-${idx}`, 
                             content: MapPolygonComponent,
                             data: {
                                 ..._,

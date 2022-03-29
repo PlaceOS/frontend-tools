@@ -297,7 +297,7 @@ export class InteractiveMapComponent
 
     /* istanbul ignore next */
     public trackByFn(index: number, feature: ViewerFeature) {
-        return feature ? feature.track_id : undefined;
+        return feature?.track_id || JSON.stringify({ ...feature });
     }
 
     private updateFeatureList() {
@@ -314,7 +314,7 @@ export class InteractiveMapComponent
         this.injectors = (this.features || []).map(
             (f: any) =>
                 old_injectors.find(
-                    (_) => _.get(MAP_FEATURE_DATA)?.track_id === f.track_id
+                    (_) => _.get(MAP_FEATURE_DATA)?.track_id && _.get(MAP_FEATURE_DATA)?.track_id === f.track_id
                 ) ||
                 Injector.create({
                     providers: [
