@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { BaseClass, HashMap } from '@placeos-tools/common';
 import { MapPolygonComponent } from '@placeos-tools/components';
+import { ViewerFeature } from '@placeos/svg-viewer';
 
 import { filter, map } from 'rxjs/operators';
 
@@ -96,27 +97,11 @@ export class EditorComponent extends BaseClass implements OnInit {
             .pipe(
                 map((l) =>
                     l.map((_, idx) => {
-                        const diff: HashMap<number> = _.points.reduce(
-                            (m, [x, y]) => ({
-                                x_min: x < m.x_min ? x : m.x_min,
-                                x_max: x > m.x_max ? x : m.x_max,
-                                y_min: y < m.y_min ? y : m.y_min,
-                                y_max: y > m.y_max ? y : m.y_max,
-                            }),
-                            {
-                                x_min: 100,
-                                x_max: -100,
-                                y_min: 100,
-                                y_max: -100,
-                            }
-                        );
                         return {
-                            location: {
-                                x: diff.x_min + (diff.x_max - diff.x_min) / 2,
-                                y: diff.y_min + (diff.y_max - diff.y_min) / 2,
-                            },
+                            location: 'svg-viewer-root',
                             track_id: `area-${idx}`, 
                             content: MapPolygonComponent,
+                            full_size: true,
                             data: {
                                 ..._,
                                 ratio: this.ratio,
@@ -127,7 +112,7 @@ export class EditorComponent extends BaseClass implements OnInit {
                                     filter((_) => !!_)
                                 ),
                             },
-                        };
+                        } as ViewerFeature;
                     })
                 )
             )
