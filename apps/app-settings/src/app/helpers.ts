@@ -63,6 +63,7 @@ export function generateWorkplaceSettingsForm() {
             min_search_length: new FormControl(3),
         }),
         events: new FormGroup({
+            allow_all_day: new FormControl(false),
             has_catering: new FormControl(false),
             hide_user_actions: new FormControl(false),
             can_book_for_others: new FormControl(false),

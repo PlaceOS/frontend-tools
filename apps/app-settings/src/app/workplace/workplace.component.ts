@@ -9,7 +9,7 @@ import { SettingsStateService } from '../settings-state.service';
                 class="flex flex-col w-full p-4 space-y-2"
                 formGroupName="workplace"
             >
-                <div class="flex space-x-2">
+                <div class="flex space-x-2" formGroupName="banner">
                     <div class="flex flex-col w-full">
                         <label>Banner Type</label>
                         <mat-form-field
@@ -17,7 +17,7 @@ import { SettingsStateService } from '../settings-state.service';
                             appearance="outline"
                             class="w-full"
                         >
-                            <mat-select>
+                            <mat-select formControlName="type">
                                 <mat-option value="info">
                                     Informational (Blue)
                                 </mat-option>
@@ -39,6 +39,7 @@ import { SettingsStateService } from '../settings-state.service';
                         >
                             <textarea
                                 matInput
+                                formControlName="content"
                                 placeholder="Banner contents"
                             ></textarea>
                         </mat-form-field>
@@ -46,13 +47,16 @@ import { SettingsStateService } from '../settings-state.service';
                 </div>
                 <h3 class="text-lg font-medium">Features</h3>
                 <div class="flex flex-wrap pb-4">
-                    <div class="flex flex-col min-w-[40%] flex-1" *ngFor="let f of feature_list">
+                    <div
+                        class="flex flex-col min-w-[40%] flex-1"
+                        *ngFor="let f of feature_list"
+                    >
                         <mat-checkbox
                             [ngModel]="features.includes(f[0])"
                             [ngModelOptions]="{ standalone: true }"
                             (ngModelChange)="toggleFeature(f[0])"
                         >
-                        {{ f[1] }}
+                            {{ f[1] }}
                         </mat-checkbox>
                     </div>
                 </div>
@@ -103,6 +107,14 @@ import { SettingsStateService } from '../settings-state.service';
                             Allow booking of multiple Spaces
                         </mat-checkbox>
                     </div>
+                    <div
+                        class="flex flex-col w-full min-w-[40%] flex-1"
+                        formGroupName="events"
+                    >
+                        <mat-checkbox formControlName="allow_all_day">
+                            Allow all day bookings
+                        </mat-checkbox>
+                    </div>
                 </div>
                 <h3 class="text-lg font-medium">Desk Booking</h3>
                 <div class="flex flex-wrap pb-4" formGroupName="desks">
@@ -128,7 +140,8 @@ import { SettingsStateService } from '../settings-state.service';
                     </div>
                     <div class="flex flex-col min-w-[40%] flex-1">
                         <mat-checkbox formGroupName="allow_all_day">
-                            Enable setting bookings as all day when time selection available
+                            Enable setting bookings as all day when time
+                            selection available
                         </mat-checkbox>
                     </div>
                 </div>
@@ -146,14 +159,19 @@ import { SettingsStateService } from '../settings-state.service';
                 ></color-list-field>
             </div>
         </form>
-        <button mat-button class="w-32 my-2 mx-auto" (click)="save()">Save Changes</button>
+        <button mat-button class="w-32 my-2 mx-auto" (click)="save()">
+            Save Changes
+        </button>
     `,
-    styles: [`
-    :host {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-    }`],
+    styles: [
+        `
+            :host {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+        `,
+    ],
 })
 export class AppWorkplaceComponent {
     public readonly form = this._state.form;
@@ -165,7 +183,7 @@ export class AppWorkplaceComponent {
         ['parking', 'Book Car Spaces'],
         ['schedule', 'Your Bookings'],
         ['explore', 'Explore Maps'],
-    ]
+    ];
 
     public get features() {
         const form = this.form.get('workplace');
