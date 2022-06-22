@@ -142,7 +142,7 @@ import { SettingsStateService } from '../settings-state.service';
                         </mat-checkbox>
                     </div>
                     <div class="flex flex-col min-w-[40%] flex-1">
-                        <mat-checkbox formGroupName="allow_groups">
+                        <mat-checkbox formGroupName="allow_group">
                             Enable group bookings for Desks
                         </mat-checkbox>
                     </div>
