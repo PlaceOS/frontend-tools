@@ -12,6 +12,10 @@ export class SettingsStateService {
 
     public readonly loading = this._loading.asObservable();
 
+    constructor() {
+        setTimeout(() => this.loadSettings(), 300);
+    }
+
     public async loadSettings() {
         const general = await retrieveData('settings');
         const workplace = await retrieveData('workplace_app');
