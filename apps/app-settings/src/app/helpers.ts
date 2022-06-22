@@ -1,4 +1,4 @@
-import { FormControl, FormGroup } from '@angular/forms';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 
 export function generateSettingsForm() {
     return new FormGroup({
@@ -50,6 +50,7 @@ export function generateWorkplaceSettingsForm() {
             'help',
             'schedule',
         ]),
+        hide_availability: new FormControl(false),
         hide_contacts: new FormControl(false),
         can_deliver: new FormControl(false),
         general: generateGeneralSettingsForm(),
@@ -68,14 +69,17 @@ export function generateWorkplaceSettingsForm() {
             hide_user_actions: new FormControl(false),
             can_book_for_others: new FormControl(false),
             multiple_spaces: new FormControl(false),
+            max_duration: new FormControl(240, [Validators.min(15)]),
         }),
         desks: new FormGroup({
             recurrence_allowed: new FormControl(false),
-            allow_groups: new FormControl(false),
+            can_book_for_others: new FormControl(false),
+            allow_group: new FormControl(false),
             needs_reason: new FormControl(false),
             allow_time_changes: new FormControl(false),
             allow_all_day: new FormControl(false),
             available_period: new FormControl(''),
+            ignore_questions: new FormControl(true),
             auto_allocation: new FormControl(false),
         }),
         explore: new FormGroup({

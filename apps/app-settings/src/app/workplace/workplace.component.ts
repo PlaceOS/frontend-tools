@@ -68,6 +68,11 @@ import { SettingsStateService } from '../settings-state.service';
                         </mat-checkbox>
                     </div>
                     <div class="flex flex-col min-w-[40%] flex-1">
+                        <mat-checkbox formControlName="hide_availability">
+                            Hide Dashboard Availability
+                        </mat-checkbox>
+                    </div>
+                    <div class="flex flex-col min-w-[40%] flex-1">
                         <mat-checkbox formControlName="can_deliver">
                             Enable Dashboard Delivery
                         </mat-checkbox>
@@ -83,44 +88,57 @@ import { SettingsStateService } from '../settings-state.service';
                             Show User Avatars
                         </mat-checkbox>
                     </div>
-                    <div
-                        class="flex flex-col w-full min-w-[40%] flex-1"
-                        formGroupName="events"
-                    >
-                        <mat-checkbox formGroupName="has_catering">
-                            Enable Catering for Events
-                        </mat-checkbox>
-                    </div>
-                    <div
-                        class="flex flex-col w-full min-w-[40%] flex-1"
-                        formGroupName="events"
-                    >
-                        <mat-checkbox formGroupName="hide_user_actions">
-                            Prevent External Attendees for Events
-                        </mat-checkbox>
-                    </div>
-                    <div
-                        class="flex flex-col w-full min-w-[40%] flex-1"
-                        formGroupName="events"
-                    >
-                        <mat-checkbox formControlName="multiple_spaces">
-                            Allow booking of multiple Spaces
-                        </mat-checkbox>
-                    </div>
-                    <div
-                        class="flex flex-col w-full min-w-[40%] flex-1"
-                        formGroupName="events"
-                    >
-                        <mat-checkbox formControlName="allow_all_day">
-                            Allow all day bookings
-                        </mat-checkbox>
-                    </div>
+                    <ng-container formGroupName="events">
+                        <div class="flex flex-col w-full min-w-[40%] flex-1">
+                            <mat-checkbox formGroupName="has_catering">
+                                Enable Catering for Events
+                            </mat-checkbox>
+                        </div>
+                        <div class="flex flex-col w-full min-w-[40%] flex-1">
+                            <mat-checkbox formGroupName="can_book_for_others">
+                                Enable booking for other users
+                            </mat-checkbox>
+                        </div>
+                        <div class="flex flex-col w-full min-w-[40%] flex-1">
+                            <mat-checkbox formGroupName="hide_user_actions">
+                                Prevent External Attendees for Events
+                            </mat-checkbox>
+                        </div>
+                        <div class="flex flex-col w-full min-w-[40%] flex-1">
+                            <mat-checkbox formControlName="multiple_spaces">
+                                Allow booking of multiple Spaces
+                            </mat-checkbox>
+                        </div>
+                        <div class="flex flex-col w-full min-w-[40%] flex-1">
+                            <mat-checkbox formControlName="allow_all_day">
+                                Allow all day bookings
+                            </mat-checkbox>
+                        </div>
+                        <div class="flex flex-col w-full min-w-[40%] flex-1">
+                            <label for="max-duration">
+                                Max Booking Duration
+                            </label>
+                            <mat-form-field no-label appearance="outline">
+                                <input
+                                    matInput
+                                    name="max-duration"
+                                    formControlName="max_duration"
+                                    type="number"
+                                />
+                            </mat-form-field>
+                        </div>
+                    </ng-container>
                 </div>
                 <h3 class="text-lg font-medium">Desk Booking</h3>
                 <div class="flex flex-wrap pb-4" formGroupName="desks">
                     <div class="flex flex-col min-w-[40%] flex-1">
                         <mat-checkbox formGroupName="recurrence_allowed">
                             Enable Recurrence for Desk bookings
+                        </mat-checkbox>
+                    </div>
+                    <div class="flex flex-col w-full min-w-[40%] flex-1">
+                        <mat-checkbox formGroupName="can_book_for_others">
+                            Enable booking for other users
                         </mat-checkbox>
                     </div>
                     <div class="flex flex-col min-w-[40%] flex-1">
@@ -131,6 +149,11 @@ import { SettingsStateService } from '../settings-state.service';
                     <div class="flex flex-col min-w-[40%] flex-1">
                         <mat-checkbox formGroupName="needs_reason">
                             Whether desk bookings require a reason
+                        </mat-checkbox>
+                    </div>
+                    <div class="flex flex-col min-w-[40%] flex-1">
+                        <mat-checkbox formGroupName="auto_allocation">
+                            Enable auto-allocating desks by department
                         </mat-checkbox>
                     </div>
                     <div class="flex flex-col min-w-[40%] flex-1">
