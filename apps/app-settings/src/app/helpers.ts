@@ -1,7 +1,7 @@
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 
 export function generateSettingsForm() {
-    return new FormGroup({
+    return new UntypedFormGroup({
         shared: generateSharedSettingsForm(),
         workplace: generateWorkplaceSettingsForm(),
         concierge: generateConciergeSettingsForm(),
@@ -9,24 +9,24 @@ export function generateSettingsForm() {
 }
 
 export function generateSharedSettingsForm() {
-    return new FormGroup({
-        banner: new FormGroup({
-            id: new FormControl(''),
-            type: new FormControl('info'),
-            content: new FormControl(''),
+    return new UntypedFormGroup({
+        banner: new UntypedFormGroup({
+            id: new UntypedFormControl(''),
+            type: new UntypedFormControl('info'),
+            content: new UntypedFormControl(''),
         }),
-        name: new FormControl(''),
-        title: new FormControl(''),
-        short_name: new FormControl(''),
-        logo_light: new FormControl({
+        name: new UntypedFormControl(''),
+        title: new UntypedFormControl(''),
+        short_name: new UntypedFormControl(''),
+        logo_light: new UntypedFormControl({
             type: 'img',
             src: 'assets/logo-light.svg',
         }),
-        logo_dark: new FormControl({
+        logo_dark: new UntypedFormControl({
             type: 'img',
             src: 'assets/logo-dark.svg',
         }),
-        css_variables: new FormControl({
+        css_variables: new UntypedFormControl({
             '--primary': '#c2185b',
             '--secondary': '#0a0d2e',
             '--success': '#43a047',
@@ -37,58 +37,58 @@ export function generateSharedSettingsForm() {
 }
 
 export function generateWorkplaceSettingsForm() {
-    return new FormGroup({
-        banner: new FormGroup({
-            id: new FormControl(''),
-            type: new FormControl('info'),
-            content: new FormControl(''),
+    return new UntypedFormGroup({
+        banner: new UntypedFormGroup({
+            id: new UntypedFormControl(''),
+            type: new UntypedFormControl('info'),
+            content: new UntypedFormControl(''),
         }),
-        features: new FormControl([
+        features: new UntypedFormControl([
             'spaces',
             'desks',
             'explore',
             'help',
             'schedule',
         ]),
-        hide_availability: new FormControl(false),
-        hide_contacts: new FormControl(false),
-        can_deliver: new FormControl(false),
+        hide_availability: new UntypedFormControl(false),
+        hide_contacts: new UntypedFormControl(false),
+        can_deliver: new UntypedFormControl(false),
         general: generateGeneralSettingsForm(),
-        schedule: new FormGroup({ legend: new FormControl([
+        schedule: new UntypedFormGroup({ legend: new UntypedFormControl([
             { name: 'Accepted', color: '#21A453' },
             { name: 'Pending', color: '#ffbf1f' },
             { name: 'Rejected', color: '#f44336' },
         ]) }),
-        directory: new FormGroup({
-            show_avatars: new FormControl(false),
-            min_search_length: new FormControl(3),
+        directory: new UntypedFormGroup({
+            show_avatars: new UntypedFormControl(false),
+            min_search_length: new UntypedFormControl(3),
         }),
-        events: new FormGroup({
-            allow_all_day: new FormControl(false),
-            has_catering: new FormControl(false),
-            hide_user_actions: new FormControl(false),
-            can_book_for_others: new FormControl(false),
-            multiple_spaces: new FormControl(false),
-            max_duration: new FormControl(240, [Validators.min(15)]),
+        events: new UntypedFormGroup({
+            allow_all_day: new UntypedFormControl(false),
+            has_catering: new UntypedFormControl(false),
+            hide_user_actions: new UntypedFormControl(false),
+            can_book_for_others: new UntypedFormControl(false),
+            multiple_spaces: new UntypedFormControl(false),
+            max_duration: new UntypedFormControl(240, [Validators.min(15)]),
         }),
-        desks: new FormGroup({
-            recurrence_allowed: new FormControl(false),
-            can_book_for_others: new FormControl(false),
-            allow_group: new FormControl(false),
-            needs_reason: new FormControl(false),
-            allow_time_changes: new FormControl(false),
-            allow_all_day: new FormControl(false),
-            available_period: new FormControl(''),
-            ignore_questions: new FormControl(true),
-            auto_allocation: new FormControl(false),
+        desks: new UntypedFormGroup({
+            recurrence_allowed: new UntypedFormControl(false),
+            can_book_for_others: new UntypedFormControl(false),
+            allow_group: new UntypedFormControl(false),
+            needs_reason: new UntypedFormControl(false),
+            allow_time_changes: new UntypedFormControl(false),
+            allow_all_day: new UntypedFormControl(false),
+            available_period: new UntypedFormControl(''),
+            ignore_questions: new UntypedFormControl(true),
+            auto_allocation: new UntypedFormControl(false),
         }),
-        explore: new FormGroup({
-            colors: new FormControl({}),
-            can_select_building: new FormControl(false),
-            show_legend_group_names: new FormControl(false),
-            legend: new FormControl({}),
+        explore: new UntypedFormGroup({
+            colors: new UntypedFormControl({}),
+            can_select_building: new UntypedFormControl(false),
+            show_legend_group_names: new UntypedFormControl(false),
+            legend: new UntypedFormControl({}),
         }),
-        css_variables: new FormControl({
+        css_variables: new UntypedFormControl({
             '--primary': '#c2185b',
             '--secondary': '#0a0d2e',
             '--success': '#43a047',
@@ -99,19 +99,19 @@ export function generateWorkplaceSettingsForm() {
 }
 
 export function generateGeneralSettingsForm() {
-    return new FormGroup({
-        menu: new FormControl([]),
+    return new UntypedFormGroup({
+        menu: new UntypedFormControl([]),
     });
 }
 
 export function generateConciergeSettingsForm() {
-    return new FormGroup({
-        banner: new FormGroup({
-            id: new FormControl(''),
-            type: new FormControl('info'),
-            content: new FormControl(''),
+    return new UntypedFormGroup({
+        banner: new UntypedFormGroup({
+            id: new UntypedFormControl(''),
+            type: new UntypedFormControl('info'),
+            content: new UntypedFormControl(''),
         }),
-        features: new FormControl([
+        features: new UntypedFormControl([
             'daily-calendar',
             'facilities',
             'catering',
@@ -120,7 +120,7 @@ export function generateConciergeSettingsForm() {
             'reports',
         ]),
         general: generateGeneralSettingsForm(),
-        css_variables: new FormControl({
+        css_variables: new UntypedFormControl({
             '--primary': '#c2185b',
             '--secondary': '#0a0d2e',
             '--success': '#43a047',

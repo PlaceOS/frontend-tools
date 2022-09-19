@@ -23,17 +23,6 @@
             }
         }
     },
-    "targetDependencies": {
-        "build": [
-            {
-                "target": "build",
-                "projects": "dependencies"
-            }
-        ]
-    },
-    "cli": {
-        "defaultCollection": "@nrwl/angular"
-    },
     "defaultProject": "map-builder",
     "generators": {
         "@nrwl/angular": {
@@ -59,6 +48,12 @@
         },
         "@nrwl/angular:component": {
             "style": "css"
+        }
+    },
+    "$schema": "./node_modules/nx/schemas/nx-schema.json",
+    "targetDefaults": {
+        "build": {
+            "dependsOn": ["^build"]
         }
     }
 }

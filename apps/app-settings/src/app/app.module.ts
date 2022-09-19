@@ -37,7 +37,7 @@ const routes: Route[] = [
     imports: [
         BrowserModule,
         RouterModule.forRoot(routes, {
-            initialNavigation: 'enabled',
+            initialNavigation: 'enabledBlocking',
             useHash: true,
         }),
         BrowserAnimationsModule,
@@ -56,7 +56,7 @@ const routes: Route[] = [
         MatCheckboxModule,
         MatProgressSpinnerModule,
         FormsModule,
-        ReactiveFormsModule
+        ReactiveFormsModule,
     ],
     providers: [],
     bootstrap: [AppComponent],

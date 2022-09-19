@@ -1,15 +1,15 @@
+/* eslint-disable */
 module.exports = {
-    displayName: 'components',
+    displayName: 'app-settings',
     preset: '../../jest.preset.js',
     setupFilesAfterEnv: ['<rootDir>/src/test-setup.ts'],
     globals: {
         'ts-jest': {
-            stringifyContentPathRegex: '\\.(html|svg)$',
-
             tsconfig: '<rootDir>/tsconfig.spec.json',
+            stringifyContentPathRegex: '\\.(html|svg)$',
         },
     },
-    coverageDirectory: '../../coverage/libs/components',
+    coverageDirectory: '../../coverage/apps/app-settings',
     snapshotSerializers: [
         'jest-preset-angular/build/serializers/no-ng-attributes',
         'jest-preset-angular/build/serializers/ng-snapshot',

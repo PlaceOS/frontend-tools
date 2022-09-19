@@ -1,5 +1,6 @@
+/* eslint-disable */
 module.exports = {
-    displayName: 'map-regions',
+    displayName: 'map-builder',
     preset: '../../jest.preset.js',
     setupFilesAfterEnv: ['<rootDir>/src/test-setup.ts'],
     globals: {
@@ -9,7 +10,7 @@ module.exports = {
             tsconfig: '<rootDir>/tsconfig.spec.json',
         },
     },
-    coverageDirectory: '../../coverage/apps/map-regions',
+    coverageDirectory: '../../coverage/apps/map-builder',
     snapshotSerializers: [
         'jest-preset-angular/build/serializers/no-ng-attributes',
         'jest-preset-angular/build/serializers/ng-snapshot',

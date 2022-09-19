@@ -1,14 +1,16 @@
+/* eslint-disable */
 module.exports = {
-    displayName: 'sensor-map',
+    displayName: 'components',
     preset: '../../jest.preset.js',
     setupFilesAfterEnv: ['<rootDir>/src/test-setup.ts'],
     globals: {
         'ts-jest': {
-            tsconfig: '<rootDir>/tsconfig.spec.json',
             stringifyContentPathRegex: '\\.(html|svg)$',
+
+            tsconfig: '<rootDir>/tsconfig.spec.json',
         },
     },
-    coverageDirectory: '../../coverage/apps/sensor-map',
+    coverageDirectory: '../../coverage/libs/components',
     snapshotSerializers: [
         'jest-preset-angular/build/serializers/no-ng-attributes',
         'jest-preset-angular/build/serializers/ng-snapshot',
