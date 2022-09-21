@@ -10,11 +10,10 @@ import { Component } from '@angular/core';
                 <h3 class="text-white w-full mb-2 py-2 px-4 text-lg bg-red-700">
                     Input SVG URL to continue
                 </h3>
-                <mat-form-field appearance="outline">
+                <mat-form-field appearance="outline" class="w-[30rem]">
                     <input
                         matInput
                         name="map-url"
-                        class="w-[calc(100%-2rem)]"
                         [(ngModel)]="url"
                         placeholder="SVG URL e.g. https://my.domain/path/to/file.svg"
                     />

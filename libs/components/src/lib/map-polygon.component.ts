@@ -118,11 +118,11 @@ export class MapPolygonComponent extends BaseClass implements OnInit {
     public readonly svg_scale = 20;
 
     public get scale() {
-        return this._details.svg_ratio * this._details.zoom_value || 1;
+        return (this._details.svg_ratio || 1) * this._details.zoom_value || 1;
     }
 
     public get ratio() {
-        return Math.floor(this._details.svg_ratio * 100) / 100 || 1;
+        return Math.floor((this._details.svg_ratio || 1) * 100) / 100 || 1;
     }
 
     /** List of points for drawing the polygon */
