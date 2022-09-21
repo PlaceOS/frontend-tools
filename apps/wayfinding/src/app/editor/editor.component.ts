@@ -70,13 +70,37 @@ import { EditorStateService } from './editor-state.service';
                 class="rounded-none border-x-0"
                 matTooltip="Set Feature Location"
                 matTooltipPosition="right"
-                [class.bg-primary]="(method | async) === 'set-features'"
-                [class.text-white]="(method | async) === 'set-features'"
-                (click)="setMethod('set-features')"
+                [class.bg-primary]="(method | async) === 'set-feature'"
+                [class.text-white]="(method | async) === 'set-feature'"
+                (click)="setMethod('set-feature')"
             >
                 <app-icon>push_pin</app-icon>
             </button>
         </div>
+            <div
+                class="absolute bottom-2 right-2 flex items-center space-x-2 w-[26rem]"
+            >
+                <button
+                    mat-button
+                    class="bg-white text-black flex-1"
+                    (click)="saveMetadata()"
+                >
+                    <div class="flex items-center">
+                        <app-icon class="mr-4">save_alt</app-icon>
+                        {{ (embeded | async) ? 'Save' : 'Download' }} Metadata
+                    </div>
+                </button>
+                <button
+                    mat-button
+                    class="bg-white text-black flex-1"
+                    (click)="copyMetadata()"
+                >
+                    <div class="flex items-center">
+                        <app-icon class="mr-4">content_copy</app-icon>
+                        Copy Metadata
+                    </div>
+                </button>
+            </div>
     `,
     styles: [
         `
@@ -100,11 +124,14 @@ export class WayfindingEditorComponent extends BaseClass {
     public readonly features = this._editor.features;
     public readonly method = this._editor.method;
     public readonly actions = this._editor.actions;
+    public readonly embeded = this._editor.embeded;
     public readonly select_box = { top: 0, left: 0, width: 0, height: 0 };
     public select_start = [0, 0];
     public selecting = false;
 
-    public readonly setMethod = (s) => this._editor.setMethod(s)
+    public readonly setMethod = (s) => this._editor.setMethod(s);
+    public readonly saveMetadata = () => this._editor.saveMetadata();
+    public readonly copyMetadata = () => this._editor.copyMetadata();
 
     constructor(
         private _editor: EditorStateService,

@@ -31,9 +31,10 @@ export interface MapWaypointData {
                     *ngFor="let point of points"
                     [attr.cx]="point[0] * width"
                     [attr.cy]="point[1] * width * ratio"
-                    r="4"
-                    stroke="#000"
-                    [style.fill]="isActive(point) ? '#388e3c' : '#fff'"
+                    [attr.r]="point[2] ? 6 : 4"
+                    [attr.stroke-width]="point[2] ? 2 : 1"
+                    [attr.stroke]="point[2] ? '#fff' : '#000'"
+                    [style.fill]="isActive(point) ? '#388e3c' : point[2] ? 'var(--primary)' : '#fff'"
                 />
             </svg>
         </div>

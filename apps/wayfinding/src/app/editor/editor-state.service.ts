@@ -54,8 +54,7 @@ export class EditorStateService {
                     },
                 },
             ];
-        }),
-        tap((l) => console.log('List:', l))
+        })
     );
     /** URL of the map to be displayed */
     public readonly url = this._map_url.asObservable();
@@ -151,13 +150,7 @@ export class EditorStateService {
         const waypoints = this._waypoints.getValue();
         const [nearest, dist] = nearestPoint(waypoints, [x, y]);
         if (!nearest || dist > MAX_DIST) return;
-        this._waypoints.next(
-            waypoints.filter(
-                (p) =>
-                    p !== nearest &&
-                    !(p[0] === nearest[0] && p[1] === nearest[1])
-            )
-        );
+        this._waypoints.next(waypoints.filter((p) => !isSamePoint(p, nearest)));
         const links = this._waypoints_links.getValue();
         this._waypoints_links.next(
             links.filter(
@@ -193,6 +186,10 @@ export class EditorStateService {
         const [nearest, dist] = nearestPoint(waypoints, [x, y]);
         if (!nearest || dist > MAX_DIST) return;
         nearest[2] = !nearest[2];
+        this._waypoints.next([
+            ...waypoints.filter((p) => !isSamePoint(p, nearest)),
+            nearest,
+        ]);
     }
 }
 
