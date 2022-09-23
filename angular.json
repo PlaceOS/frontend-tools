@@ -630,8 +630,8 @@
                 "build": {
                     "builder": "@angular-devkit/build-angular:browser",
                     "outputs": ["{options.outputPath}"],
-                    "baseHref": ".",
                     "options": {
+                        "baseHref": ".",
                         "outputPath": "dist/apps/wayfinding",
                         "index": "apps/wayfinding/src/index.html",
                         "main": "apps/wayfinding/src/main.ts",
