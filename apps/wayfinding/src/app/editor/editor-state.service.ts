@@ -167,6 +167,7 @@ export class EditorStateService {
     public async loadWayfindingGrid() {
         if (!this._embeded.getValue()) return;
         const { size, points, links } = await retrieveData('wayfinding-grid');
+        console.log('Loaded data:', size, points, links);
         this._waypoints.next(points);
         this._waypoints_links.next(links);
         this._grid_size.next(size);
