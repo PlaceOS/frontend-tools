@@ -51,7 +51,7 @@ export function shortestPath(
         let next = null;
         node_list.add(current);
         visited.add(current);
-        const list = Array.from(adj_list.get(current)) || [];
+        const list = Array.from(adj_list.get(current) || []);
         let shortest_distance = 99999;
         for (const node of list) {
             const [nx, ny] = node;
