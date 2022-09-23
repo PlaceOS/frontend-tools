@@ -118,6 +118,9 @@ export class EditorStateService {
     constructor(private _clipboard: Clipboard) {
         const is_child = isChildFrame();
         this._embeded.next(is_child);
+        if (is_child) {
+            this.loadWayfindingGrid();
+        }
     }
 
     /** Update the map URL */
