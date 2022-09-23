@@ -6,14 +6,21 @@ import {
     retrieveData,
     sendMessage,
 } from '@placeos-tools/common';
-import { getViewerByURL, Point, ViewerFeature } from '@placeos/svg-viewer';
+import { getViewerByURL, Point } from '@placeos/svg-viewer';
 import { BehaviorSubject, combineLatest } from 'rxjs';
-import { map, switchMap, tap } from 'rxjs/operators';
+import { switchMap } from 'rxjs/operators';
+import { findPath } from './astar';
+import { MapNavPathDisplayComponent } from './map-navpath-display.component';
 import { MapWaypointDisplayComponent } from './map-waypoint-display.component';
 
 const TYPES = ['temperature', 'humidity', 'presense'];
 export type GridPoint = [number, number, boolean];
-export type ActionMethod = 'add' | 'remove' | 'link' | 'set-feature';
+export type ActionMethod =
+    | 'add'
+    | 'remove'
+    | 'link'
+    | 'set-feature'
+    | 'testing';
 
 const MAX_DIST = 0.02;
 const RES = 0.01;
@@ -28,6 +35,7 @@ export class EditorStateService {
     private _active_point = new BehaviorSubject<GridPoint>(null);
 
     private _grid_size = new BehaviorSubject<[number, number]>([1000, 50]);
+    private _navpath = new BehaviorSubject<GridPoint[]>([]);
     private _waypoints = new BehaviorSubject<GridPoint[]>([]);
     private _waypoints_links = new BehaviorSubject<[GridPoint, GridPoint][]>(
         []
@@ -37,10 +45,12 @@ export class EditorStateService {
         this._waypoints,
         this._active_point,
         this._waypoints_links,
+        this._navpath,
+        this._method,
     ]).pipe(
-        switchMap(async ([points, active, links]) => {
+        switchMap(async ([points, active, links, path_points, method]) => {
             const viewer = await getViewerByURL(this._map_url.getValue());
-            return [
+            const list: any[] = [
                 {
                     location: 'svg-viewer-root',
                     content: MapWaypointDisplayComponent,
@@ -51,9 +61,40 @@ export class EditorStateService {
                         links,
                         active,
                         ratio: viewer?.ratio,
+                        testing: method === 'testing',
                     },
                 },
             ];
+            if (method === 'testing' && (active || path_points)) {
+                const points: GridPoint[] = path_points
+                    ? path_points
+                    : [[active[0], active[1], true]];
+                const nav_links = [];
+                for (let i = 1; i < points.length; i++) {
+                    const link = links.find(
+                        ([p1, p2]) =>
+                            (isSamePoint(p1, points[i - 1]) &&
+                                isSamePoint(p2, points[i])) ||
+                            (isSamePoint(p2, points[i - 1]) &&
+                                isSamePoint(p1, points[i]))
+                    );
+                    if (link) nav_links.push(link);
+                }
+                list.push({
+                    location: 'svg-viewer-root',
+                    content: MapNavPathDisplayComponent,
+                    full_size: true,
+                    no_scale: true,
+                    data: {
+                        points,
+                        links: nav_links,
+                        ratio: viewer?.ratio,
+                        color: '#1976d2',
+                    },
+                });
+                console.log(list);
+            }
+            return list;
         })
     );
     /** URL of the map to be displayed */
@@ -90,6 +131,8 @@ export class EditorStateService {
 
     public setMethod(method: ActionMethod) {
         this._method.next(method);
+        this._active_point.next(null);
+        this._navpath.next(null);
     }
 
     public toMetadataObject() {
@@ -137,6 +180,7 @@ export class EditorStateService {
         else if (method === 'remove') this._handleRemoveWaypoint({ x, y });
         else if (method === 'link') this._handleLinkWaypoint({ x, y });
         else if (method === 'set-feature') this._handleSetFeature({ x, y });
+        else if (method === 'testing') this._handleTestNavigation({ x, y });
     }
 
     private _handleAddWaypoint({ x, y }: Point) {
@@ -171,8 +215,9 @@ export class EditorStateService {
             if (
                 isSamePoint(this._active_point.getValue(), nearest) ||
                 linkExists(links, this._active_point.getValue(), nearest)
-            )
-                return;
+            ) {
+                return this._active_point.next(nearest);
+            }
             this._waypoints_links.next([
                 ...links,
                 [this._active_point.getValue(), nearest],
@@ -190,6 +235,23 @@ export class EditorStateService {
             ...waypoints.filter((p) => !isSamePoint(p, nearest)),
             nearest,
         ]);
+    }
+
+    private _handleTestNavigation({ x, y }: Point) {
+        if (!this._active_point.getValue()) {
+            this._active_point.next([x, y, false]);
+        } else {
+            const waypoints = this._waypoints.getValue();
+            const links = this._waypoints_links.getValue();
+            const path = getPathBetweenPoints(
+                waypoints,
+                links,
+                [x, y, false],
+                this._active_point.getValue()
+            );
+            this._navpath.next(path);
+            this._active_point.next(null);
+        }
     }
 }
 
@@ -226,4 +288,21 @@ function linkExists(
 
 function isSamePoint([x1, y1]: GridPoint, [x2, y2]: GridPoint) {
     return x1 === x2 && y1 === y2;
+}
+
+function getPathBetweenPoints(
+    points: GridPoint[],
+    links: [GridPoint, GridPoint][],
+    [sx, sy]: GridPoint,
+    [ex, ey]: GridPoint
+): GridPoint[] {
+    const [nearest_start] = nearestPoint(points, [sx, sy]);
+    const [nearest_end] = nearestPoint(points, [ex, ey]);
+    let path = findPath(links as any, nearest_start as any, nearest_end as any);
+    const set = new Set<GridPoint>();
+    set.add(nearest_start);
+    for (const [p1, p2] of path) {
+        set.add([p2[0], p2[1], false]);
+    }
+    return Array.from(set);
 }

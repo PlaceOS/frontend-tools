@@ -1,20 +1,11 @@
 import { Component, Inject } from '@angular/core';
 import { MAP_FEATURE_DATA } from '@placeos-tools/components';
-import { GridPoint } from './editor-state.service';
-
-export interface MapWaypointData {
-    points: GridPoint[];
-    links: [GridPoint, GridPoint][];
-    active: GridPoint | null;
-    ratio?: number;
-    testing?: boolean;
-    color?: string;
-}
+import { MapWaypointData } from './map-waypoint-display.component';
 
 @Component({
-    selector: `map-waypoint-display`,
+    selector: `map-navpath-display`,
     template: `
-        <div class="absolute inset-0" [class.opacity-30]="testing">
+        <div class="absolute inset-0">
             <svg
                 [attr.viewBox]="'0 0 ' + width + ' ' + width * ratio"
                 preserveAspectRatio="none"
@@ -27,7 +18,7 @@ export interface MapWaypointData {
                     [attr.x2]="link[1][0] * width"
                     [attr.y2]="link[1][1] * width * ratio"
                     stroke-width="2"
-                    stroke="#000"
+                    [attr.stroke]="color"
                 />
                 <circle
                     *ngFor="let point of points"
@@ -36,8 +27,7 @@ export interface MapWaypointData {
                     [attr.cy]="point[1] * width * ratio"
                     [attr.r]="point[2] ? 6 : 4"
                     [attr.stroke-width]="point[2] ? 2 : 1"
-                    [attr.stroke]="point[2] ? '#fff' : '#000'"
-                    [style.fill]="isActive(point) ? '#388e3c' : point[2] ? 'var(--primary)' : '#fff'"
+                    [style.fill]="point[2] ? 'var(--primary)' : color"
                     [matTooltip]="point[0] + ', ' + point[1]"
                 />
             </svg>
@@ -45,20 +35,13 @@ export interface MapWaypointData {
     `,
     styles: [``],
 })
-export class MapWaypointDisplayComponent {
+export class MapNavPathDisplayComponent {
     public readonly points = this._details.points;
     public readonly links = this._details.links;
-    public readonly active = this._details.active;
+    public readonly color = this._details.color || '#000';
     public readonly ratio = this._details.ratio || 1;
-    public readonly testing = !!this._details.testing;
 
     public width = 300;
-
-    public isActive([x, y]: GridPoint) {
-        if (!this.active) return false;
-        const [ax, ay] = this.active;
-        return x === ax && y === ay;
-    }
 
     constructor(@Inject(MAP_FEATURE_DATA) private _details: MapWaypointData) {}
 }

@@ -20,6 +20,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { environment } from '../environments/environment';
 import { MapWaypointDisplayComponent } from './editor/map-waypoint-display.component';
+import { MapNavPathDisplayComponent } from './editor/map-navpath-display.component';
 
 @NgModule({
     declarations: [
@@ -28,6 +29,7 @@ import { MapWaypointDisplayComponent } from './editor/map-waypoint-display.compo
         WayfindingEditorComponent,
         WayfindingPlaygroundComponent,
         MapWaypointDisplayComponent,
+        MapNavPathDisplayComponent
     ],
     imports: [
         BrowserModule,

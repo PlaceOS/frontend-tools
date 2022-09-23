@@ -16,6 +16,7 @@ import { EditorStateService } from './editor-state.service';
         </div>
         <div
             class="absolute top-2 left-2 bg-white rounded shadow p-2 w-52 space-y-2"
+            *ngIf="(method | async) !== 'testing'"
         >
             <div class="flex flex-col flex-1">
                 <mat-form-field appearance="outline" class="w-full h-16">
@@ -31,6 +32,7 @@ import { EditorStateService } from './editor-state.service';
         </div>
         <div
             class="absolute top-1/2 left-2 -translate-y-1/2 bg-white rounded shadow overflow-hidden flex flex-col divide-y divide-solid divide-gray-200"
+            *ngIf="(method | async) !== 'testing'"
         >
             <button
                 mat-icon-button
@@ -77,30 +79,52 @@ import { EditorStateService } from './editor-state.service';
                 <app-icon>push_pin</app-icon>
             </button>
         </div>
-            <div
-                class="absolute bottom-2 right-2 flex items-center space-x-2 w-[26rem]"
+        <div
+            class="absolute bottom-2 right-2 flex items-center space-x-2 w-[36rem]"
+        >
+            <button
+                mat-button
+                class="bg-white text-black flex-1"
+                *ngIf="(method | async) !== 'testing'"
+                (click)="setMethod('testing')"
             >
-                <button
-                    mat-button
-                    class="bg-white text-black flex-1"
-                    (click)="saveMetadata()"
-                >
-                    <div class="flex items-center">
-                        <app-icon class="mr-4">save_alt</app-icon>
-                        {{ (embeded | async) ? 'Save' : 'Download' }} Metadata
-                    </div>
-                </button>
-                <button
-                    mat-button
-                    class="bg-white text-black flex-1"
-                    (click)="copyMetadata()"
-                >
-                    <div class="flex items-center">
-                        <app-icon class="mr-4">content_copy</app-icon>
-                        Copy Metadata
-                    </div>
-                </button>
-            </div>
+                <div class="flex items-center">
+                    <app-icon class="mr-4">save_alt</app-icon>
+                    Test Wayfinding
+                </div>
+            </button>
+            <button
+                mat-button
+                class="bg-white text-black flex-1"
+                *ngIf="(method | async) === 'testing'"
+                (click)="setMethod('add')"
+            >
+                <div class="flex items-center">
+                    <app-icon class="mr-4">save_alt</app-icon>
+                    Configure Wayfinding
+                </div>
+            </button>
+            <button
+                mat-button
+                class="bg-white text-black flex-1"
+                (click)="saveMetadata()"
+            >
+                <div class="flex items-center">
+                    <app-icon class="mr-4">save_alt</app-icon>
+                    {{ (embeded | async) ? 'Save' : 'Download' }} Metadata
+                </div>
+            </button>
+            <button
+                mat-button
+                class="bg-white text-black flex-1"
+                (click)="copyMetadata()"
+            >
+                <div class="flex items-center">
+                    <app-icon class="mr-4">content_copy</app-icon>
+                    Copy Metadata
+                </div>
+            </button>
+        </div>
     `,
     styles: [
         `
