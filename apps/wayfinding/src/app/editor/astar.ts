@@ -5,7 +5,7 @@ export function findPath(
 ): [number, number][] {
     console.log('Create Adjacency List', links);
     const adj_list = createAdjacencyList(links || []);
-    console.log('Find Path', start, end);
+    console.log('Find Path', start, end, adj_list);
     const node_path = shortestPath(start, end, adj_list);
     const path = [];
     for (const [s, e] of node_path.entries()) path.push([s, e]);
