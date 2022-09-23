@@ -4,7 +4,7 @@ export function findPath(
     end: [number, number]
 ): [number, number][] {
     console.log('Create Adjacency List', links);
-    const adj_list = createAdjacencyList(links);
+    const adj_list = createAdjacencyList(links || []);
     console.log('Find Path', start, end);
     const node_path = shortestPath(start, end, adj_list);
     const path = [];
@@ -51,7 +51,7 @@ export function shortestPath(
         let next = null;
         node_list.add(current);
         visited.add(current);
-        const list = Array.from(adj_list.get(current));
+        const list = Array.from(adj_list.get(current)) || [];
         let shortest_distance = 99999;
         for (const node of list) {
             const [nx, ny] = node;
