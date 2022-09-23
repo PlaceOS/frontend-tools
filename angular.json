@@ -654,36 +654,26 @@
                         "ngswConfigPath": "apps/wayfinding/ngsw-config.json"
                     },
                     "configurations": {
-                        "configurations": {
-                            "production": {
-                                "budgets": [
-                                    {
-                                        "type": "initial",
-                                        "maximumWarning": "500kb",
-                                        "maximumError": "1mb"
-                                    },
-                                    {
-                                        "type": "anyComponentStyle",
-                                        "maximumWarning": "2kb",
-                                        "maximumError": "4kb"
-                                    }
-                                ],
-                                "fileReplacements": [
-                                    {
-                                        "replace": "apps/wayfinding/src/environments/environment.ts",
-                                        "with": "apps/wayfinding/src/environments/environment.prod.ts"
-                                    }
-                                ],
-                                "outputHashing": "all"
-                            },
-                            "development": {
-                                "buildOptimizer": false,
-                                "optimization": false,
-                                "vendorChunk": true,
-                                "extractLicenses": false,
-                                "sourceMap": true,
-                                "namedChunks": true
-                            }
+                        "production": {
+                            "budgets": [
+                                {
+                                    "type": "initial",
+                                    "maximumWarning": "500kb",
+                                    "maximumError": "1mb"
+                                },
+                                {
+                                    "type": "anyComponentStyle",
+                                    "maximumWarning": "2kb",
+                                    "maximumError": "4kb"
+                                }
+                            ],
+                            "fileReplacements": [
+                                {
+                                    "replace": "apps/wayfinding/src/environments/environment.ts",
+                                    "with": "apps/wayfinding/src/environments/environment.prod.ts"
+                                }
+                            ],
+                            "outputHashing": "all"
                         },
                         "development": {
                             "buildOptimizer": false,
