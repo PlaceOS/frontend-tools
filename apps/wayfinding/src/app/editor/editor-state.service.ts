@@ -244,14 +244,15 @@ export class EditorStateService {
     private _handleTestNavigation({ x, y }: Point) {
         if (!this._active_point.getValue()) {
             this._active_point.next([x, y, false]);
+            this._navpath.next(null);
         } else {
             const waypoints = this._waypoints.getValue();
             const links = this._waypoints_links.getValue();
             const path = getPathBetweenPoints(
                 waypoints,
                 links,
+                this._active_point.getValue(),
                 [x, y, false],
-                this._active_point.getValue()
             );
             this._navpath.next(path);
             this._active_point.next(null);
@@ -302,6 +303,7 @@ function getPathBetweenPoints(
 ): GridPoint[] {
     const [nearest_start] = nearestPoint(points, [sx, sy]);
     const [nearest_end] = nearestPoint(points, [ex, ey]);
+    console.log('Points:', [sx, sy], [ex, ey], nearest_start, nearest_end);
     let path = findPath(links as any, nearest_start as any, nearest_end as any);
     const set = new Set<GridPoint>();
     set.add(nearest_start);
