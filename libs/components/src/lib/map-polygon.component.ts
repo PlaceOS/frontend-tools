@@ -176,7 +176,7 @@ export class MapPolygonComponent extends BaseClass implements OnInit {
     public processPoints() {
         const { zoom_value, points } = this._details;
         if (!points?.length) return;
-        const diff: HashMap<number> = points.reduce(
+        const diff: any = points.reduce(
             (m, [x, y]) => ({
                 x_min: x < m.x_min ? x : m.x_min,
                 x_max: x > m.x_max ? x : m.x_max,
