@@ -13,10 +13,10 @@ import { BuildingLevel, OrganisationService } from './organisation.service';
                 <mat-checkbox></mat-checkbox>
             </div>
             <div class="min-w-0 w-10 p-0"></div>
-            <div class="w-48">{{ level.display_name }}</div>
+            <div class="w-56">{{ level.display_name }}</div>
             <div></div>
             <div></div>
-            <div class="w-48"></div>
+            <div class="w-56"></div>
             <div></div>
             <div></div>
             <div>{{ level.allow_visitors ? 'YES' : 'NO' }}</div>

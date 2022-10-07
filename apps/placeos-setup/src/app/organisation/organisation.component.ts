@@ -27,10 +27,10 @@ import { OrganisationService } from './organisation.service';
                         >
                             Actions
                         </div>
-                        <div thead class="w-48">Display Name</div>
+                        <div thead class="w-56">Display Name</div>
                         <div thead>Country</div>
                         <div thead>City</div>
-                        <div thead class="w-48">Street Address</div>
+                        <div thead class="w-56">Street Address</div>
                         <div thead>Floors</div>
                         <div thead>Currency</div>
                         <div thead>Visitors?</div>

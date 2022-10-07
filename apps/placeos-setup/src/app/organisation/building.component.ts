@@ -19,10 +19,10 @@ import { Building, OrganisationService } from './organisation.service';
                     <app-icon>{{ show ? 'expand_less' : 'expand_more'}}</app-icon>
                 </button>
             </div>
-            <div class="w-48">{{ building.display_name }}</div>
+            <div class="w-56">{{ building.display_name }}</div>
             <div>{{ building.country }}</div>
             <div>{{ building.city }}</div>
-            <div class="w-48">{{ building.address }}</div>
+            <div class="w-56">{{ building.address }}</div>
             <div>{{ (levels | async)?.length || 0 }}</div>
             <div>{{ building.currency }}</div>
             <div>{{ building.allow_visitors ? 'YES' : 'NO' }}</div>

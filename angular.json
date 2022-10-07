@@ -498,6 +498,7 @@
                     "builder": "@angular-devkit/build-angular:browser",
                     "outputs": ["{options.outputPath}"],
                     "options": {
+                        "baseHref": ".",
                         "outputPath": "dist/apps/placeos-setup",
                         "index": "apps/placeos-setup/src/index.html",
                         "main": "apps/placeos-setup/src/main.ts",
