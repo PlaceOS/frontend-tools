@@ -8,7 +8,7 @@ import {
 } from '@placeos-tools/common';
 import { getViewerByURL, Point } from '@placeos/svg-viewer';
 import { BehaviorSubject, combineLatest } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
+import { map, switchMap } from 'rxjs/operators';
 import { findPath } from './astar';
 import { MapNavPathDisplayComponent } from './map-navpath-display.component';
 import { MapWaypointDisplayComponent } from './map-waypoint-display.component';
@@ -40,6 +40,14 @@ export class EditorStateService {
     private _waypoints_links = new BehaviorSubject<[GridPoint, GridPoint][]>(
         []
     );
+    public readonly navpath = combineLatest([this._navpath, this._grid_size]).pipe(switchMap(async ([path, [width]]) => {
+        const viewer = await getViewerByURL(this._map_url.getValue());
+        const height = Math.floor(width * (viewer?.ratio || 1));
+        const angle = 0;
+        for (let i = 1; i < path.length; i++) {
+            
+        }
+    }));
     /** List of features to be displayed on the map */
     public readonly features = combineLatest([
         this._waypoints,
