@@ -54,7 +54,7 @@ export class SidebarComponent {
             route: '/interfaces',
             icon: { content: 'web_asset' },
         },
-        { name: 'Maps', route: '/maps', icon: { content: 'map' } },
+        { name: 'Floorplans', route: '/maps', icon: { content: 'map' } },
         { name: 'Rooms', route: '/spaces', icon: { content: 'meeting_room' } },
         { name: 'Desks', route: '/desks', icon: { content: 'desk' } },
         { name: 'Lockers', route: '/lockers', icon: { content: 'key' } },

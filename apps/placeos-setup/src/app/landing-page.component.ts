@@ -27,9 +27,9 @@ import { Component } from '@angular/core';
                     assigned to the floorplan.
                 </p>
             </div>
-            <h2 class="text-xl pt-4 font-medium w-[640px] mx-auto">
+            <h3 class="text-xl pt-4 font-medium w-[640px] mx-auto">
                 Available Resources to setup
-            </h2>
+            </h3>
             <div
                 class="flex flex-wrap w-[640px] bg-white dark:bg-neutral-700 border border-gray-200 dark:border-neutral-500 rounded p-4"
             >
@@ -43,6 +43,23 @@ import { Component } from '@angular/core';
                     <app-icon [icon]="item.icon"></app-icon>
                     <p>{{ item?.name }}</p>
                 </a>
+            </div>
+            <h3 class="text-xl pt-4 font-medium w-[640px] mx-auto">
+                Finialising and finishing up
+            </h3>
+            <div
+                class="flex flex-col w-[640px] bg-white dark:bg-neutral-700 border border-gray-200 dark:border-neutral-500 rounded p-4 space-y-2"
+            >
+                <div class="flex items-center p-2 bg-pending rounded shadow text-black text-sm space-x-2">
+                    <app-icon class="text-xl">warning</app-icon>
+                    <div>Please make sure you have filled out the all the relavant sections of the application.</div>
+                </div>
+                <p class="p-2">
+                    Once you have finished filling out the sections of this application you can click the export button below to generate a metadata file to be used to configure PlaceOS.
+                </p>
+                <button mat-button>
+                    Export PlaceOS Build Configuration
+                </button>
             </div>
         </div>
     `,
@@ -60,7 +77,7 @@ export class LandingPageComponent {
             route: '/interfaces',
             icon: { content: 'web_asset' },
         },
-        { name: 'Maps', route: '/maps', icon: { content: 'map' } },
+        { name: 'Floorplans', route: '/maps', icon: { content: 'map' } },
         { name: 'Rooms', route: '/spaces', icon: { content: 'meeting_room' } },
         { name: 'Desks', route: '/desks', icon: { content: 'desk' } },
         { name: 'Lockers', route: '/lockers', icon: { content: 'key' } },
