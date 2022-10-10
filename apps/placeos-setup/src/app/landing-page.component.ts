@@ -1,10 +1,89 @@
-import { Component } from "@angular/core";
+import { Component } from '@angular/core';
 
 @Component({
     selector: 'app-landing-page',
-    template: ``,
-    styles: [``]
+    template: `
+        <div
+            class="flex flex-col items-center w-full h-full overflow-auto p-4 space-y-2"
+        >
+            <h2 class="text-2xl font-medium w-[640px] mx-auto">
+                Welcome to the PlaceOS Build Sheet Application
+            </h2>
+            <div
+                class="flex flex-col w-[640px] bg-white dark:bg-neutral-700 border border-gray-200 dark:border-neutral-500 rounded p-4 space-y-2"
+            >
+                <div class="flex items-center p-2 bg-pending rounded shadow text-black text-sm space-x-2">
+                    <app-icon class="text-xl">warning</app-icon>
+                    <div>Before continuing please read this carefully.</div>
+                </div>
+                <p class="p-2">
+                    Identifiers for resources such as Rooms and Desks are
+                    permanent and won't be able to be changed one they are added
+                    to the live PlaceOS instance.
+                </p>
+                <p class="p-2">
+                    It is strongly recommended to set unique identitiers for
+                    these resources that match up with the ones that have been
+                    assigned to the floorplan.
+                </p>
+            </div>
+            <h2 class="text-xl pt-4 font-medium w-[640px] mx-auto">
+                Available Resources to setup
+            </h2>
+            <div
+                class="flex flex-wrap w-[640px] bg-white dark:bg-neutral-700 border border-gray-200 dark:border-neutral-500 rounded p-4"
+            >
+                <a
+                    menu
+                    matRipple
+                    class="flex items-center p-2 rounded m-2 w-[30%] border border-gray-200 dark:border-neutral-500 space-x-2"
+                    *ngFor="let item of resources"
+                    [routerLink]="[item.route]"
+                >
+                    <app-icon [icon]="item.icon"></app-icon>
+                    <p>{{ item?.name }}</p>
+                </a>
+            </div>
+        </div>
+    `,
+    styles: [``],
 })
 export class LandingPageComponent {
-
+    public readonly resources = [
+        {
+            name: 'Organisation',
+            route: '/organisation',
+            icon: { content: 'business' },
+        },
+        {
+            name: 'Interfaces',
+            route: '/interfaces',
+            icon: { content: 'web_asset' },
+        },
+        { name: 'Maps', route: '/maps', icon: { content: 'map' } },
+        { name: 'Rooms', route: '/spaces', icon: { content: 'meeting_room' } },
+        { name: 'Desks', route: '/desks', icon: { content: 'desk' } },
+        { name: 'Lockers', route: '/lockers', icon: { content: 'key' } },
+        { name: 'Zoning', route: '/zoning', icon: { content: 'hive' } },
+        {
+            name: 'Catering',
+            route: '/catering',
+            icon: { content: 'restaurant' },
+        },
+        {
+            name: 'Parking',
+            route: '/parking',
+            icon: { content: 'directions_car' },
+        },
+        { name: 'Assets', route: '/assets', icon: { content: 'category' } },
+        {
+            name: 'Monitoring',
+            route: '/monitoring',
+            icon: { content: 'screenshot_monitor' },
+        },
+        {
+            name: 'Access Control',
+            route: '/access-control',
+            icon: { content: 'badge' },
+        }]
 }

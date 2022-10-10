@@ -15,7 +15,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { ComponentsModule } from '@placeos-tools/components';
 
 import { AppComponent } from './app.component';
-import { SidebarComponent } from './sidebar.component';
+import { SidebarComponent } from './components/sidebar.component';
 import { InterfacesComponent } from './interfaces/interfaces.component';
 import { LandingPageComponent } from './landing-page.component';
 import { OrganisationComponent } from './organisation/organisation.component';
