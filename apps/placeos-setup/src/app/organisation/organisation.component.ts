@@ -6,10 +6,15 @@ import { OrganisationService } from './organisation.service';
     template: `
         <div class="flex flex-col h-full w-full overflow-hidden">
             <header class="bg-neutral-700 p-2 space-x-2">
-                <button mat-button class="w-32">
+                <button mat-button class="w-32" (click)="newBuilding()">
                     Add Building
                 </button>
-                <button mat-button class="w-32">
+                <button
+                    mat-button
+                    class="w-32"
+                    [disabled]="!(buildings | async)?.length"
+                    (click)="newLevel()"
+                >
                     Add Level
                 </button>
             </header>
@@ -29,7 +34,7 @@ import { OrganisationService } from './organisation.service';
                         </div>
                         <div thead class="w-56">Display Name</div>
                         <div thead>Country</div>
-                        <div thead>City</div>
+                        <div thead class="w-32">City</div>
                         <div thead class="w-56">Street Address</div>
                         <div thead>Floors</div>
                         <div thead>Currency</div>
@@ -39,7 +44,8 @@ import { OrganisationService } from './organisation.service';
                     <ng-container
                         *ngIf="(buildings | async)?.length; else empty_state"
                     >
-                        <div org-building
+                        <div
+                            org-building
                             *ngFor="let bld of buildings | async"
                             [building]="bld"
                         ></div>
@@ -48,8 +54,8 @@ import { OrganisationService } from './organisation.service';
             </main>
         </div>
         <ng-template #empty_state>
-            <div class="w-full h-full flex items-center justify-center">
-                <p>No buildings setup for organisation</p>
+            <div class="w-full h-full flex items-center justify-center p-8">
+                <p class="opacity-60">No buildings setup for organisation</p>
             </div>
         </ng-template>
     `,
@@ -74,6 +80,9 @@ import { OrganisationService } from './organisation.service';
 })
 export class OrganisationComponent {
     public readonly buildings = this._org.buildings;
+
+    public readonly newBuilding = () => this._org.openBuildingModal();
+    public readonly newLevel = () => this._org.openLevelModal();
 
     constructor(private _org: OrganisationService) {}
 }

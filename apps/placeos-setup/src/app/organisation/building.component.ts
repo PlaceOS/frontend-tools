@@ -15,18 +15,35 @@ import { Building, OrganisationService } from './organisation.service';
                 <mat-checkbox></mat-checkbox>
             </div>
             <div class="min-w-0 flex items-center w-10 p-0 justify-end">
-                <button mat-icon-button (click)="show = !show" [disabled]="!(levels | async)?.length">
-                    <app-icon>{{ show ? 'expand_less' : 'expand_more'}}</app-icon>
+                <button
+                    mat-icon-button
+                    (click)="show = !show"
+                    [disabled]="!(levels | async)?.length"
+                >
+                    <app-icon>{{
+                        show ? 'expand_less' : 'expand_more'
+                    }}</app-icon>
                 </button>
             </div>
             <div class="w-56">{{ building.display_name }}</div>
             <div>{{ building.country }}</div>
-            <div>{{ building.city }}</div>
+            <div class="w-32">{{ building.city }}</div>
             <div class="w-56">{{ building.address }}</div>
             <div>{{ (levels | async)?.length || 0 }}</div>
             <div>{{ building.currency }}</div>
             <div>{{ building.allow_visitors ? 'YES' : 'NO' }}</div>
             <div>{{ building.catering_available ? 'YES' : 'NO' }}</div>
+            <div
+                actions
+                class="absolute top-1/2 -translate-y-1/2 left-24 rounded-3xl flex items-center bg-white dark:bg-neutral-700 shadow !p-0 min-w-0"
+            >
+                <button mat-icon-button matTooltip="Edit Building" (click)="edit()">
+                    <app-icon>edit</app-icon>
+                </button>
+                <button mat-icon-button matTooltip="Delete Building" (click)="remove()">
+                    <app-icon>delete</app-icon>
+                </button>
+            </div>
         </div>
         <ul
             *ngIf="(levels | async)?.length"
@@ -36,7 +53,7 @@ import { Building, OrganisationService } from './organisation.service';
         >
             <li
                 org-level
-                class="flex items-center"
+                class="flex items-center w-full"
                 *ngFor="let item of levels | async; let i = index"
                 [level]="item"
             ></li>
@@ -79,6 +96,9 @@ export class BuildingComponent {
         this._bld_id,
         this._org.levels,
     ]).pipe(map(([id, l]) => l.filter((lvl) => lvl.parent_id === id)));
+
+    public readonly edit = () => this._org.openBuildingModal(this.building);
+    public readonly remove = () => this._org.removeBuilding(this.building);
 
     constructor(private _org: OrganisationService) {}
 

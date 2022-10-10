@@ -15,12 +15,23 @@ import { BuildingLevel, OrganisationService } from './organisation.service';
             <div class="min-w-0 w-10 p-0"></div>
             <div class="w-56">{{ level.display_name }}</div>
             <div></div>
-            <div></div>
+            <div class="w-32"></div>
             <div class="w-56"></div>
             <div></div>
             <div></div>
             <div>{{ level.allow_visitors ? 'YES' : 'NO' }}</div>
             <div>{{ level.catering_available ? 'YES' : 'NO' }}</div>
+            <div
+                actions
+                class="absolute top-1/2 -translate-y-1/2 left-24 rounded-3xl flex items-center bg-white dark:bg-neutral-700 shadow !p-0 min-w-0"
+            >
+                <button mat-icon-button matTooltip="Edit Level" (click)="edit()">
+                    <app-icon>edit</app-icon>
+                </button>
+                <button mat-icon-button matTooltip="Delete Level" (click)="remove()">
+                    <app-icon>delete</app-icon>
+                </button>
+            </div>
         </div>
     `,
     styles: [
@@ -35,11 +46,26 @@ import { BuildingLevel, OrganisationService } from './organisation.service';
                 padding: 1rem;
                 flex-shrink: 0;
             }
+
+[actions] {
+    opacity: 0;
+    transition: opacity 200ms;
+    pointer-events: none;
+}
+
+[details]:hover [actions] {
+    opacity: 1;
+    pointer-events: auto;
+}
         `,
     ],
 })
 export class OrganisationLevelComponent {
     @Input() public level: BuildingLevel;
+
+
+    public readonly edit = () => this._org.openLevelModal(this.level);
+    public readonly remove = () => this._org.removeLevel(this.level);
 
     constructor(private _org: OrganisationService) {}
 }

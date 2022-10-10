@@ -6,6 +6,11 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ClipboardModule } from '@angular/cdk/clipboard';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatDialogModule } from '@angular/material/dialog';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatSelectModule } from '@angular/material/select';
 
 import { ComponentsModule } from '@placeos-tools/components';
 
@@ -16,6 +21,9 @@ import { LandingPageComponent } from './landing-page.component';
 import { OrganisationComponent } from './organisation/organisation.component';
 import { BuildingComponent } from './organisation/building.component';
 import { OrganisationLevelComponent } from './organisation/level.component';
+import { OrganisationBuildingModalComponent } from './organisation/building-modal.component';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { OrganisationLevelModalComponent } from './organisation/level-modal.component';
 
 const ROUTES: Route[] = [
     { path: 'home', component: LandingPageComponent },
@@ -30,7 +38,9 @@ const ROUTES: Route[] = [
         SidebarComponent,
         OrganisationComponent,
         BuildingComponent,
+        OrganisationBuildingModalComponent,
         OrganisationLevelComponent,
+        OrganisationLevelModalComponent,
         InterfacesComponent,
         LandingPageComponent,
     ],
@@ -41,10 +51,17 @@ const ROUTES: Route[] = [
             initialNavigation: 'enabledBlocking',
             useHash: true,
         }),
+        MatFormFieldModule,
+        MatInputModule,
+        MatTooltipModule,
+        MatDialogModule,
+        MatSelectModule,
         MatCheckboxModule,
         MatButtonModule,
         ComponentsModule,
         ClipboardModule,
+        FormsModule,
+        ReactiveFormsModule
     ],
     providers: [],
     bootstrap: [AppComponent],

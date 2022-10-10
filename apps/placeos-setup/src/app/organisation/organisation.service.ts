@@ -1,6 +1,10 @@
 import { Injectable } from "@angular/core";
+import { MatDialog } from "@angular/material/dialog";
 import { randomInt } from "@placeos-tools/common";
+import { openConfirmModal } from "libs/components/src/lib/confirm-modal.component";
 import { BehaviorSubject } from "rxjs";
+import { OrganisationBuildingModalComponent } from "./building-modal.component";
+import { OrganisationLevelModalComponent } from "./level-modal.component";
 
 export interface Building {
     id: string;
@@ -27,51 +31,68 @@ export interface BuildingLevel {
     providedIn: 'root'
 })
 export class OrganisationService {
-    private _building_list = new BehaviorSubject<Building[]>([{
-        id: 'test',
-        display_name: 'Test Building 1',
-        name: 'Building 1',
-        country: 'Australia',
-        city: 'Sydney',
-        address: '10 Market Place',
-        currency: 'AUD',
-        allow_visitors: false,
-        catering_available: true,
-    },{
-        id: 'test2',
-        display_name: 'Test Building 2',
-        name: 'Building 2',
-        country: 'Australia',
-        city: 'Brisbane',
-        address: '11 Market Place',
-        currency: 'AUD',
-        allow_visitors: true,
-        catering_available: false,
-    }]);
-    private _floor_list = new BehaviorSubject<BuildingLevel[]>([{
-        id: 'test-lvl',
-        parent_id: 'test',
-        display_name: 'Test Level 1',
-        name: 'Level 1',
-        allow_visitors: false,
-        catering_available: true,
-    }]);
+    private _building_list = new BehaviorSubject<Building[]>([]);
+    private _floor_list = new BehaviorSubject<BuildingLevel[]>([]);
 
     public readonly buildings = this._building_list.asObservable();
     public readonly levels = this._floor_list.asObservable();
 
-    constructor() {
-        // this._load();
+    constructor(private _dialog: MatDialog) {
+        this._load();
     }
 
     public setBuilding(bld: Building) {
         if (!bld.id) bld.id = `bld-${randomInt(9999_9999, 1000_0000)}`;
         this._building_list.next([...this._building_list.getValue().filter(_ => _.id !== bld.id), bld]);
+        this._store();
     }
 
     public setLevel(lvl: BuildingLevel) {
         if (!lvl.id) lvl.id = `lvl-${randomInt(9999_9999, 1000_0000)}`;
         this._floor_list.next([...this._floor_list.getValue().filter(_ => _.id !== lvl.id), lvl]);
+        this._store();
+    }
+
+    public async removeBuilding(bld: Building) {
+        const { close, reason } = await openConfirmModal({
+            title: 'Remove Building',
+            content: `Are you sure you want to remove building "${bld.display_name || bld.name}"?`,
+            icon: { content: 'delete' }
+        }, this._dialog);
+        if (reason !== 'done') return;
+        this._building_list.next(this._building_list.getValue().filter(_ => _.id !== bld.id));
+        close();
+    }
+
+    public async removeLevel(lvl: BuildingLevel) {
+        const { close, reason } = await openConfirmModal({
+            title: 'Remove Building',
+            content: `Are you sure you want to remove building "${lvl.display_name || lvl.name}"?`,
+            icon: { content: 'delete' }
+        }, this._dialog);
+        if (reason !== 'done') return;
+        this._floor_list.next(this._floor_list.getValue().filter(_ => _.id !== lvl.id));
+        close();
+    }
+
+    public openBuildingModal(bld?: Building) {
+        const ref = this._dialog.open(OrganisationBuildingModalComponent, {
+            data: bld
+        });
+        ref.componentInstance.onSave.subscribe((bld) => {
+            this.setBuilding(bld as any);
+            ref.close();
+        });
+    }
+
+    public openLevelModal(lvl?: BuildingLevel) {
+        const ref = this._dialog.open(OrganisationLevelModalComponent, {
+            data: { lvl, bld_list: this._building_list.getValue() }
+        });
+        ref.componentInstance.onSave.subscribe((lvl) => {
+            this.setLevel(lvl as any);
+            ref.close();
+        });
     }
 
     private _load() {

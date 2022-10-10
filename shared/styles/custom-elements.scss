@@ -1,5 +1,3 @@
-
-
 button.mat-button,
 a[button],
 .dark-mode button.mat-button,
@@ -63,7 +61,6 @@ mat-form-field {
     border-top: none;
 }
 
-
 .mat-form-field {
     &.rounded {
         .mat-form-field-outline-start {
@@ -93,7 +90,7 @@ mat-form-field {
     }
 
     &[overlay],
-    &[overlay]:hover  {
+    &[overlay]:hover {
         .mat-form-field-outline {
             background-color: #fff;
             border-radius: 4px;
@@ -102,7 +99,7 @@ mat-form-field {
 
     .mat-form-field-should-float .mat-form-field-wrapper {
         .mat-form-field-label {
-            transform: translateY(-1.5em) scale(.75) !important;
+            transform: translateY(-1.5em) scale(0.75) !important;
         }
     }
 }
@@ -135,6 +132,161 @@ mat-form-field {
     }
 
     &[disabled] {
-        opacity: .35;
+        opacity: 0.35;
+    }
+}
+
+#placeos {
+    .mat-hint {
+        color: inherit;
+        opacity: 0.6;
+    }
+
+    .mat-form-field-infix {
+        border-top-width: 0.25rem;
+    }
+
+
+    .mat-dialog-container {
+        padding: 0;
+    }
+}
+
+#placeos .dark,
+#placeos [dark] {
+
+    button[disabled="true"] {
+        color: rgba(255, 255, 255, 0.3);
+    }
+
+    mat-tab-group {
+        .mat-tab-label-container {
+            @apply bg-gray-900;
+        }
+        .mat-tab-label-content {
+            @apply text-white;
+        }
+    }
+
+    nav {
+        .mat-tab-links {
+            @apply bg-gray-900;
+        }
+        .mat-tab-link {
+            @apply text-white;
+        }
+    }
+
+    .mat-select-value-text,
+    .mat-select-arrow {
+        color: #fff;
+    }
+
+    .mat-form-field-outline > div {
+        color: #fff8;
+    }
+
+    .mat-form-field {
+        ::placeholder,
+        .mat-select-placeholder {
+            color: #fff8;
+        }
+    }
+
+    button.mat-button,
+    a[button] {
+        color: #fff;
+
+        &.inverse {
+            background: none;
+            --color: #fffa;
+        }
+
+        &.error {
+            --color: var(--error);
+        }
+
+        &[disabled] {
+            opacity: 0.3;
+        }
+    }
+
+    .mat-slide-toggle-bar {
+        background-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .mat-checked .mat-slide-toggle-bar {
+        background-color: rgba(255, 255, 255, 0.4);
+    }
+    mat-dialog-container {
+        background-color: #404040;
+        color: #fff;
+    }
+
+    mat-bottom-sheet-container {
+        background-color: #404040;
+        color: #fff;
+    }
+
+    .mat-paginator {
+        background-color: inherit;
+        color: inherit;
+    }
+
+    .mat-spinner {
+        circle {
+            stroke: var(--secondary);
+        }
+    }
+
+    mat-pseudo-checkbox.mat-pseudo-checkbox-checked {
+        background: var(--secondary);
+    }
+
+    mat-checkbox {
+        .mat-checkbox-frame {
+            border-color: #fff6;
+        }
+
+        &.mat-checkbox-checked .mat-checkbox-background {
+            background-color: var(--secondary);
+        }
+    }
+
+    .mat-autocomplete-panel {
+        @apply bg-neutral-700;
+    }
+
+    .ql-toolbar {
+        .ql-stroke {
+            stroke: #eee;
+        }
+        .ql-picker-label::before {
+            color: #fff;
+        }
+    }
+    .ql-blank::before {
+        color: #fff8;
+    }
+
+    .mat-menu-panel,
+    .mat-select-panel {
+        @apply bg-neutral-800;
+    }
+
+    .mat-option-text {
+        @apply text-white;
+    }
+
+    mat-option.mat-active {
+        @apply bg-white/5;
+    }
+
+    .mat-active .mat-option-text {
+        @apply text-blue-500;
+    }
+
+    .mat-option:hover {
+        @apply bg-white/10;
     }
 }
