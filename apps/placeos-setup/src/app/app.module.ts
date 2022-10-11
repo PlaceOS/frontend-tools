@@ -24,11 +24,13 @@ import { OrganisationLevelComponent } from './organisation/level.component';
 import { OrganisationBuildingModalComponent } from './organisation/building-modal.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { OrganisationLevelModalComponent } from './organisation/level-modal.component';
+import { InterfaceDetailsComponent } from './interfaces/interface-details.component';
 
 const ROUTES: Route[] = [
     { path: 'home', component: LandingPageComponent },
     { path: 'organisation', component: OrganisationComponent },
-    { path: 'interfaces', component: InterfacesComponent },
+    { path: 'interfaces/:id', component: InterfacesComponent },
+    { path: 'interfaces', redirectTo: `/interfaces/root` },
     { path: '**', redirectTo: '/home' },
 ];
 
@@ -42,6 +44,7 @@ const ROUTES: Route[] = [
         OrganisationLevelComponent,
         OrganisationLevelModalComponent,
         InterfacesComponent,
+        InterfaceDetailsComponent,
         LandingPageComponent,
     ],
     imports: [

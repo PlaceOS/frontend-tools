@@ -16,7 +16,7 @@ import { CURRENCIES } from '../data/currency';
             <header
                 class="w-full bg-blue-300 dark:bg-neutral-700 border-b border-gray-200 dark:border-neutral-500"
             >
-                <div class="mx-auto w-[640px] relative p-4 text-center">
+                <div class="mx-auto w-[640px] max-w-full relative p-4 text-center">
                     <div class="font-medium">{{ form.value.id ? 'Edit' : 'New' }} Building</div>
                     <button
                         mat-icon-button
@@ -30,7 +30,7 @@ import { CURRENCIES } from '../data/currency';
             </header>
             <ng-container *ngIf="!loading; else load_state">
                 <main
-                    class="mx-auto w-[640px] p-4 flex-1 h-1/2 overflow-auto"
+                    class="mx-auto w-[640px] max-w-full p-4 flex-1 h-1/2 overflow-auto"
                     [formGroup]="form"
                 >
                     <div class="w-full">
@@ -157,7 +157,7 @@ import { CURRENCIES } from '../data/currency';
                 <footer
                     class="w-full bg-blue-300 dark:bg-neutral-700 border-t border-gray-200 dark:border-neutral-500"
                 >
-                    <div class="mx-auto w-[640px] relative p-4">
+                    <div class="mx-auto w-[640px] max-w-full relative p-4">
                         <button mat-button (click)="save()" class="w-32">
                             Save
                         </button>
