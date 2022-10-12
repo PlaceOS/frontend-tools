@@ -59,8 +59,8 @@ export class LockersService {
 
     public async removeLocker(locker: Locker) {
         const { close, reason } = await openConfirmModal({
-            title: 'Remove Room',
-            content: `Are you sure you want to remove room "${locker.display_name || locker.name}"?`,
+            title: 'Remove Locker',
+            content: `Are you sure you want to remove locker "${locker.display_name || locker.name}"?`,
             icon: { content: 'delete' }
         }, this._dialog);
         if (reason !== 'done') return;

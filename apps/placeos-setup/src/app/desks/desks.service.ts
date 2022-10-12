@@ -59,8 +59,8 @@ export class DesksService {
 
     public async removeDesk(desk: Desk) {
         const { close, reason } = await openConfirmModal({
-            title: 'Remove Room',
-            content: `Are you sure you want to remove room "${desk.display_name || desk.name}"?`,
+            title: 'Remove Desk',
+            content: `Are you sure you want to remove desk "${desk.display_name || desk.name}"?`,
             icon: { content: 'delete' }
         }, this._dialog);
         if (reason !== 'done') return;
