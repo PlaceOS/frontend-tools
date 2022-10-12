@@ -35,6 +35,9 @@ import { DeskDetailsComponent } from './desks/desk-details.component';
 import { LockerModalComponent } from './lockers/locker-modal.component';
 import { LockersComponent } from './lockers/lockers.component';
 import { LockerDetailsComponent } from './lockers/locker-details.component';
+import { ZoneModalComponent } from './zoning/zone-modal.component';
+import { ZonesComponent } from './zoning/zoning.component';
+import { ZoneDetailsComponent } from './zoning/zone-details.component';
 
 const ROUTES: Route[] = [
     { path: 'home', component: LandingPageComponent },
@@ -44,6 +47,7 @@ const ROUTES: Route[] = [
     { path: 'spaces', component: SpacesComponent },
     { path: 'desks', component: DesksComponent },
     { path: 'lockers', component: LockersComponent },
+    { path: 'zoning', component: ZonesComponent },
     { path: '**', redirectTo: '/home' },
 ];
 
@@ -67,7 +71,10 @@ const ROUTES: Route[] = [
         DeskDetailsComponent,
         LockerModalComponent,
         LockersComponent,
-        LockerDetailsComponent
+        LockerDetailsComponent,
+        ZoneModalComponent,
+        ZonesComponent,
+        ZoneDetailsComponent
     ],
     imports: [
         BrowserModule,
