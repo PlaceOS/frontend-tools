@@ -38,6 +38,9 @@ import { LockerDetailsComponent } from './lockers/locker-details.component';
 import { ZoneModalComponent } from './zoning/zone-modal.component';
 import { ZonesComponent } from './zoning/zoning.component';
 import { ZoneDetailsComponent } from './zoning/zone-details.component';
+import { CarSpacesComponent } from './car-spaces/car-spaces.component';
+import { CarSpaceModalComponent } from './car-spaces/car-space-modal.component';
+import { CarSpaceDetailsComponent } from './car-spaces/car-space-details.component';
 
 const ROUTES: Route[] = [
     { path: 'home', component: LandingPageComponent },
@@ -48,6 +51,7 @@ const ROUTES: Route[] = [
     { path: 'desks', component: DesksComponent },
     { path: 'lockers', component: LockersComponent },
     { path: 'zoning', component: ZonesComponent },
+    { path: 'parking', component: CarSpacesComponent },
     { path: '**', redirectTo: '/home' },
 ];
 
@@ -74,7 +78,10 @@ const ROUTES: Route[] = [
         LockerDetailsComponent,
         ZoneModalComponent,
         ZonesComponent,
-        ZoneDetailsComponent
+        ZoneDetailsComponent,
+        CarSpacesComponent,
+        CarSpaceModalComponent,
+        CarSpaceDetailsComponent
     ],
     imports: [
         BrowserModule,
