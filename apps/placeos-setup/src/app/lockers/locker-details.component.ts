@@ -1,0 +1,76 @@
+import { Component, Input } from '@angular/core';
+import { Building, OrganisationService } from '../organisation/organisation.service';
+import { Locker, LockersService } from './lockers.service';
+
+@Component({
+    selector: `locker-details,[locker-details]`,
+    template: `
+        <div
+            details
+            class="flex items-center border-b border-neutral-500 text-sm hover:bg-black/10 relative"
+        >
+            <div thead class="min-w-0 w-10">
+                <mat-checkbox></mat-checkbox>
+            </div>
+            <div thead class="font-mono text-xs">{{ item.map_id }}</div>
+            <div thead class="w-56">{{ item.display_name }}</div>
+            <div thead>{{ item.name }}</div>
+            <div thead>{{ item.building_id }}</div>
+            <div thead>{{ item.level_id }}</div>
+            <div thead>{{ item.zone }}</div>
+            <div thead class="w-64">{{ item.features?.join() || 'NONE' }}</div>
+            <div thead class="w-64">{{ item.whitelist_groups?.join() || 'NONE' }}</div>
+            <div thead>{{ item.bookable ? 'YES' : 'NO' }}</div>
+            <div thead>{{ item.requires_approval ? 'YES' : 'NO' }}</div>
+            <div thead>{{ item.auto_release ? 'YES' : 'NO' }}</div>
+            <div thead>{{ item.auto_release_delay || '10' }} minutes</div>
+            <div thead class="w-32">{{ item.sensor_brand }}</div>
+            <div thead>{{ item.recurrence ? 'YES' : 'NO' }}</div>
+            <div thead>{{ item.max_recurrence }}</div>
+            <div
+                actions
+                class="absolute top-1/2 -translate-y-1/2 left-12 rounded-3xl flex items-center bg-white dark:bg-neutral-700 shadow !p-0 min-w-0 w-auto"
+            >
+                <button mat-icon-button matTooltip="Edit Room" (click)="edit()">
+                    <app-icon>edit</app-icon>
+                </button>
+                <button mat-icon-button matTooltip="Delete Room" (click)="remove()">
+                    <app-icon>delete</app-icon>
+                </button>
+            </div>
+        </div>
+    `,
+    styles: [
+        `
+            :host {
+                min-width: 100%;
+            }
+
+            [details] > div {
+                min-width: 6rem;
+                width: 6rem;
+                padding: 1rem;
+                flex-shrink: 0;
+            }
+
+            [actions] {
+                opacity: 0;
+                transition: opacity 200ms;
+                pointer-events: none;
+            }
+
+            [details]:hover [actions] {
+                opacity: 1;
+                pointer-events: auto;
+            }
+        `,
+    ]
+})
+export class LockerDetailsComponent {
+    @Input() public item: Locker;
+
+    public readonly edit = () => this._service.openLockerModal(this.item);
+    public readonly remove = () => this._service.removeLocker(this.item);
+
+    constructor(private _service: LockersService) {}
+}

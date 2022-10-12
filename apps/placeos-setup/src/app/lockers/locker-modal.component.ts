@@ -6,10 +6,10 @@ import { COMMA, ENTER } from '@angular/cdk/keycodes';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 
 import { OrganisationService } from '../organisation/organisation.service';
-import { Desk } from './desks.service';
+import { Locker } from './lockers.service';
 
 @Component({
-    selector: 'desk-modal',
+    selector: 'locker-modal',
     template: `
         <div
             class="absolute inset-0 bg-white dark:bg-neutral-600 dark:text-white flex flex-col"
@@ -19,7 +19,7 @@ import { Desk } from './desks.service';
             >
                 <div class="mx-auto w-[640px] relative p-4 text-center">
                     <div class="font-medium">
-                        {{ form.value.id ? 'Edit' : 'New' }} Desk
+                        {{ form.value.id ? 'Edit' : 'New' }} Locker
                     </div>
                     <button
                         mat-icon-button
@@ -37,18 +37,18 @@ import { Desk } from './desks.service';
                     [formGroup]="form"
                 >
                     <div class="w-full">
-                        <label for="desk-id">Desk ID</label>
+                        <label for="locker-id">Locker ID</label>
                         <mat-form-field appearance="outline" class="w-full">
                             <input
                                 matInput
-                                name="desk-id"
+                                name="locker-id"
                                 formControlName="map_id"
-                                placeholder="Desk ID"
+                                placeholder="Locker ID"
                             />
                             <mat-hint>
                                 Map ID associated with the map
                             </mat-hint>
-                            <mat-error>Desk ID is required</mat-error>
+                            <mat-error>Locker ID is required</mat-error>
                         </mat-form-field>
                     </div>
                     <div class="w-full">
@@ -78,7 +78,7 @@ import { Desk } from './desks.service';
                                 placeholder="Level Name"
                             />
                             <mat-hint>
-                                Organisational name for the desk
+                                Organisational name for the locker
                             </mat-hint>
                             <mat-error>Name is required</mat-error>
                         </mat-form-field>
@@ -120,7 +120,7 @@ import { Desk } from './desks.service';
                                 </mat-option>
                             </mat-select>
                             <mat-hint>
-                                Building Level that the desk resides in
+                                Building Level that the locker resides in
                             </mat-hint>
                             <mat-error>Building Level is required</mat-error>
                         </mat-form-field>
@@ -135,17 +135,17 @@ import { Desk } from './desks.service';
                                 placeholder="Sensor Brand"
                             />
                             <mat-hint>
-                                Brand of sensors that are used in the desk
+                                Brand of sensors that are used in the locker
                             </mat-hint>
                             <mat-error>Sensor brand is required</mat-error>
                         </mat-form-field>
                     </div>
                     <div class="w-full">
-                        <label for="display-name">Desk Features</label>
+                        <label for="display-name">Locker Features</label>
                         <mat-form-field appearance="outline" class="w-full">
                             <mat-chip-list
                                 #featureList
-                                aria-label="Desk Features"
+                                aria-label="Locker Features"
                             >
                                 <mat-chip
                                     *ngFor="let item of form.value.features"
@@ -171,7 +171,7 @@ import { Desk } from './desks.service';
                                 />
                             </mat-chip-list>
                             <mat-hint>
-                                Resources in the desk that are available for
+                                Resources in the locker that are available for
                                 users.
                             </mat-hint>
                             <mat-error>Display name is required</mat-error>
@@ -216,7 +216,7 @@ import { Desk } from './desks.service';
                                 />
                             </mat-chip-list>
                             <mat-hint>
-                                Users groups to limit access to this desk
+                                Users groups to limit access to this locker
                             </mat-hint>
                             <mat-error>Display name is required</mat-error>
                         </mat-form-field>
@@ -226,7 +226,7 @@ import { Desk } from './desks.service';
                             name="visitors"
                             formControlName="bookable"
                         >
-                            Is desk bookable?
+                            Is locker bookable?
                         </mat-checkbox>
                     </div>
                     <div class="w-full py-2">
@@ -250,7 +250,7 @@ import { Desk } from './desks.service';
                             name="recurrence"
                             formControlName="recurrence"
                         >
-                            Should recurring bookings be allowed in this desk?
+                            Should recurring bookings be allowed in this locker?
                         </mat-checkbox>
                     </div>
                     <div class="w-full" *ngIf="form.value.recurrence">
@@ -285,14 +285,14 @@ import { Desk } from './desks.service';
         <ng-template #load_state>
             <div class="mx-auto w-[640px] p-4 flex-1 h-1/2">
                 <mat-spinner></mat-spinner>
-                <p>Saving desk data...</p>
+                <p>Saving locker data...</p>
             </div>
         </ng-template>
     `,
     styles: [``],
 })
-export class DeskModalComponent {
-    @Output() public readonly onSave = new EventEmitter<Partial<Desk>>();
+export class LockerModalComponent {
+    @Output() public readonly onSave = new EventEmitter<Partial<Locker>>();
     public loading = false;
     public addOnBlur = true;
 
@@ -338,7 +338,7 @@ export class DeskModalComponent {
 
     constructor(
         @Inject(MAT_DIALOG_DATA)
-        private _data: Desk,
+        private _data: Locker,
         private _org: OrganisationService
     ) {
         this.form.patchValue(this._data as any);

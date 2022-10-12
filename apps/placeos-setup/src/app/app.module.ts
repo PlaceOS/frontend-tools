@@ -32,6 +32,9 @@ import { SpaceDetailsComponent } from './spaces/space-details.component';
 import { DeskModalComponent } from './desks/desk-modal.component';
 import { DesksComponent } from './desks/desks.component';
 import { DeskDetailsComponent } from './desks/desk-details.component';
+import { LockerModalComponent } from './lockers/locker-modal.component';
+import { LockersComponent } from './lockers/lockers.component';
+import { LockerDetailsComponent } from './lockers/locker-details.component';
 
 const ROUTES: Route[] = [
     { path: 'home', component: LandingPageComponent },
@@ -40,6 +43,7 @@ const ROUTES: Route[] = [
     { path: 'interfaces', redirectTo: `/interfaces/root` },
     { path: 'spaces', component: SpacesComponent },
     { path: 'desks', component: DesksComponent },
+    { path: 'lockers', component: LockersComponent },
     { path: '**', redirectTo: '/home' },
 ];
 
@@ -60,7 +64,10 @@ const ROUTES: Route[] = [
         SpaceDetailsComponent,
         DeskModalComponent,
         DesksComponent,
-        DeskDetailsComponent
+        DeskDetailsComponent,
+        LockerModalComponent,
+        LockersComponent,
+        LockerDetailsComponent
     ],
     imports: [
         BrowserModule,
