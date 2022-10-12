@@ -2,3 +2,8 @@
 label {
     @apply font-semibold text-sm;
 }
+#placeos {
+    input {
+        caret-color: var(--primary);   
+    }
+}

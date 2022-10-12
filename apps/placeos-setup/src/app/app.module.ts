@@ -11,6 +11,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSelectModule } from '@angular/material/select';
+import { MatChipsModule } from '@angular/material/chips';
 
 import { ComponentsModule } from '@placeos-tools/components';
 
@@ -25,12 +26,16 @@ import { OrganisationBuildingModalComponent } from './organisation/building-moda
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { OrganisationLevelModalComponent } from './organisation/level-modal.component';
 import { InterfaceDetailsComponent } from './interfaces/interface-details.component';
+import { SpaceModalComponent } from './spaces/space-modal.component';
+import { SpacesComponent } from './spaces/spaces.component';
+import { SpaceDetailsComponent } from './spaces/space-details.component';
 
 const ROUTES: Route[] = [
     { path: 'home', component: LandingPageComponent },
     { path: 'organisation', component: OrganisationComponent },
     { path: 'interfaces/:id', component: InterfacesComponent },
     { path: 'interfaces', redirectTo: `/interfaces/root` },
+    { path: 'spaces', component: SpacesComponent },
     { path: '**', redirectTo: '/home' },
 ];
 
@@ -46,6 +51,9 @@ const ROUTES: Route[] = [
         InterfacesComponent,
         InterfaceDetailsComponent,
         LandingPageComponent,
+        SpaceModalComponent,
+        SpacesComponent,
+        SpaceDetailsComponent
     ],
     imports: [
         BrowserModule,
@@ -61,6 +69,7 @@ const ROUTES: Route[] = [
         MatSelectModule,
         MatCheckboxModule,
         MatButtonModule,
+        MatChipsModule,
         ComponentsModule,
         ClipboardModule,
         FormsModule,

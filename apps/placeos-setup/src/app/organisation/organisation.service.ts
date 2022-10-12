@@ -61,6 +61,7 @@ export class OrganisationService {
         }, this._dialog);
         if (reason !== 'done') return;
         this._building_list.next(this._building_list.getValue().filter(_ => _.id !== bld.id));
+        this._store();
         close();
     }
 
@@ -72,6 +73,7 @@ export class OrganisationService {
         }, this._dialog);
         if (reason !== 'done') return;
         this._floor_list.next(this._floor_list.getValue().filter(_ => _.id !== lvl.id));
+        this._store();
         close();
     }
 
