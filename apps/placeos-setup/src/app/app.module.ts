@@ -29,6 +29,9 @@ import { InterfaceDetailsComponent } from './interfaces/interface-details.compon
 import { SpaceModalComponent } from './spaces/space-modal.component';
 import { SpacesComponent } from './spaces/spaces.component';
 import { SpaceDetailsComponent } from './spaces/space-details.component';
+import { DeskModalComponent } from './desks/desk-modal.component';
+import { DesksComponent } from './desks/desks.component';
+import { DeskDetailsComponent } from './desks/desk-details.component';
 
 const ROUTES: Route[] = [
     { path: 'home', component: LandingPageComponent },
@@ -36,6 +39,7 @@ const ROUTES: Route[] = [
     { path: 'interfaces/:id', component: InterfacesComponent },
     { path: 'interfaces', redirectTo: `/interfaces/root` },
     { path: 'spaces', component: SpacesComponent },
+    { path: 'desks', component: DesksComponent },
     { path: '**', redirectTo: '/home' },
 ];
 
@@ -53,7 +57,10 @@ const ROUTES: Route[] = [
         LandingPageComponent,
         SpaceModalComponent,
         SpacesComponent,
-        SpaceDetailsComponent
+        SpaceDetailsComponent,
+        DeskModalComponent,
+        DesksComponent,
+        DeskDetailsComponent
     ],
     imports: [
         BrowserModule,

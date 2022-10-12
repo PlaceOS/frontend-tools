@@ -1,9 +1,9 @@
 import { Component, Input } from '@angular/core';
 import { Building, OrganisationService } from '../organisation/organisation.service';
-import { Space, SpacesService } from './spaces.service';
+import { Desk, DesksService } from './desks.service';
 
 @Component({
-    selector: `space-details,[space-details]`,
+    selector: `desk-details,[desk-details]`,
     template: `
         <div
             details
@@ -12,27 +12,21 @@ import { Space, SpacesService } from './spaces.service';
             <div thead class="min-w-0 w-10">
                 <mat-checkbox></mat-checkbox>
             </div>
-            <div thead class="font-mono text-xs">{{ item.room_id }}</div>
+            <div thead class="font-mono text-xs">{{ item.map_id }}</div>
             <div thead class="w-56">{{ item.display_name }}</div>
             <div thead>{{ item.name }}</div>
             <div thead>{{ item.building_id }}</div>
             <div thead>{{ item.level_id }}</div>
-            <div thead class="w-56">{{ item.email }}</div>
-            <div thead>{{ item.capacity || '0' }}</div>
-            <div thead>{{ item.type }}</div>
+            <div thead>{{ item.zone }}</div>
             <div thead class="w-64">{{ item.features?.join() || 'NONE' }}</div>
-            <div thead>{{ item.pets_allowed ? 'YES' : 'NO' }}</div>
-            <div thead>{{ item.catering_available ? 'YES' : 'NO' }}</div>
-            <div thead>{{ item.requires_approval ? 'YES' : 'NO' }}</div>
-            <div thead>{{ item.visitors ? 'YES' : 'NO' }}</div>
             <div thead class="w-64">{{ item.whitelist_groups?.join() || 'NONE' }}</div>
+            <div thead>{{ item.bookable ? 'YES' : 'NO' }}</div>
+            <div thead>{{ item.requires_approval ? 'YES' : 'NO' }}</div>
             <div thead>{{ item.auto_release ? 'YES' : 'NO' }}</div>
             <div thead>{{ item.auto_release_delay || '10' }} minutes</div>
             <div thead class="w-32">{{ item.sensor_brand }}</div>
             <div thead>{{ item.recurrence ? 'YES' : 'NO' }}</div>
             <div thead>{{ item.max_recurrence }}</div>
-            <div thead>{{ item.all_day ? 'YES' : 'NO' }}</div>
-            <div thead>{{ item.images ? 'YES' : 'NO' }}</div>
             <div
                 actions
                 class="absolute top-1/2 -translate-y-1/2 left-12 rounded-3xl flex items-center bg-white dark:bg-neutral-700 shadow !p-0 min-w-0 w-auto"
@@ -72,11 +66,11 @@ import { Space, SpacesService } from './spaces.service';
         `,
     ]
 })
-export class SpaceDetailsComponent {
-    @Input() public item: Space;
+export class DeskDetailsComponent {
+    @Input() public item: Desk;
 
-    public readonly edit = () => this._service.openSpaceModal(this.item);
-    public readonly remove = () => this._service.removeSpace(this.item);
+    public readonly edit = () => this._service.openDeskModal(this.item);
+    public readonly remove = () => this._service.removeDesk(this.item);
 
-    constructor(private _service: SpacesService) {}
+    constructor(private _service: DesksService) {}
 }

@@ -6,10 +6,10 @@ import { COMMA, ENTER } from '@angular/cdk/keycodes';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 
 import { OrganisationService } from '../organisation/organisation.service';
-import { Space } from './spaces.service';
+import { Desk } from './desks.service';
 
 @Component({
-    selector: 'space-modal',
+    selector: 'desk-modal',
     template: `
         <div
             class="absolute inset-0 bg-white dark:bg-neutral-600 dark:text-white flex flex-col"
@@ -19,7 +19,7 @@ import { Space } from './spaces.service';
             >
                 <div class="mx-auto w-[640px] relative p-4 text-center">
                     <div class="font-medium">
-                        {{ form.value.id ? 'Edit' : 'New' }} Room
+                        {{ form.value.id ? 'Edit' : 'New' }} Desk
                     </div>
                     <button
                         mat-icon-button
@@ -37,18 +37,18 @@ import { Space } from './spaces.service';
                     [formGroup]="form"
                 >
                     <div class="w-full">
-                        <label for="room-id">Room ID</label>
+                        <label for="desk-id">Desk ID</label>
                         <mat-form-field appearance="outline" class="w-full">
                             <input
                                 matInput
-                                name="room-id"
-                                formControlName="room_id"
-                                placeholder="Room ID"
+                                name="desk-id"
+                                formControlName="desk_id"
+                                placeholder="Desk ID"
                             />
                             <mat-hint>
                                 Map ID associated with the map
                             </mat-hint>
-                            <mat-error>Room ID is required</mat-error>
+                            <mat-error>Desk ID is required</mat-error>
                         </mat-form-field>
                     </div>
                     <div class="w-full">
@@ -78,7 +78,7 @@ import { Space } from './spaces.service';
                                 placeholder="Level Name"
                             />
                             <mat-hint>
-                                Organisational name for the space
+                                Organisational name for the desk
                             </mat-hint>
                             <mat-error>Name is required</mat-error>
                         </mat-form-field>
@@ -120,7 +120,7 @@ import { Space } from './spaces.service';
                                 </mat-option>
                             </mat-select>
                             <mat-hint>
-                                Building Level that the space resides in
+                                Building Level that the desk resides in
                             </mat-hint>
                             <mat-error>Building Level is required</mat-error>
                         </mat-form-field>
@@ -135,17 +135,17 @@ import { Space } from './spaces.service';
                                 placeholder="Sensor Brand"
                             />
                             <mat-hint>
-                                Brand of sensors that are used in the room
+                                Brand of sensors that are used in the desk
                             </mat-hint>
                             <mat-error>Sensor brand is required</mat-error>
                         </mat-form-field>
                     </div>
                     <div class="w-full">
-                        <label for="display-name">Room Features</label>
+                        <label for="display-name">Desk Features</label>
                         <mat-form-field appearance="outline" class="w-full">
                             <mat-chip-list
                                 #featureList
-                                aria-label="Room Features"
+                                aria-label="Desk Features"
                             >
                                 <mat-chip
                                     *ngFor="let item of form.value.features"
@@ -171,7 +171,7 @@ import { Space } from './spaces.service';
                                 />
                             </mat-chip-list>
                             <mat-hint>
-                                Resources in the room that are available for
+                                Resources in the desk that are available for
                                 users.
                             </mat-hint>
                             <mat-error>Display name is required</mat-error>
@@ -216,7 +216,7 @@ import { Space } from './spaces.service';
                                 />
                             </mat-chip-list>
                             <mat-hint>
-                                Users groups to limit access to this room
+                                Users groups to limit access to this desk
                             </mat-hint>
                             <mat-error>Display name is required</mat-error>
                         </mat-form-field>
@@ -224,17 +224,9 @@ import { Space } from './spaces.service';
                     <div class="w-full py-2">
                         <mat-checkbox
                             name="visitors"
-                            formControlName="allow_visitors"
+                            formControlName="bookable"
                         >
-                            Are visitors allow to the building?
-                        </mat-checkbox>
-                    </div>
-                    <div class="w-full py-2">
-                        <mat-checkbox
-                            name="catering"
-                            formControlName="catering_available"
-                        >
-                            Is catering available in the building?
+                            Is desk bookable?
                         </mat-checkbox>
                     </div>
                     <div class="w-full py-2">
@@ -247,47 +239,18 @@ import { Space } from './spaces.service';
                     </div>
                     <div class="w-full py-2">
                         <mat-checkbox
-                            name="visitors"
-                            formControlName="visitors"
-                        >
-                            Are visitors allow to use this room?
-                        </mat-checkbox>
-                    </div>
-                    <div class="w-full py-2">
-                        <mat-checkbox
                             name="auto-release"
                             formControlName="auto_release"
                         >
                             Should bookings be released if not checked into?
                         </mat-checkbox>
                     </div>
-                    <div class="w-full" *ngIf="form.value.auto_release">
-                        <label for="auto-release-delay"
-                            >Auto-release delay</label
-                        >
-                        <mat-form-field appearance="outline" class="w-full">
-                            <input
-                                matInput
-                                name="auto-release-delay"
-                                type="number"
-                                formControlName="auto_release_delay"
-                                placeholder="Auto-release Delay"
-                            />
-                            <mat-hint>
-                                Duration in minutes after the start of the
-                                booking
-                            </mat-hint>
-                            <mat-error
-                                >Auto-release delay is required</mat-error
-                            >
-                        </mat-form-field>
-                    </div>
                     <div class="w-full py-2">
                         <mat-checkbox
                             name="recurrence"
                             formControlName="recurrence"
                         >
-                            Should recurring bookings be allowed in this room?
+                            Should recurring bookings be allowed in this desk?
                         </mat-checkbox>
                     </div>
                     <div class="w-full" *ngIf="form.value.recurrence">
@@ -307,17 +270,6 @@ import { Space } from './spaces.service';
                             <mat-error>Max recurrences is required</mat-error>
                         </mat-form-field>
                     </div>
-                    <div class="w-full py-2">
-                        <mat-checkbox name="all-day" formControlName="all_day">
-                            Should all day bookings be allowed in this room?
-                        </mat-checkbox>
-                    </div>
-                    <div class="w-full py-2">
-                        <mat-checkbox name="images" formControlName="images">
-                            Does this room have images that can be displayed to
-                            users?
-                        </mat-checkbox>
-                    </div>
                 </main>
                 <footer
                     class="w-full bg-blue-300 dark:bg-neutral-700 border-t border-gray-200 dark:border-neutral-500"
@@ -333,14 +285,14 @@ import { Space } from './spaces.service';
         <ng-template #load_state>
             <div class="mx-auto w-[640px] p-4 flex-1 h-1/2">
                 <mat-spinner></mat-spinner>
-                <p>Saving space data...</p>
+                <p>Saving desk data...</p>
             </div>
         </ng-template>
     `,
     styles: [``],
 })
-export class SpaceModalComponent {
-    @Output() public readonly onSave = new EventEmitter<Partial<Space>>();
+export class DeskModalComponent {
+    @Output() public readonly onSave = new EventEmitter<Partial<Desk>>();
     public loading = false;
     public addOnBlur = true;
 
@@ -349,7 +301,7 @@ export class SpaceModalComponent {
     public readonly level_list = this._org.levels;
     public readonly form = new FormGroup({
         id: new FormControl(''),
-        room_id: new FormControl('', [Validators.required]),
+        desk_id: new FormControl('', [Validators.required]),
         building_id: new FormControl('', [Validators.required]),
         level_id: new FormControl('', [Validators.required]),
         display_name: new FormControl(''),
@@ -386,7 +338,7 @@ export class SpaceModalComponent {
 
     constructor(
         @Inject(MAT_DIALOG_DATA)
-        private _data: Space,
+        private _data: Desk,
         private _org: OrganisationService
     ) {
         this.form.patchValue(this._data as any);
