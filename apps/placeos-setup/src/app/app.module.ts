@@ -41,6 +41,9 @@ import { ZoneDetailsComponent } from './zoning/zone-details.component';
 import { CarSpacesComponent } from './car-spaces/car-spaces.component';
 import { CarSpaceModalComponent } from './car-spaces/car-space-modal.component';
 import { CarSpaceDetailsComponent } from './car-spaces/car-space-details.component';
+import { MonitoringComponent } from './monitoring/monitoring.component';
+import { MonitoringItemDetailsComponent } from './monitoring/item-details.component';
+import { MonitoringItemModalComponent } from './monitoring/item-modal.component';
 
 const ROUTES: Route[] = [
     { path: 'home', component: LandingPageComponent },
@@ -52,6 +55,7 @@ const ROUTES: Route[] = [
     { path: 'lockers', component: LockersComponent },
     { path: 'zoning', component: ZonesComponent },
     { path: 'parking', component: CarSpacesComponent },
+    { path: 'monitoring', component: MonitoringComponent },
     { path: '**', redirectTo: '/home' },
 ];
 
@@ -81,7 +85,10 @@ const ROUTES: Route[] = [
         ZoneDetailsComponent,
         CarSpacesComponent,
         CarSpaceModalComponent,
-        CarSpaceDetailsComponent
+        CarSpaceDetailsComponent,
+        MonitoringComponent,
+        MonitoringItemDetailsComponent,
+        MonitoringItemModalComponent
     ],
     imports: [
         BrowserModule,
