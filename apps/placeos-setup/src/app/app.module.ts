@@ -47,6 +47,9 @@ import { MonitoringItemModalComponent } from './monitoring/item-modal.component'
 import { AssetsComponent } from './assets/assets.component';
 import { AssetDetailsComponent } from './assets/asset-details.component';
 import { AssetModalComponent } from './assets/asset-modal.component';
+import { AccessControlsComponent } from './access-control/access-control.component';
+import { AccessControlModalComponent } from './access-control/access-control-modal.component';
+import { AccessControlDetailsComponent } from './access-control/access-control-details.component';
 
 const ROUTES: Route[] = [
     { path: 'home', component: LandingPageComponent },
@@ -60,6 +63,7 @@ const ROUTES: Route[] = [
     { path: 'parking', component: CarSpacesComponent },
     { path: 'assets', component: AssetsComponent },
     { path: 'monitoring', component: MonitoringComponent },
+    { path: 'access-control', component: AccessControlsComponent },
     { path: '**', redirectTo: '/home' },
 ];
 
@@ -95,7 +99,10 @@ const ROUTES: Route[] = [
         MonitoringItemModalComponent,
         AssetsComponent,
         AssetDetailsComponent,
-        AssetModalComponent
+        AssetModalComponent,
+        AccessControlsComponent,
+        AccessControlModalComponent,
+        AccessControlDetailsComponent
     ],
     imports: [
         BrowserModule,
