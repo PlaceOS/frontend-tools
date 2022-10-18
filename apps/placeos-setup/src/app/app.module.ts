@@ -50,6 +50,9 @@ import { AssetModalComponent } from './assets/asset-modal.component';
 import { AccessControlsComponent } from './access-control/access-control.component';
 import { AccessControlModalComponent } from './access-control/access-control-modal.component';
 import { AccessControlDetailsComponent } from './access-control/access-control-details.component';
+import { FloorPlansComponent } from './floorplans/floorplans.component';
+import { FloorPlanModalComponent } from './floorplans/floorplan-modal.component';
+import { FloorPlanDetailsComponent } from './floorplans/floorplan-details.component';
 
 const ROUTES: Route[] = [
     { path: 'home', component: LandingPageComponent },
@@ -57,6 +60,7 @@ const ROUTES: Route[] = [
     { path: 'interfaces/:id', component: InterfacesComponent },
     { path: 'interfaces', redirectTo: `/interfaces/root` },
     { path: 'spaces', component: SpacesComponent },
+    { path: 'floorplans', component: FloorPlansComponent },
     { path: 'desks', component: DesksComponent },
     { path: 'lockers', component: LockersComponent },
     { path: 'zoning', component: ZonesComponent },
@@ -82,6 +86,9 @@ const ROUTES: Route[] = [
         SpaceModalComponent,
         SpacesComponent,
         SpaceDetailsComponent,
+        FloorPlansComponent,
+        FloorPlanModalComponent,
+        FloorPlanDetailsComponent,
         DeskModalComponent,
         DesksComponent,
         DeskDetailsComponent,

@@ -51,27 +51,27 @@ export class LockersService {
 
     constructor(private _dialog: MatDialog) {}
 
-    public setLocker(locker: Locker) {
-        if (!locker.id) locker.id = `locker-${randomInt(9999_9999, 1000_0000)}`;
-        this._locker_list.next([...this._locker_list.getValue().filter(_ => _.id !== locker.id), locker]);
+    public setLocker(item: Locker) {
+        if (!item.id) item.id = `locker-${randomInt(9999_9999, 1000_0000)}`;
+        this._locker_list.next([...this._locker_list.getValue().filter(_ => _.id !== item.id), item]);
         this._store();
     }
 
-    public async removeLocker(locker: Locker) {
+    public async removeLocker(item: Locker) {
         const { close, reason } = await openConfirmModal({
             title: 'Remove Locker',
-            content: `Are you sure you want to remove locker "${locker.display_name || locker.name}"?`,
+            content: `Are you sure you want to remove locker "${item.display_name || item.name}"?`,
             icon: { content: 'delete' }
         }, this._dialog);
         if (reason !== 'done') return;
-        this._locker_list.next(this._locker_list.getValue().filter(_ => _.id !== locker.id));
+        this._locker_list.next(this._locker_list.getValue().filter(_ => _.id !== item.id));
         this._store();
         close();
     }
 
-    public openLockerModal(locker?: Locker) {
+    public openLockerModal(item?: Locker) {
         const ref = this._dialog.open(LockerModalComponent, {
-            data: locker
+            data: item
         });
         ref.componentInstance.onSave.subscribe((locker) => {
             this.setLocker(locker as any);
