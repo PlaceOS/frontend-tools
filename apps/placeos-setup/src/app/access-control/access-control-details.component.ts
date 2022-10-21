@@ -22,10 +22,10 @@ import { AccessControl, AccessControlService } from './access-control.service';
                 actions
                 class="absolute top-1/2 -translate-y-1/2 left-12 rounded-3xl flex items-center bg-white dark:bg-neutral-700 shadow !p-0 min-w-0 w-auto"
             >
-                <button mat-icon-button matTooltip="Edit Room" (click)="edit()">
+                <button mat-icon-button matTooltip="Edit Settings" (click)="edit()">
                     <app-icon>edit</app-icon>
                 </button>
-                <button mat-icon-button matTooltip="Delete Room" (click)="remove()">
+                <button mat-icon-button matTooltip="Delete Settings" (click)="remove()">
                     <app-icon>delete</app-icon>
                 </button>
             </div>
