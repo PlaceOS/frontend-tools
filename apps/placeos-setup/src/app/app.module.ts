@@ -53,6 +53,7 @@ import { AccessControlDetailsComponent } from './access-control/access-control-d
 import { FloorPlansComponent } from './floorplans/floorplans.component';
 import { FloorPlanModalComponent } from './floorplans/floorplan-modal.component';
 import { FloorPlanDetailsComponent } from './floorplans/floorplan-details.component';
+import { FloorPlanExampleModalComponent } from './floorplans/example-modal.component';
 
 const ROUTES: Route[] = [
     { path: 'home', component: LandingPageComponent },
@@ -89,6 +90,7 @@ const ROUTES: Route[] = [
         FloorPlansComponent,
         FloorPlanModalComponent,
         FloorPlanDetailsComponent,
+        FloorPlanExampleModalComponent,
         DeskModalComponent,
         DesksComponent,
         DeskDetailsComponent,

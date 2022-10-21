@@ -1,4 +1,6 @@
 import { Component } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
+import { FloorPlanExampleModalComponent } from './example-modal.component';
 import { FloorPlansService } from './floorplans.service';
 
 @Component({
@@ -8,6 +10,9 @@ import { FloorPlansService } from './floorplans.service';
             <header class="bg-neutral-700 p-2 space-x-2">
                 <button mat-button class="w-32" (click)="newFloorPlan()">
                     Add Floor Plan
+                </button>
+                <button mat-button class="w-44" (click)="viewExample()">
+                    View Example Map
                 </button>
             </header>
             <main class="w-full h-1/2 flex-1 overflow-auto">
@@ -68,5 +73,9 @@ export class FloorPlansComponent {
 
     public readonly newFloorPlan = () => this._service.openFloorPlanModal();
 
-    constructor(private _service: FloorPlansService) {}
+    constructor(private _service: FloorPlansService, private _dialog: MatDialog) {}
+
+    public viewExample() {
+        this._dialog.open(FloorPlanExampleModalComponent);
+    }
 }
