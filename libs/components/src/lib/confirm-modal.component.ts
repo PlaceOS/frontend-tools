@@ -1,36 +1,14 @@
 import { Component, Output, EventEmitter, Inject } from '@angular/core';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { openGenericModal } from '@placeos-tools/common';
 
 import { ApplicationIcon, DialogEvent } from 'libs/common/src/lib/types';
-import { first } from 'rxjs/operators';
-
-export interface ConfirmRepsonse {
-    reason: 'done' | '' | null;
-    loading: (_: string) => void;
-    close: () => void;
-}
 
 export async function openConfirmModal(
     data: ConfirmModalData,
     dialog: MatDialog
-): Promise<ConfirmRepsonse> {
-    const ref = dialog.open<ConfirmModalComponent, ConfirmModalData>(
-        ConfirmModalComponent,
-        {
-            ...CONFIRM_METADATA,
-            data,
-        }
-    );
-    return {
-        ...(await Promise.race([
-            ref.componentInstance.event
-                .pipe(first((_) => _.reason === 'done'))
-                .toPromise(),
-            ref.afterClosed().toPromise(),
-        ])),
-        loading: (s) => (ref.componentInstance.loading = s),
-        close: () => ref.close(),
-    };
+) {
+    return openGenericModal(ConfirmModalComponent, data, dialog, CONFIRM_METADATA as any)
 }
 
 export interface ConfirmModalData {

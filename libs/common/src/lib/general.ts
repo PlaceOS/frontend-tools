@@ -1,5 +1,7 @@
 
 import { HashMap } from './types';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { first } from 'rxjs/operators';
 
 /** Available console output streams. */
 export type ConsoleStream = 'debug' | 'warn' | 'log' | 'error';
@@ -10,6 +12,38 @@ declare global {
     interface Window {
         debug: boolean;
     }
+}
+
+export interface GenericModalResponse {
+    reason: 'done' | '' | null;
+    metadata?: any;
+    loading: (_: string) => void;
+    close: () => void;
+}
+
+export async function openGenericModal<T, U>(
+    modal_class: T,
+    data: U,
+    dialog: MatDialog,
+    metadata: any = {}
+): Promise<GenericModalResponse> {
+    const ref: MatDialogRef<any> = (dialog as any).open(
+        modal_class,
+        {
+            ...metadata,
+            data,
+        }
+    );
+    return {
+        ...(await Promise.race([
+            ref.componentInstance.event
+                .pipe(first((_: any) => _.reason === 'done'))
+                .toPromise(),
+            ref.afterClosed().toPromise(),
+        ])),
+        loading: (s) => (ref.componentInstance.loading = s),
+        close: () => ref.close(),
+    };
 }
 
 export function setAppName(name: string) {

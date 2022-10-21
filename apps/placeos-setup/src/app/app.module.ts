@@ -12,6 +12,9 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSelectModule } from '@angular/material/select';
 import { MatChipsModule } from '@angular/material/chips';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { MatTabsModule } from '@angular/material/tabs';
+import { MatMenuModule } from '@angular/material/menu';
 
 import { ComponentsModule } from '@placeos-tools/components';
 
@@ -54,6 +57,11 @@ import { FloorPlansComponent } from './floorplans/floorplans.component';
 import { FloorPlanModalComponent } from './floorplans/floorplan-modal.component';
 import { FloorPlanDetailsComponent } from './floorplans/floorplan-details.component';
 import { FloorPlanExampleModalComponent } from './floorplans/example-modal.component';
+import { CateringComponent } from './catering/catering.component';
+import { CateringMenuComponent } from './catering/catering-menu.component';
+import { CateringMenuItemComponent } from './catering/catering-menu-item.component';
+import { CateringItemModalComponent } from './catering/catering-item-modal.component';
+import { CateringItemOptionModalComponent } from './catering/catering-option-modal.component';
 
 const ROUTES: Route[] = [
     { path: 'home', component: LandingPageComponent },
@@ -62,6 +70,7 @@ const ROUTES: Route[] = [
     { path: 'interfaces', redirectTo: `/interfaces/root` },
     { path: 'spaces', component: SpacesComponent },
     { path: 'floorplans', component: FloorPlansComponent },
+    { path: 'catering', component: CateringComponent },
     { path: 'desks', component: DesksComponent },
     { path: 'lockers', component: LockersComponent },
     { path: 'zoning', component: ZonesComponent },
@@ -76,42 +85,58 @@ const ROUTES: Route[] = [
     declarations: [
         AppComponent,
         SidebarComponent,
+        LandingPageComponent,
+
         OrganisationComponent,
         BuildingComponent,
         OrganisationBuildingModalComponent,
         OrganisationLevelComponent,
         OrganisationLevelModalComponent,
+
         InterfacesComponent,
         InterfaceDetailsComponent,
-        LandingPageComponent,
+
         SpaceModalComponent,
         SpacesComponent,
         SpaceDetailsComponent,
+
         FloorPlansComponent,
         FloorPlanModalComponent,
         FloorPlanDetailsComponent,
         FloorPlanExampleModalComponent,
+
         DeskModalComponent,
         DesksComponent,
         DeskDetailsComponent,
+
         LockerModalComponent,
         LockersComponent,
         LockerDetailsComponent,
+
         ZoneModalComponent,
         ZonesComponent,
         ZoneDetailsComponent,
+
         CarSpacesComponent,
         CarSpaceModalComponent,
         CarSpaceDetailsComponent,
+
         MonitoringComponent,
         MonitoringItemDetailsComponent,
         MonitoringItemModalComponent,
+
         AssetsComponent,
         AssetDetailsComponent,
         AssetModalComponent,
         AccessControlsComponent,
         AccessControlModalComponent,
-        AccessControlDetailsComponent
+        AccessControlDetailsComponent,
+
+        CateringComponent,
+        CateringMenuComponent,
+        CateringMenuItemComponent,
+        CateringItemModalComponent,
+        CateringItemOptionModalComponent
     ],
     imports: [
         BrowserModule,
@@ -128,6 +153,9 @@ const ROUTES: Route[] = [
         MatCheckboxModule,
         MatButtonModule,
         MatChipsModule,
+        MatAutocompleteModule,
+        MatTabsModule,
+        MatMenuModule,
         ComponentsModule,
         ClipboardModule,
         FormsModule,
