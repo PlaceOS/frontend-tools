@@ -31,14 +31,24 @@ export interface BuildingLevel {
     providedIn: 'root'
 })
 export class OrganisationService {
-    private _building_list = new BehaviorSubject<Building[]>([]);
+    private _building_list = new BehaviorSubject<Building[]>([{
+        id: 'bld-01',
+        display_name: 'Building 1',
+        name: 'BLD 01',
+        country: 'Austrialia',
+        city: 'Sydney',
+        address: '1 Happy Place',
+        currency: 'AUD',
+        allow_visitors: true,
+        catering_available: true,
+    }]);
     private _floor_list = new BehaviorSubject<BuildingLevel[]>([]);
 
     public readonly buildings = this._building_list.asObservable();
     public readonly levels = this._floor_list.asObservable();
 
     constructor(private _dialog: MatDialog) {
-        this._load();
+        // this._load();
     }
 
     public setBuilding(bld: Building) {

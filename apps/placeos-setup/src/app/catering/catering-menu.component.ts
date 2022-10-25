@@ -7,12 +7,7 @@ import { CateringStateService } from './catering-state.service';
 @Component({
     selector: 'catering-menu',
     template: `
-        <mat-tab-group
-            class="h-full"
-            (selectedIndexChange)="
-                shown_tab.next($event === 0 ? '' : categories[$event - 1])
-            "
-        >
+        <mat-tab-group class="h-full">
             <mat-tab label="All Items">
                 <ng-container *ngIf="(menu | async)?.length; else empty_state">
                     <ng-container *ngFor="let item of menu | async">
@@ -20,7 +15,7 @@ import { CateringStateService } from './catering-state.service';
                     </ng-container>
                 </ng-container>
             </mat-tab>
-            <mat-tab *ngFor="let group of categories" [label]="group">
+            <mat-tab *ngFor="let group of categories | async" [label]="group">
                 <ng-container *ngFor="let item of (tab_menu | async)[group]">
                     <div catering-menu-item [item]="item"></div>
                 </ng-container>
@@ -47,6 +42,8 @@ import { CateringStateService } from './catering-state.service';
 export class CateringMenuComponent {
     /** Observable for the currently active menu */
     public readonly menu = this._catering.menu;
+
+    public readonly categories = this._catering.categories;
     /** Store for the currently selected tab */
     public readonly shown_tab = new BehaviorSubject<string>('');
     /** Observable for the menu list for the selected tab */
@@ -61,13 +58,10 @@ export class CateringMenuComponent {
                     (item) => item.category === group
                 );
             }
+            console.log('Menu:', menu, categories, menu_map);
             return menu_map;
         })
     );
-
-    public get categories() {
-        return this._catering.categories;
-    }
 
     constructor(private _catering: CateringStateService) {}
 }

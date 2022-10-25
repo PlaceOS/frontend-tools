@@ -23,25 +23,25 @@ export interface CateringItemModalData {
 @Component({
     selector: 'catering-item-modal',
     template: `
-        <header>
-            <h3 mat-dialog-title>{{ item.id ? 'Edit' : 'Add' }} Item</h3>
+        <header class="flex items-center p-2 justify-between border-b border-gray-200 dark:border-neutral-500">
+            <h3 class="p-2 font-medium">{{ item.id ? 'Edit' : 'Add' }} Item</h3>
             <button mat-icon-button mat-dialog-close *ngIf="!loading">
                 <app-icon>close</app-icon>
             </button>
         </header>
         <form
-            class="p-4 overflow-auto"
+            class="p-4 overflow-auto max-h-[65vh]"
             *ngIf="form && !loading; else load_state"
             [formGroup]="form"
         >
-            <div class="field" *ngIf="form.controls.name">
+            <div class="flex flex-col" *ngIf="form.controls.name">
                 <label
                     for="title"
                     [class.error]="
                         form.controls.name.invalid && form.controls.name.touched
                     "
                 >
-                    Name<span>*</span>:
+                    Name<span required>*</span>:
                 </label>
                 <mat-form-field appearance="outline">
                     <input
@@ -53,7 +53,7 @@ export interface CateringItemModalData {
                     <mat-error>Name is required</mat-error>
                 </mat-form-field>
             </div>
-            <div class="field" *ngIf="form.controls.category">
+            <div class="flex flex-col" *ngIf="form.controls.category">
                 <label
                     for="category"
                     [class.error]="
@@ -61,7 +61,7 @@ export interface CateringItemModalData {
                         form.controls.category.touched
                     "
                 >
-                    Category<span>*</span>:
+                    Category<span required>*</span>:
                 </label>
                 <mat-form-field appearance="outline">
                     <input
@@ -74,7 +74,7 @@ export interface CateringItemModalData {
                     <mat-error>Category is required</mat-error>
                 </mat-form-field>
             </div>
-            <div class="field" *ngIf="form.controls.tags">
+            <div class="flex flex-col" *ngIf="form.controls.tags">
                 <label
                     for="tags"
                     [class.error]="
@@ -113,7 +113,7 @@ export interface CateringItemModalData {
                     </mat-chip-list>
                 </mat-form-field>
             </div>
-            <div class="field" *ngIf="form.controls.description">
+            <div class="flex flex-col" *ngIf="form.controls.description">
                 <label for="description">Description:</label>
                 <mat-form-field appearance="outline">
                     <textarea
@@ -124,7 +124,7 @@ export interface CateringItemModalData {
                     ></textarea>
                 </mat-form-field>
             </div>
-            <div class="field" *ngIf="form.controls.unit_price">
+            <div class="flex flex-col" *ngIf="form.controls.unit_price">
                 <label
                     for="title"
                     [class.error]="
@@ -132,7 +132,7 @@ export interface CateringItemModalData {
                         form.controls.unit_price.touched
                     "
                 >
-                    Unit Price<span>*</span>:
+                    Unit Price<span required>*</span>:
                 </label>
                 <mat-form-field appearance="outline">
                     <input
@@ -165,9 +165,9 @@ export interface CateringItemModalData {
         </form>
         <footer
             *ngIf="!loading"
-            class="flex p-2 items-center justify-center border-t border-solid border-gray-300"
+            class="flex p-2 items-center justify-center border-t border-solid border-gray-300 dark:border-neutral-500"
         >
-            <button mat-button [disabled]="!form.dirty" (click)="saveChanges()">
+            <button mat-button class="w-32" [disabled]="!form.dirty" (click)="saveChanges()">
                 Save
             </button>
         </footer>
@@ -185,9 +185,8 @@ export interface CateringItemModalData {
     `,
     styles: [
         `
-            .field {
-                display: flex;
-                flex-wrap: wrap;
+            mat-form-field {
+                width: 24rem;
             }
         `,
     ],

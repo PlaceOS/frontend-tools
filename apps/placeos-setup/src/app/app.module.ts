@@ -62,6 +62,9 @@ import { CateringMenuComponent } from './catering/catering-menu.component';
 import { CateringMenuItemComponent } from './catering/catering-menu-item.component';
 import { CateringItemModalComponent } from './catering/catering-item-modal.component';
 import { CateringItemOptionModalComponent } from './catering/catering-option-modal.component';
+import { CateringMenuDetailsComponent } from './catering/catering-menu-details.component';
+import { CateringMenuModalComponent } from './catering/catering-menu-modal.component';
+import { CounterComponent } from './components/counter.component';
 
 const ROUTES: Route[] = [
     { path: 'home', component: LandingPageComponent },
@@ -86,6 +89,7 @@ const ROUTES: Route[] = [
         AppComponent,
         SidebarComponent,
         LandingPageComponent,
+        CounterComponent,
 
         OrganisationComponent,
         BuildingComponent,
@@ -134,7 +138,9 @@ const ROUTES: Route[] = [
 
         CateringComponent,
         CateringMenuComponent,
+        CateringMenuDetailsComponent,
         CateringMenuItemComponent,
+        CateringMenuModalComponent,
         CateringItemModalComponent,
         CateringItemOptionModalComponent
     ],

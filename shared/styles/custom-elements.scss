@@ -182,6 +182,13 @@ mat-form-field {
         color: #fff;
     }
 
+    .mat-menu-item {
+        color: inherit;
+        &:hover {
+            background-color: #fff2;
+        }
+    }
+
     .mat-form-field-outline > div {
         color: #fff8;
     }

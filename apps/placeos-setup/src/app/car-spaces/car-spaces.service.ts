@@ -59,8 +59,8 @@ export class CarSpacesService {
 
     public async removeCarSpace(carspace: CarSpace) {
         const { close, reason } = await openConfirmModal({
-            title: 'Remove CarSpace',
-            content: `Are you sure you want to remove carspace "${carspace.display_name || carspace.name}"?`,
+            title: 'Remove Car Space',
+            content: `Are you sure you want to remove car space "${carspace.display_name || carspace.name}"?`,
             icon: { content: 'delete' }
         }, this._dialog);
         if (reason !== 'done') return;

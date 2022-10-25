@@ -44,3 +44,7 @@ body {
     }
 }
 
+span[required] {
+    color: orange;
+}
+

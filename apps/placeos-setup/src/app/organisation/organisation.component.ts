@@ -1,4 +1,6 @@
 import { Component } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { BaseClass } from '@placeos-tools/common';
 import { OrganisationService } from './organisation.service';
 
 @Component({
@@ -78,11 +80,25 @@ import { OrganisationService } from './organisation.service';
         `,
     ],
 })
-export class OrganisationComponent {
+export class OrganisationComponent extends BaseClass {
     public readonly buildings = this._org.buildings;
 
     public readonly newBuilding = () => this._org.openBuildingModal();
     public readonly newLevel = () => this._org.openLevelModal();
 
-    constructor(private _org: OrganisationService) {}
+    constructor(private _org: OrganisationService, private _route: ActivatedRoute) {
+        super();
+    }
+
+    public ngOnInit() {
+        this.subscription('route.query', this._route.queryParamMap.subscribe((params) => {
+            if (params.has('add')) {
+                if (params.get('add') === 'building') {
+                    this.newBuilding();
+                } else if (params.get('add') === 'level') {
+                    this.newLevel();
+                }
+            }
+        }))
+    }
 }

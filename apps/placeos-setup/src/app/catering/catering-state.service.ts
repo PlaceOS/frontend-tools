@@ -3,25 +3,26 @@ import { MatDialog } from '@angular/material/dialog';
 import { BaseClass, unique } from '@placeos-tools/common';
 import { randomInt } from '@placeos-tools/common';
 import { openConfirmModal } from 'libs/components/src/lib/confirm-modal.component';
-import { BehaviorSubject, combineLatest } from 'rxjs';
+import { BehaviorSubject, combineLatest, Observable } from 'rxjs';
 import { map, take } from 'rxjs/operators';
 import { OrganisationService } from '../organisation/organisation.service';
 import { openCateringItemModal } from './catering-item-modal.component';
 
 import { CateringItem } from './catering-item.class';
+import { CateringMenuModalComponent } from './catering-menu-modal.component';
 import { openCateringItemOptionModal } from './catering-option-modal.component';
 import { CateringOption } from './catering.interfaces';
 
 export interface CateringMenuConfig {
     id: string;
     building_id: string;
+    name: string;
 }
 
 @Injectable({
     providedIn: 'root',
 })
 export class CateringStateService extends BaseClass {
-    private _menu_list = new BehaviorSubject<CateringMenuConfig[]>([]);
     private _menu_map = new BehaviorSubject<Record<string, CateringItem[]>>({});
     private _loading = new BehaviorSubject<boolean>(false);
     private _currency = new BehaviorSubject<string>('USD');
@@ -34,7 +35,16 @@ export class CateringStateService extends BaseClass {
     public readonly active_id = this._active_id.asObservable();
 
     /** List of available menus */
-    public readonly menu_list = this._menu_list.asObservable();
+    public readonly menu_list: Observable<CateringMenuConfig[]> =
+        this._org.buildings.pipe(
+            map((_) =>
+                _.filter((bld) => bld.catering_available).map((bld) => ({
+                    id: `menu-${bld.id}`,
+                    building_id: bld.id,
+                    name: bld.display_name || bld.name,
+                }))
+            )
+        );
     /** Menu for the active ID */
     public readonly menu = combineLatest([
         this._active_id,
@@ -45,28 +55,40 @@ export class CateringStateService extends BaseClass {
         map((menu) => unique(menu.map((i) => i.category)))
     );
 
-    constructor(private _dialog: MatDialog, private _org: OrganisationService) {
-        super();
+    public menuForID(id: string) {
+        const menus = this._menu_map.getValue() || {};
+        return menus[id] || [];
     }
 
-    public async initMenuList() {
+    constructor(private _dialog: MatDialog, private _org: OrganisationService) {
+        super();
         this._load();
-        const buildings = await this._org.buildings.pipe(take(1)).toPromise();
-        for (const bld of buildings) {
-            if (
-                !this._menu_list
-                    .getValue()
-                    .find(({ building_id }) => building_id === bld.id)
-            ) {
-                this._menu_list.next([
-                    ...this._menu_list.getValue(),
-                    {
-                        id: `menu-${randomInt(9999_9999, 1000_0000)}`,
-                        building_id: bld.id,
-                    },
-                ]);
-            }
-        }
+    }
+
+    public openMenuModal(item: CateringMenuConfig) {
+        this._active_id.next(item.id);
+        const ref = this._dialog.open(CateringMenuModalComponent, {
+            data: item
+        });
+        this.subscription('add-item', ref.componentInstance.add.subscribe(() => this.addItem()));
+        ref.afterClosed().subscribe(() => this._active_id.next(''));
+    }
+
+    public async removeMenu(item: CateringMenuConfig) {
+        const { close, reason } = await openConfirmModal(
+            {
+                title: 'Clear Menu',
+                content: `Are you sure you want to remove all the menu items for "${item.name}"?`,
+                icon: { content: 'delete_sweep' },
+            },
+            this._dialog
+        );
+        if (reason !== 'done') return;
+        const menu = { ...this._menu_map.getValue() };
+        delete menu[item.id];
+        this._menu_map.next(menu);
+        this._store();
+        close();
     }
 
     public async addItem(item: CateringItem = new CateringItem()) {
@@ -79,10 +101,12 @@ export class CateringStateService extends BaseClass {
             this._dialog
         );
         if (reason !== 'done') return;
+        console.log('Item:', metadata);
         const menu = await this.menu.pipe(take(1)).toPromise();
         const index = menu.findIndex((itm) => itm.id === item.id);
         if (index >= 0) menu.splice(index, 1, metadata.item);
         else menu.push(metadata.item);
+        console.log('Menu:', menu);
         this._updateMenu(menu);
         close();
     }
@@ -127,7 +151,7 @@ export class CateringStateService extends BaseClass {
         let menu = await this.menu.pipe(take(1)).toPromise();
         menu = menu.filter((itm) => item.id !== itm.id);
         this._updateMenu(menu);
-        close()
+        close();
     }
 
     public async deleteOption(item: CateringItem, option: CateringOption) {
@@ -158,28 +182,22 @@ export class CateringStateService extends BaseClass {
         close();
     }
 
-
     private _updateMenu(menu: CateringItem[]) {
-
+        const old_menu = this._menu_map.getValue();
+        const new_menu = { ...old_menu };
+        new_menu[this._active_id.getValue()] = menu;
+        this._menu_map.next(new_menu);
         this._store();
     }
 
     private _load() {
-        let data = JSON.parse(
-            localStorage.getItem('PLACEOS_BUILD.MenuList') || '[]'
-        );
-        this._menu_list.next(data);
-        data = JSON.parse(
+        const data = JSON.parse(
             localStorage.getItem('PLACEOS_BUILD.MenuMap') || '{}'
         );
         this._menu_map.next(data);
     }
 
     private _store() {
-        localStorage.setItem(
-            'PLACEOS_BUILD.MenuList',
-            JSON.stringify(this._menu_list.getValue())
-        );
         localStorage.setItem(
             'PLACEOS_BUILD.MenuMap',
             JSON.stringify(this._menu_map.getValue())

@@ -7,6 +7,14 @@ import { CateringStateService } from './catering-state.service';
     template: `
         <div class="flex flex-col h-full w-full overflow-hidden">
             <header class="bg-neutral-700 p-2 space-x-2 h-14">
+                <a
+                    button
+                    mat-button
+                    [routerLink]="['/organisation']"
+                    [queryParams]="{ add: 'building' }"
+                >
+                    Add Building
+                </a>
             </header>
             <main class="w-full h-1/2 flex-1 overflow-auto">
                 <div table>
@@ -16,8 +24,8 @@ import { CateringStateService } from './catering-state.service';
                         <div thead class="min-w-0 w-10">
                             <mat-checkbox></mat-checkbox>
                         </div>
-                        <div thead>Name</div>
                         <div thead>Building</div>
+                        <div thead>Item Count</div>
                     </div>
                     <ng-container
                         *ngIf="(menu_list | async)?.length; else empty_state"
@@ -44,8 +52,8 @@ import { CateringStateService } from './catering-state.service';
             }
 
             [thead] {
-                min-width: 10rem;
-                width: 10rem;
+                min-width: 12rem;
+                width: 12rem;
                 padding: 1rem;
                 font-weight: 500;
                 flex-shrink: 0;
@@ -60,5 +68,8 @@ import { CateringStateService } from './catering-state.service';
 export class CateringComponent {
     public readonly menu_list = this._service.menu_list;
 
-    constructor(private _service: CateringStateService, private _org: OrganisationService) {}
+    constructor(
+        private _service: CateringStateService,
+        private _org: OrganisationService
+    ) {}
 }

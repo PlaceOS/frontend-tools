@@ -14,19 +14,20 @@ export interface CateringItemOptionModalData {
     types: string[];
 }
 
-
 export async function openCateringItemOptionModal(
     data: CateringItemOptionModalData,
     dialog: MatDialog
 ) {
-    return openGenericModal(CateringItemOptionModalComponent, data, dialog)
+    return openGenericModal(CateringItemOptionModalComponent, data, dialog);
 }
 
 @Component({
     selector: 'catering-option-modal',
     template: `
-        <header>
-            <h3 mat-dialog-title>
+        <header
+            class="flex items-center p-2 justify-between border-b border-gray-200 dark:border-neutral-500"
+        >
+            <h3 class="p-2 font-medium">
                 {{ option.id ? 'Edit' : 'Add' }} Item Option
             </h3>
             <button mat-icon-button mat-dialog-close *ngIf="!loading">
@@ -38,14 +39,14 @@ export async function openCateringItemOptionModal(
             *ngIf="form && !loading; else load_state"
             [formGroup]="form"
         >
-            <div class="field" *ngIf="form.controls.name">
+            <div class="flex flex-col" *ngIf="form.controls.name">
                 <label
                     for="title"
                     [class.error]="
                         form.controls.name.invalid && form.controls.name.touched
                     "
                 >
-                    Name<span>*</span>:
+                    Name<span required>*</span>:
                 </label>
                 <mat-form-field appearance="outline">
                     <input
@@ -57,7 +58,7 @@ export async function openCateringItemOptionModal(
                     <mat-error>Name is required</mat-error>
                 </mat-form-field>
             </div>
-            <div class="field" *ngIf="form.controls.group">
+            <div class="flex flex-col" *ngIf="form.controls.group">
                 <label
                     for="group"
                     [class.error]="
@@ -65,7 +66,7 @@ export async function openCateringItemOptionModal(
                         form.controls.group.touched
                     "
                 >
-                    Type<span>*</span>:
+                    Type<span required>*</span>:
                 </label>
                 <mat-form-field appearance="outline">
                     <input
@@ -78,7 +79,7 @@ export async function openCateringItemOptionModal(
                     <mat-error>Type is required</mat-error>
                 </mat-form-field>
             </div>
-            <div class="field" *ngIf="form.controls.unit_price">
+            <div class="flex flex-col" *ngIf="form.controls.unit_price">
                 <label for="title">Unit Price:</label>
                 <mat-form-field appearance="outline">
                     <input
@@ -90,7 +91,7 @@ export async function openCateringItemOptionModal(
                     />
                 </mat-form-field>
             </div>
-            <div class="field" *ngIf="form.controls.multiple">
+            <div class="flex flex-col" *ngIf="form.controls.multiple">
                 <mat-checkbox name="multiple" formControlName="multiple">
                     Can select multiple of type
                 </mat-checkbox>
@@ -98,9 +99,9 @@ export async function openCateringItemOptionModal(
         </form>
         <footer
             *ngIf="!loading"
-            class="flex p-2 items-center justify-center border-t border-solid border-gray-300"
+            class="flex p-2 items-center justify-center border-t border-solid border-gray-300 dark:border-neutral-500"
         >
-            <button mat-button [disabled]="!form.dirty" (click)="saveChanges()">
+            <button mat-button class="w-32" [disabled]="!form.dirty" (click)="saveChanges()">
                 Save
             </button>
         </footer>
@@ -118,9 +119,8 @@ export async function openCateringItemOptionModal(
     `,
     styles: [
         `
-            .field {
-                display: flex;
-                flex-wrap: wrap;
+            mat-form-field {
+                width: 24rem;
             }
         `,
     ],
