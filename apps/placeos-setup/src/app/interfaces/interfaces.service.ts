@@ -21,7 +21,7 @@ export interface Interface {
         parking: boolean;
         lockers: boolean;
         visitors: boolean;
-        standalon_visitors: boolean;
+        standalone_visitors: boolean;
     };
     concierge: {
         required: boolean;
@@ -69,7 +69,7 @@ export class InterfacesService {
                 parking: false,
                 lockers: false,
                 visitors: true,
-                standalon_visitors: true,
+                standalone_visitors: true,
             },
             concierge: {
                 required: true,

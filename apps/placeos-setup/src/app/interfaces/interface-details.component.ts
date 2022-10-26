@@ -122,7 +122,7 @@ import { Interface, InterfacesService } from './interfaces.service';
 export class InterfaceDetailsComponent {
     @Input() public item: Interface;
 
-    public readonly view = () => this._service.openInterfaceModal(this.item);
+    public readonly view = () => this._service.openInterfaceDetailsModal(this.item);
     public readonly edit = () => this._service.openInterfaceModal(this.item);
     public readonly remove = () => this._service.removeInterface(this.item);
 
