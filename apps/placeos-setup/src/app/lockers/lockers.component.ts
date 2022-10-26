@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { LockersService } from './lockers.service';
 
 @Component({
-    selector: 'app-organisation',
+    selector: 'app-lockers',
     template: `
         <div class="flex flex-col h-full w-full overflow-hidden">
             <header class="bg-neutral-700 p-2 space-x-2">

@@ -1,51 +1,160 @@
-import { Injectable, Input } from "@angular/core";
-import { BehaviorSubject } from "rxjs";
-import { OrganisationService } from "../organisation/organisation.service";
+import { Injectable } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
+import { randomInt } from '@placeos-tools/common';
+import { openConfirmModal } from 'libs/components/src/lib/confirm-modal.component';
+import { BehaviorSubject } from 'rxjs';
+import { InterfaceDetailsModalComponent } from './interface-details-modal.component';
+import { InterfaceModalComponent } from './interface-modal.component';
 
-export interface InterfaceSettings {
+export interface Interface {
     id: string;
-    workplace: WorkplaceInterfaceSettings;
-    booking_panel: BookingPanelInterfaceSettings;
-    visitor_kiosk: VisitorKioskInterfaceSettings;
-    concierge: boolean;
-    map_kiosk: boolean;
-    outlook_addin: boolean;
-}
-
-export interface WorkplaceInterfaceSettings {
-    meetings: boolean;
-    catering: boolean;
-    external_attendees: boolean;
-    desks: boolean;
-    desk_groups: boolean;
-    parking: boolean;
-    lockers: boolean;
-    assets: boolean;
-    visitors: boolean;
-    schedule: boolean;
-}
-
-export interface BookingPanelInterfaceSettings {
-    required: boolean;
-    show_title: boolean;
-    show_host: boolean;
-    show_image: boolean;
-    show_checkin_qr: boolean;
-}
-
-export interface VisitorKioskInterfaceSettings {
-    required: boolean;
-    induction: boolean;
-    catering: boolean;
+    building_id: string;
+    building_name: string;
+    required: string[];
+    workplace: {
+        required: boolean;
+        meetings: boolean;
+        catering: boolean;
+        assets: boolean;
+        desks: boolean;
+        group_desks: boolean;
+        parking: boolean;
+        lockers: boolean;
+        visitors: boolean;
+        standalon_visitors: boolean;
+    };
+    concierge: {
+        required: boolean;
+        match_workplace: boolean;
+    };
+    booking_panel: {
+        required: boolean;
+        show_title: boolean;
+        show_host: boolean;
+        show_images: boolean;
+        show_qrcode: boolean;
+    };
+    visitor_kiosk: {
+        required: boolean;
+        induction: boolean;
+        catering: boolean;
+    };
+    map_kiosk: {
+        required: boolean;
+        touch_enabled: boolean;
+    };
+    outlook_plugin: {
+        required: boolean;
+        match_workplace: boolean;
+    };
 }
 
 @Injectable({
-    providedIn: 'root'
+    providedIn: 'root',
 })
 export class InterfacesService {
-    private _interface_list = new BehaviorSubject<InterfaceSettings[]>([{ id: 'root', workplace: {}, booking_panel: {}, visitor_kiosk: {} } as any]);
+    private _interface_list = new BehaviorSubject<Interface[]>([
+        {
+            id: 'default',
+            building_id: 'default',
+            building_name: 'Default Config',
+            required: ['workplace', 'concierge'],
+            workplace: {
+                required: true,
+                meetings: true,
+                catering: false,
+                assets: false,
+                desks: true,
+                group_desks: false,
+                parking: false,
+                lockers: false,
+                visitors: true,
+                standalon_visitors: true,
+            },
+            concierge: {
+                required: true,
+                match_workplace: true,
+            },
+            booking_panel: {
+                required: true,
+                show_title: true,
+                show_host: true,
+                show_images: true,
+                show_qrcode: true,
+            },
+            visitor_kiosk: {
+                required: false,
+                induction: true,
+                catering: false,
+            },
+            map_kiosk: {
+                required: false,
+                touch_enabled: true,
+            },
+            outlook_plugin: {
+                required: false,
+                match_workplace: true,
+            },
+        },
+    ]);
 
     public readonly interfaces = this._interface_list.asObservable();
 
-    constructor(private _org: OrganisationService) {}
+    constructor(private _dialog: MatDialog) {}
+
+    public setInterface(item: Interface) {
+        if (!item.id) item.id = `interface-${randomInt(9999_9999, 1000_0000)}`;
+        this._interface_list.next([
+            ...this._interface_list.getValue().filter((_) => _.id !== item.id),
+            item,
+        ]);
+        this._store();
+    }
+
+    public async removeInterface(item: Interface) {
+        const { close, reason } = await openConfirmModal(
+            {
+                title: 'Remove Interface',
+                content: `Are you sure you want to remove interface config for "${item.building_name}"?`,
+                icon: { content: 'delete' },
+            },
+            this._dialog
+        );
+        if (reason !== 'done') return;
+        this._interface_list.next(
+            this._interface_list.getValue().filter((_) => _.id !== item.id)
+        );
+        this._store();
+        close();
+    }
+
+    public openInterfaceModal(item?: Interface) {
+        const ref = this._dialog.open(InterfaceModalComponent, {
+            data: item,
+        });
+        ref.componentInstance.onSave.subscribe((itm) => {
+            this.setInterface(itm as any);
+            ref.close();
+        });
+    }
+
+    public openInterfaceDetailsModal(item: Interface) {
+        this._dialog.open(InterfaceDetailsModalComponent, {
+            data: item,
+        });
+    }
+
+    private _load() {
+        const data = JSON.parse(
+            localStorage.getItem('PLACEOS_BUILD.Interfaces') || '[]'
+        );
+        this._interface_list.next(data);
+    }
+
+    private _store() {
+        localStorage.setItem(
+            'PLACEOS_BUILD.Interfaces',
+            JSON.stringify(this._interface_list.getValue())
+        );
+    }
 }
