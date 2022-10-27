@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { ExportService } from './data/export.service';
 
 @Component({
     selector: 'app-landing-page',
@@ -12,7 +13,9 @@ import { Component } from '@angular/core';
             <div
                 class="flex flex-col w-[640px] bg-white dark:bg-neutral-700 border border-gray-200 dark:border-neutral-500 rounded p-4 space-y-2"
             >
-                <div class="flex items-center p-2 bg-pending rounded shadow text-black text-sm space-x-2">
+                <div
+                    class="flex items-center p-2 bg-pending rounded shadow text-black text-sm space-x-2"
+                >
                     <app-icon class="text-xl">warning</app-icon>
                     <div>Before continuing please read this carefully.</div>
                 </div>
@@ -36,12 +39,18 @@ import { Component } from '@angular/core';
                 <a
                     menu
                     matRipple
-                    class="flex items-center p-2 rounded m-2 w-[30%] border border-gray-200 dark:border-neutral-500 space-x-2"
+                    class="flex items-center px-2 rounded m-2 w-[30%] border border-gray-200 dark:border-neutral-500 space-x-2"
                     *ngFor="let item of resources"
                     [routerLink]="[item.route]"
                 >
                     <app-icon [icon]="item.icon"></app-icon>
-                    <p>{{ item?.name }}</p>
+                    <p class="flex-1 py-2">{{ item?.name }}</p>
+                    <app-icon
+                        *ngIf="item.count && (item.count | async) > 0"
+                        class="text-green-600 text-2xl -mr-2"
+                    >
+                        done
+                    </app-icon>
                 </a>
             </div>
             <h3 class="text-xl pt-4 font-medium w-[640px] mx-auto">
@@ -50,16 +59,21 @@ import { Component } from '@angular/core';
             <div
                 class="flex flex-col w-[640px] bg-white dark:bg-neutral-700 border border-gray-200 dark:border-neutral-500 rounded p-4 space-y-2"
             >
-                <div class="flex items-center p-2 bg-pending rounded shadow text-black text-sm space-x-2">
+                <div
+                    class="flex items-center p-2 bg-pending rounded shadow text-black text-sm space-x-2"
+                >
                     <app-icon class="text-xl">warning</app-icon>
-                    <div>Please make sure you have filled out the all the relavant sections of the application.</div>
+                    <div>
+                        Please make sure you have filled out the all the
+                        relavant sections of the application.
+                    </div>
                 </div>
                 <p class="p-2">
-                    Once you have finished filling out the sections of this application you can click the export button below to generate a metadata file to be used to configure PlaceOS.
+                    Once you have finished filling out the sections of this
+                    application you can click the export button below to
+                    generate a metadata file to be used to configure PlaceOS.
                 </p>
-                <button mat-button>
-                    Export PlaceOS Build Configuration
-                </button>
+                <button mat-button (click)="export()">Export PlaceOS Build Configuration</button>
             </div>
         </div>
     `,
@@ -71,36 +85,77 @@ export class LandingPageComponent {
             name: 'Organisation',
             route: '/organisation',
             icon: { content: 'business' },
+            count: this._export.org_zone_count,
         },
         {
             name: 'Interfaces',
             route: '/interfaces',
             icon: { content: 'web_asset' },
+            count: this._export.interface_count,
         },
-        { name: 'Floorplans', route: '/floorplans', icon: { content: 'map' } },
-        { name: 'Rooms', route: '/spaces', icon: { content: 'meeting_room' } },
-        { name: 'Desks', route: '/desks', icon: { content: 'desk' } },
-        { name: 'Lockers', route: '/lockers', icon: { content: 'key' } },
-        { name: 'Zoning', route: '/zoning', icon: { content: 'hive' } },
+        {
+            name: 'Floorplans',
+            route: '/floorplans',
+            icon: { content: 'map' },
+            count: this._export.floorplan_count,
+        },
+        {
+            name: 'Rooms',
+            route: '/spaces',
+            icon: { content: 'meeting_room' },
+            count: this._export.space_count,
+        },
+        {
+            name: 'Desks',
+            route: '/desks',
+            icon: { content: 'desk' },
+            count: this._export.desk_count,
+        },
+        {
+            name: 'Lockers',
+            route: '/lockers',
+            icon: { content: 'key' },
+            count: this._export.locker_count,
+        },
+        {
+            name: 'Zoning',
+            route: '/zoning',
+            icon: { content: 'hive' },
+            count: this._export.zone_count,
+        },
         {
             name: 'Catering',
             route: '/catering',
             icon: { content: 'restaurant' },
+            count: this._export.catering_count,
         },
         {
             name: 'Parking',
             route: '/parking',
             icon: { content: 'directions_car' },
+            count: this._export.parking_count,
         },
-        { name: 'Assets', route: '/assets', icon: { content: 'category' } },
+        {
+            name: 'Assets',
+            route: '/assets',
+            icon: { content: 'category' },
+            count: this._export.asset_count,
+        },
         {
             name: 'Monitoring',
             route: '/monitoring',
             icon: { content: 'screenshot_monitor' },
+            count: this._export.region_count,
         },
         {
             name: 'Access Control',
             route: '/access-control',
             icon: { content: 'badge' },
-        }]
+            count: this._export.access_control_count,
+        },
+    ];
+
+    public readonly export = () => this._export.exportData();
+
+    constructor(private _export: ExportService) {}
 }
