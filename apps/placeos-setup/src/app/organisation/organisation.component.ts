@@ -8,7 +8,7 @@ import { OrganisationService } from './organisation.service';
 @Component({
     selector: 'app-organisation',
     template: `
-        <div class="flex flex-col h-full w-full overflow-hidden">
+        <div class="flex flex-col h-full w-full overflow-hidden relative">
             <header class="bg-neutral-700 p-2 space-x-2">
                 <button mat-button class="w-32" (click)="newBuilding()">
                     Add Building

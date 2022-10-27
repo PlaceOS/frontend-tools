@@ -60,7 +60,7 @@ export class OrganisationService {
     public readonly selected = this._selected.asObservable();
 
     constructor(private _dialog: MatDialog) {
-        // this._load();
+        this._load();
     }
 
     public isSelected(id: string) {

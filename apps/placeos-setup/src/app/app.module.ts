@@ -67,6 +67,7 @@ import { CateringMenuModalComponent } from './catering/catering-menu-modal.compo
 import { CounterComponent } from './components/counter.component';
 import { InterfaceModalComponent } from './interfaces/interface-modal.component';
 import { InterfaceDetailsModalComponent } from './interfaces/interface-details-modal.component';
+import { DataWarningComponent } from './components/data-warning.component';
 
 const ROUTES: Route[] = [
     { path: 'home', component: LandingPageComponent },
@@ -92,6 +93,7 @@ const ROUTES: Route[] = [
         SidebarComponent,
         LandingPageComponent,
         CounterComponent,
+        DataWarningComponent,
 
         OrganisationComponent,
         BuildingComponent,

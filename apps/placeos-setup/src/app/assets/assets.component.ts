@@ -6,7 +6,7 @@ import { AssetsService } from './assets.service';
 @Component({
     selector: 'app-organisation',
     template: `
-        <div class="flex flex-col h-full w-full overflow-hidden">
+        <div class="flex flex-col h-full w-full overflow-hidden relative">
             <header class="bg-neutral-700 p-2 space-x-2">
                 <button mat-button class="w-32" (click)="newAsset()">
                     Add Asset
@@ -57,6 +57,7 @@ import { AssetsService } from './assets.service';
                     </ng-container>
                 </div>
             </main>
+             <data-warning></data-warning>
         </div>
         <ng-template #empty_state>
             <div class="w-full h-full flex items-center justify-center p-8">

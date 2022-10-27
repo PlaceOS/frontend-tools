@@ -5,7 +5,7 @@ import { CateringStateService } from './catering-state.service';
 @Component({
     selector: 'app-catering',
     template: `
-        <div class="flex flex-col h-full w-full overflow-hidden">
+        <div class="flex flex-col h-full w-full overflow-hidden relative">
             <header class="bg-neutral-700 p-2 space-x-2 h-14">
                 <a
                     button
@@ -38,6 +38,7 @@ import { CateringStateService } from './catering-state.service';
                     </ng-container>
                 </div>
             </main>
+             <data-warning></data-warning>
         </div>
         <ng-template #empty_state>
             <div class="w-full h-full flex items-center justify-center p-8">
