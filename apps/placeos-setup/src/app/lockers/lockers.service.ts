@@ -88,6 +88,24 @@ export class LockersService {
         close();
     }
 
+    public async removeSelected() {
+        const list = this._selected.getValue();
+        if (!list.length) return;
+        if (list.length === 1) {
+            return this.removeLocker(this._locker_list.getValue().find(_ => _.id === list[0]));
+        }
+        const { close, reason } = await openConfirmModal({
+            title: 'Remove Lockers',
+            content: `Are you sure you want to remove ${list.length} lockers?`,
+            icon: { content: 'delete' }
+        }, this._dialog);
+        if (reason !== 'done') return;
+        this._locker_list.next(this._locker_list.getValue().filter(_ => !list.find(id => _.id === id)));
+        this._selected.next([]);
+        this._store();
+        close();
+    }
+
     public openLockerModal(item?: Locker) {
         const ref = this._dialog.open(LockerModalComponent, {
             data: item

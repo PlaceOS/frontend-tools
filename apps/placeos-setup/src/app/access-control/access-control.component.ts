@@ -11,6 +11,14 @@ import { AccessControlService } from './access-control.service';
                 <button mat-button class="w-48" (click)="newAccessControl()">
                     Add Access Control
                 </button>
+                <button
+                    mat-button
+                    class="w-48"
+                    *ngIf="(all_selected | async) || (some_selected | async)"
+                    (click)="removeSelected()"
+                >
+                    Remove Selected
+                </button>
             </header>
             <main class="w-full h-1/2 flex-1 overflow-auto">
                 <div table>
@@ -74,6 +82,7 @@ export class AccessControlsComponent {
 
     public readonly newAccessControl = () => this._service.openAccessControlModal();
     public readonly setSelected = (s) => this._service.setSelected('*', s);
+    public readonly removeSelected = () => this._service.removeSelected();
     public readonly all_selected = combineLatest([
         this._service.access_controls,
         this._service.selected,

@@ -44,7 +44,15 @@ export class OrganisationService {
             catering_available: true,
         },
     ]);
-    private _floor_list = new BehaviorSubject<BuildingLevel[]>([]);
+    private _floor_list = new BehaviorSubject<BuildingLevel[]>([
+        {
+            id: 'lvl-01',
+            parent_id: 'bld-01',
+            display_name: 'Level 1',
+            name: 'LVL 01',
+            allow_visitors: true,
+            catering_available: true,
+        },]);
     private _selected = new BehaviorSubject<string[]>([]);
 
     public readonly buildings = this._building_list.asObservable();

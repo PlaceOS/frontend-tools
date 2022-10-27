@@ -11,6 +11,14 @@ import { SpacesService } from './spaces.service';
                 <button mat-button class="w-32" (click)="newSpace()">
                     Add Room
                 </button>
+                <button
+                    mat-button
+                    class="w-48"
+                    *ngIf="(all_selected | async) || (some_selected | async)"
+                    (click)="removeSelected()"
+                >
+                    Remove Selected
+                </button>
             </header>
             <main class="w-full h-1/2 flex-1 overflow-auto">
                 <div table>
@@ -89,6 +97,7 @@ export class SpacesComponent {
 
     public readonly newSpace = () => this._service.openSpaceModal();
     public readonly setSelected = (s) => this._service.setSelected('*', s);
+    public readonly removeSelected = () => this._service.removeSelected();
     public readonly all_selected = combineLatest([
         this._service.spaces,
         this._service.selected,

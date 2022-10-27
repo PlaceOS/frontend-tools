@@ -71,6 +71,7 @@ export class ZonesService {
     }
 
     public async removeZone(zone: Zone) {
+        if (!zone) return;
         const { close, reason } = await openConfirmModal({
             title: 'Remove Zone',
             content: `Are you sure you want to remove zone "${zone.name}"?`,
@@ -78,6 +79,24 @@ export class ZonesService {
         }, this._dialog);
         if (reason !== 'done') return;
         this._zone_list.next(this._zone_list.getValue().filter(_ => _.id !== zone.id));
+        this._store();
+        close();
+    }
+
+    public async removeSelected() {
+        const list = this._selected.getValue();
+        if (!list.length) return;
+        if (list.length === 1) {
+            return this.removeZone(this._zone_list.getValue().find(_ => _.id === list[0]));
+        }
+        const { close, reason } = await openConfirmModal({
+            title: 'Remove Zones',
+            content: `Are you sure you want to remove ${list.length} zones?`,
+            icon: { content: 'delete' }
+        }, this._dialog);
+        if (reason !== 'done') return;
+        this._zone_list.next(this._zone_list.getValue().filter(_ => !list.find(id => _.id === id)));
+        this._selected.next([]);
         this._store();
         close();
     }

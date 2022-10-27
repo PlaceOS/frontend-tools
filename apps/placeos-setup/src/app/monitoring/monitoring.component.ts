@@ -11,6 +11,14 @@ import { MonitoringService } from './monitoring.service';
                 <button mat-button class="w-[18rem]" (click)="newLocker()">
                     Add Environmental Monitoring Region
                 </button>
+                <button
+                    mat-button
+                    class="w-48"
+                    *ngIf="(all_selected | async) || (some_selected | async)"
+                    (click)="removeSelected()"
+                >
+                    Remove Selected
+                </button>
             </header>
             <main class="w-full h-1/2 flex-1 overflow-auto">
                 <div table>
@@ -75,6 +83,7 @@ export class MonitoringComponent {
 
     public readonly newLocker = () => this._service.openItemModal();
     public readonly setSelected = (s) => this._service.setSelected('*', s);
+    public readonly removeSelected = () => this._service.removeSelected();
     public readonly all_selected = combineLatest([
         this._service.item_list,
         this._service.selected,

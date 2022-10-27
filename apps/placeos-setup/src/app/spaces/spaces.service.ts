@@ -101,6 +101,24 @@ export class SpacesService {
         close();
     }
 
+    public async removeSelected() {
+        const list = this._selected.getValue();
+        if (!list.length) return;
+        if (list.length === 1) {
+            return this.removeSpace(this._space_list.getValue().find(_ => _.id === list[0]));
+        }
+        const { close, reason } = await openConfirmModal({
+            title: 'Remove Spaces',
+            content: `Are you sure you want to remove ${list.length} spaces?`,
+            icon: { content: 'delete' }
+        }, this._dialog);
+        if (reason !== 'done') return;
+        this._space_list.next(this._space_list.getValue().filter(_ => !list.find(id => _.id === id)));
+        this._selected.next([]);
+        this._store();
+        close();
+    }
+
     public openSpaceModal(space?: Space) {
         const ref = this._dialog.open(SpaceModalComponent, {
             data: space

@@ -16,6 +16,14 @@ import { FloorPlansService } from './floorplans.service';
                 <button mat-button class="w-44" (click)="viewExample()">
                     View Example Map
                 </button>
+                <button
+                    mat-button
+                    class="w-48"
+                    *ngIf="(all_selected | async) || (some_selected | async)"
+                    (click)="removeSelected()"
+                >
+                    Remove Selected
+                </button>
             </header>
             <main class="w-full h-1/2 flex-1 overflow-auto">
                 <div table>
@@ -79,6 +87,7 @@ export class FloorPlansComponent {
 
     public readonly newFloorPlan = () => this._service.openFloorPlanModal();
     public readonly setSelected = (s) => this._service.setSelected('*', s);
+    public readonly removeSelected = () => this._service.removeSelected();
     public readonly all_selected = combineLatest([
         this._service.floorplans,
         this._service.selected,

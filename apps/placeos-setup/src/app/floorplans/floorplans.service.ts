@@ -72,6 +72,24 @@ export class FloorPlansService {
         close();
     }
 
+    public async removeSelected() {
+        const list = this._selected.getValue();
+        if (!list.length) return;
+        if (list.length === 1) {
+            return this.removeFloorPlan(this._floorplan_list.getValue().find(_ => _.id === list[0]));
+        }
+        const { close, reason } = await openConfirmModal({
+            title: 'Remove regions',
+            content: `Are you sure you want to remove ${list.length} regions?`,
+            icon: { content: 'delete' }
+        }, this._dialog);
+        if (reason !== 'done') return;
+        this._floorplan_list.next(this._floorplan_list.getValue().filter(_ => !list.find(id => _.id === id)));
+        this._selected.next([]);
+        this._store();
+        close();
+    }
+
     public openFloorPlanModal(item?: FloorPlan) {
         const ref = this._dialog.open(FloorPlanModalComponent, {
             data: item
