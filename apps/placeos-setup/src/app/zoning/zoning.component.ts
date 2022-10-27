@@ -51,7 +51,7 @@ import { ZonesService } from './zoning.service';
         </div>
         <ng-template #empty_state>
             <div class="w-full h-full flex items-center justify-center p-8">
-                <p class="opacity-60">No rooms setup for organisation</p>
+                <p class="opacity-60">No zones setup for organisation</p>
             </div>
         </ng-template>
     `,
@@ -83,7 +83,7 @@ export class ZonesComponent {
     public readonly all_selected = combineLatest([
         this._service.zones,
         this._service.selected,
-    ]).pipe(map(([l, s]) => l.length === s.length));
+    ]).pipe(map(([l, s]) => l.length === s.length && s.length > 0));
     public readonly some_selected = combineLatest([
         this._service.zones,
         this._service.selected,

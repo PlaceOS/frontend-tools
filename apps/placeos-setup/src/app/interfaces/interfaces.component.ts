@@ -79,7 +79,7 @@ export class InterfacesComponent {
     public readonly all_selected = combineLatest([
         this._service.interfaces,
         this._service.selected,
-    ]).pipe(map(([l, s]) => l.length === s.length));
+    ]).pipe(map(([l, s]) => l.length === s.length && s.length > 0));
     public readonly some_selected = combineLatest([
         this._service.interfaces,
         this._service.selected,

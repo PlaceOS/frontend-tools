@@ -96,7 +96,7 @@ export class OrganisationComponent extends BaseClass {
         this._org.buildings,
         this._org.levels,
         this._org.selected,
-    ]).pipe(map(([b, l, s]) => (b.length + l.length) === s.length));
+    ]).pipe(map(([b, l, s]) => (b.length + l.length) === s.length && s.length > 0));
     public readonly some_selected = combineLatest([
         this._org.buildings,
         this._org.levels,

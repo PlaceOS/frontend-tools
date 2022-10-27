@@ -35,7 +35,9 @@ export class FloorPlansService {
     public readonly floorplans = this._floorplan_list.asObservable();
     public readonly selected = this._selected.asObservable();
 
-    constructor(private _dialog: MatDialog) {}
+    constructor(private _dialog: MatDialog) {
+        this._load();
+    }
 
     public isSelected(id: string) {
         const list = this._selected.getValue();

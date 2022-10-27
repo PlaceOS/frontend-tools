@@ -34,7 +34,9 @@ export class AccessControlService {
     public readonly access_controls = this._access_control_list.asObservable();
     public readonly selected = this._selected.asObservable();
 
-    constructor(private _dialog: MatDialog) {}
+    constructor(private _dialog: MatDialog) {
+        this._load();
+    }
 
     public isSelected(id: string) {
         const list = this._selected.getValue();

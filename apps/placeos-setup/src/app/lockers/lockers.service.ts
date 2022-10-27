@@ -51,7 +51,9 @@ export class LockersService {
     public readonly lockers = this._locker_list.asObservable();
     public readonly selected = this._selected.asObservable();
 
-    constructor(private _dialog: MatDialog) {}
+    constructor(private _dialog: MatDialog) {
+        this._load();
+    }
 
     public isSelected(id: string) {
         const list = this._selected.getValue();
