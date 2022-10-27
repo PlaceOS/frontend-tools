@@ -10,7 +10,7 @@ import { Space, SpacesService } from './spaces.service';
             class="flex items-center border-b border-neutral-500 text-sm hover:bg-black/10 relative"
         >
             <div thead class="min-w-0 w-10">
-                <mat-checkbox></mat-checkbox>
+                <mat-checkbox [ngModel]="selected" (ngModelChange)="setSelected($event)"></mat-checkbox>
             </div>
             <div thead class="font-mono text-xs">{{ item.room_id }}</div>
             <div thead class="w-56">{{ item.display_name }}</div>
@@ -77,6 +77,11 @@ export class SpaceDetailsComponent {
 
     public readonly edit = () => this._service.openSpaceModal(this.item);
     public readonly remove = () => this._service.removeSpace(this.item);
+    public readonly setSelected = (s) => this._service.setSelected(this.item.id, s);
+
+    public get selected() {
+        return this._service.isSelected(this.item.id);
+    }
 
     constructor(private _service: SpacesService) {}
 }

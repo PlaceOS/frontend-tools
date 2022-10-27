@@ -10,7 +10,7 @@ import { BuildingLevel, OrganisationService } from './organisation.service';
             class="flex items-center border-b border-neutral-500 text-sm hover:bg-black/10"
         >
             <div thead class="min-w-0 relative">
-                <mat-checkbox></mat-checkbox>
+                <mat-checkbox [ngModel]="selected" (ngModelChange)="setSelected($event)"></mat-checkbox>
             </div>
             <div class="min-w-0 w-10 p-0"></div>
             <div class="w-56">{{ level.display_name }}</div>
@@ -63,9 +63,13 @@ import { BuildingLevel, OrganisationService } from './organisation.service';
 export class OrganisationLevelComponent {
     @Input() public level: BuildingLevel;
 
-
     public readonly edit = () => this._org.openLevelModal(this.level);
     public readonly remove = () => this._org.removeLevel(this.level);
+    public readonly setSelected = (s) => this._org.setSelected(this.level.id, s);
+
+    public get selected() {
+        return this._org.isSelected(this.level.id);
+    }
 
     constructor(private _org: OrganisationService) {}
 }

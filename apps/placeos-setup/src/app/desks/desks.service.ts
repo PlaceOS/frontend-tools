@@ -47,9 +47,27 @@ export class DesksService {
         max_recurrence: 2
     }]);
 
+    private _selected = new BehaviorSubject<string[]>([]);
+
     public readonly desks = this._desk_list.asObservable();
+    public readonly selected = this._selected.asObservable();
 
     constructor(private _dialog: MatDialog) {}
+
+    public isSelected(id: string) {
+        const list = this._selected.getValue();
+        return !!list.find(_ => id === _);
+    }
+
+    public setSelected(id: string, state: boolean) {
+        const list = this._selected.getValue().filter(_ => _ !== id);
+        if (id === '*') {
+            this._selected.next(!state ? [] : this._desk_list.getValue().map(_ => _.id));
+            return;
+        }
+        if (!state) this._selected.next(list);
+        else this._selected.next([...list, id]);
+    }
 
     public setDesk(desk: Desk) {
         if (!desk.id) desk.id = `desk-${randomInt(9999_9999, 1000_0000)}`;

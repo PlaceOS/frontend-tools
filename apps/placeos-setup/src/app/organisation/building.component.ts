@@ -12,7 +12,7 @@ import { Building, OrganisationService } from './organisation.service';
             class="flex items-center border-b border-neutral-500 text-sm hover:bg-black/10 relative"
         >
             <div thead class="min-w-0">
-                <mat-checkbox></mat-checkbox>
+                <mat-checkbox [ngModel]="selected" (ngModelChange)="setSelected($event)"></mat-checkbox>
             </div>
             <div class="min-w-0 flex items-center w-10 p-0 justify-end">
                 <button
@@ -99,6 +99,11 @@ export class BuildingComponent {
 
     public readonly edit = () => this._org.openBuildingModal(this.building);
     public readonly remove = () => this._org.removeBuilding(this.building);
+    public readonly setSelected = (s) => this._org.setSelected(this.building.id, s);
+
+    public get selected() {
+        return this._org.isSelected(this.building.id);
+    }
 
     constructor(private _org: OrganisationService) {}
 

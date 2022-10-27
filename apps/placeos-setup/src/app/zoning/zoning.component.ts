@@ -1,4 +1,6 @@
 import { Component } from '@angular/core';
+import { combineLatest } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { ZonesService } from './zoning.service';
 
 @Component({
@@ -16,7 +18,11 @@ import { ZonesService } from './zoning.service';
                         class="sticky top-0 flex items-center bg-neutral-800 border-b border-neutral-500 w-full"
                     >
                         <div thead class="min-w-0 w-10">
-                            <mat-checkbox></mat-checkbox>
+                            <mat-checkbox
+                                [ngModel]="all_selected | async"
+                                [indeterminate]="some_selected | async"
+                                (ngModelChange)="setSelected($event)"
+                            ></mat-checkbox>
                         </div>
                         <div thead>Name</div>
                         <div thead>Building</div>
@@ -73,6 +79,15 @@ export class ZonesComponent {
     public readonly zones = this._service.zones;
 
     public readonly newZone = () => this._service.openZoneModal();
+    public readonly setSelected = (s) => this._service.setSelected('*', s);
+    public readonly all_selected = combineLatest([
+        this._service.zones,
+        this._service.selected,
+    ]).pipe(map(([l, s]) => l.length === s.length));
+    public readonly some_selected = combineLatest([
+        this._service.zones,
+        this._service.selected,
+    ]).pipe(map(([l, s]) => l.length !== s.length && s.length > 0));
 
     constructor(private _service: ZonesService) {}
 }

@@ -1,5 +1,7 @@
 import { Component } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
+import { combineLatest } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { FloorPlanExampleModalComponent } from './example-modal.component';
 import { FloorPlansService } from './floorplans.service';
 
@@ -21,7 +23,11 @@ import { FloorPlansService } from './floorplans.service';
                         class="sticky top-0 flex items-center bg-neutral-800 border-b border-neutral-500 w-full"
                     >
                         <div thead class="min-w-0 w-10">
-                            <mat-checkbox></mat-checkbox>
+                            <mat-checkbox
+                                [ngModel]="all_selected | async"
+                                [indeterminate]="some_selected | async"
+                                (ngModelChange)="setSelected($event)"
+                            ></mat-checkbox>
                         </div>
                         <div thead>Building</div>
                         <div thead>Level</div>
@@ -72,6 +78,15 @@ export class FloorPlansComponent {
     public readonly floorplans = this._service.floorplans;
 
     public readonly newFloorPlan = () => this._service.openFloorPlanModal();
+    public readonly setSelected = (s) => this._service.setSelected('*', s);
+    public readonly all_selected = combineLatest([
+        this._service.floorplans,
+        this._service.selected,
+    ]).pipe(map(([l, s]) => l.length === s.length));
+    public readonly some_selected = combineLatest([
+        this._service.floorplans,
+        this._service.selected,
+    ]).pipe(map(([l, s]) => l.length !== s.length && s.length > 0));
 
     constructor(private _service: FloorPlansService, private _dialog: MatDialog) {}
 

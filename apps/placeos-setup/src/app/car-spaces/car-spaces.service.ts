@@ -46,10 +46,27 @@ export class CarSpacesService {
         recurrence: true,
         max_recurrence: 2
     }]);
+    private _selected = new BehaviorSubject<string[]>([]);
 
     public readonly spaces = this._space_list.asObservable();
+    public readonly selected = this._selected.asObservable();
 
     constructor(private _dialog: MatDialog) {}
+
+    public isSelected(id: string) {
+        const list = this._selected.getValue();
+        return !!list.find(_ => id === _);
+    }
+
+    public setSelected(id: string, state: boolean) {
+        const list = this._selected.getValue().filter(_ => _ !== id);
+        if (id === '*') {
+            this._selected.next(!state ? [] : this._space_list.getValue().map(_ => _.id));
+            return;
+        }
+        if (!state) this._selected.next(list);
+        else this._selected.next([...list, id]);
+    }
 
     public setCarSpace(carspace: CarSpace) {
         if (!carspace.id) carspace.id = `carspace-${randomInt(9999_9999, 1000_0000)}`;
