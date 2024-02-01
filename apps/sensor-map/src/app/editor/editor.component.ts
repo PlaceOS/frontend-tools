@@ -88,12 +88,16 @@ export class EditorComponent extends BaseClass implements OnInit {
     public ngOnInit() {
         const handle_params = async (params: ParamMap) => {
             if (params.has('src')) {
+                console.log('Map Source:', params.get('src'));
                 const src = await sendMessage({
                     type: 'backoffice',
                     action: 'resource',
                     name: params.get('src'),
                     content: {},
-                }).catch((_) => '');
+                }).catch((_) => {
+                    console.log('Error:', _);
+                    return '';
+                });
                 this._editor.setURL(src || params.get('src'));
             }
         };
