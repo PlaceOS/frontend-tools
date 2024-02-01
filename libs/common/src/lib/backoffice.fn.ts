@@ -2,7 +2,7 @@ import type { HashMap } from './types';
 
 export interface FrameMessage {
     type: 'backoffice';
-    action: 'update' | 'metadata';
+    action: 'update' | 'metadata' | 'resource';
     name?: string;
     status?: 'success' | 'error';
     content: HashMap;
@@ -44,14 +44,16 @@ export function retrieveData<T = HashMap>(
 }
 
 export function sendMessage(msg: FrameMessage) {
-    return new Promise<void>((resolve, reject) => {
+    return new Promise<any>((resolve, reject) => {
         if (isChildFrame()) {
             window.parent.postMessage(JSON.stringify(msg), '*');
             const onMessage = (m: any) => {
                 if (typeof m.data !== 'string') return;
                 const parsed: FrameMessage = JSON.parse(m.data);
                 if (parsed && parsed.type === 'backoffice') {
-                    parsed.status === 'success' ? resolve() : reject();
+                    parsed.status === 'success'
+                        ? resolve(parsed.content)
+                        : reject();
                     window.removeEventListener('message', onMessage);
                 }
             };

@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, ParamMap } from '@angular/router';
-import { BaseClass } from '@placeos-tools/common';
+import { BaseClass, sendMessage } from '@placeos-tools/common';
 
 import { EditorStateService } from './editor-state.service';
 
@@ -64,31 +64,37 @@ import { EditorStateService } from './editor-state.service';
 })
 export class EditorComponent extends BaseClass implements OnInit {
     /** URL of the map to display */
-    public readonly url = this._state.url;
+    public readonly url = this._editor.url;
     /** Whether UI is embeded */
-    public readonly embeded = this._state.embeded;
-    public readonly features = this._state.features;
+    public readonly embeded = this._editor.embeded;
+    public readonly features = this._editor.features;
     public actions = [
         { id: '*', action: 'click', callback: (_, p) => this.clicked(p) },
         { id: '*', action: 'touchend', callback: (_, p) => this.clicked(p) },
     ];
 
-    public readonly clicked = (p) => this._state.setSensorPosition(p);
+    public readonly clicked = (p) => this._editor.setSensorPosition(p);
 
-    public readonly saveMetadata = () => this._state.saveMetadata();
-    public readonly copyMetadata = () => this._state.copyMetadata();
+    public readonly saveMetadata = () => this._editor.saveMetadata();
+    public readonly copyMetadata = () => this._editor.copyMetadata();
 
     constructor(
-        private _state: EditorStateService,
+        private _editor: EditorStateService,
         private _route: ActivatedRoute
     ) {
         super();
     }
 
-    public ngOnInit(): void {
-        const handle_params = (params: ParamMap) => {
+    public ngOnInit() {
+        const handle_params = async (params: ParamMap) => {
             if (params.has('src')) {
-                this._state.setURL(params.get('src') as string);
+                const src = await sendMessage({
+                    type: 'backoffice',
+                    action: 'resource',
+                    name: params.get('src'),
+                    content: {},
+                }).catch((_) => '');
+                this._editor.setURL(src || params.get('src'));
             }
         };
         this.subscription(
@@ -99,6 +105,6 @@ export class EditorComponent extends BaseClass implements OnInit {
             'route.params',
             this._route.paramMap.subscribe(handle_params)
         );
-        this._state.loadSensorLocations();
+        this._editor.loadSensorLocations();
     }
 }

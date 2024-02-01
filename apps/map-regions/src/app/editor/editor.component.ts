@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { BaseClass, HashMap } from '@placeos-tools/common';
+import { BaseClass, HashMap, sendMessage } from '@placeos-tools/common';
 import { MapPolygonComponent } from '@placeos-tools/components';
 import { ViewerFeature } from '@placeos/svg-viewer';
 
@@ -49,7 +49,7 @@ import { EditorStateService } from './editor-state.service';
 })
 export class EditorComponent extends BaseClass implements OnInit {
     /** URL of the map to display */
-    public readonly url = this._state.url;
+    public readonly url = this._editor.url;
     public actions = [];
     /** Map regions for active map URL */
     public regions = [];
@@ -57,14 +57,15 @@ export class EditorComponent extends BaseClass implements OnInit {
     public ratio = 1;
 
     /** Handler for click events on the map */
-    public readonly clicked = (n) => (_, p) => this._state.handleMapClick(n, p);
+    public readonly clicked = (n) => (_, p) =>
+        this._editor.handleMapClick(n, p);
     public readonly setRatio = (r) => {
         this.ratio = r;
-        this._state.setRatio(r);
+        this._editor.setRatio(r);
     };
 
     constructor(
-        private _state: EditorStateService,
+        private _editor: EditorStateService,
         private _route: ActivatedRoute
     ) {
         super();
@@ -79,9 +80,15 @@ export class EditorComponent extends BaseClass implements OnInit {
             { id: '*', action: 'touchmove', callback: this.clicked('move') },
             { id: '*', action: 'touchend', callback: this.clicked('end') },
         ];
-        const handle_params = (params) => {
+        const handle_params = async (params) => {
             if (params.has('src')) {
-                this._state.setURL(params.get('src'));
+                const src = await sendMessage({
+                    type: 'backoffice',
+                    action: 'resource',
+                    name: params.get('src'),
+                    content: {},
+                }).catch((_) => '');
+                this._editor.setURL(src || params.get('src'));
             }
         };
         this.subscription(
@@ -93,19 +100,19 @@ export class EditorComponent extends BaseClass implements OnInit {
             this._route.paramMap.subscribe(handle_params)
         );
 
-        this._state.regions
+        this._editor.regions
             .pipe(
                 map((l) =>
                     l.map((_, idx) => {
                         return {
                             location: 'svg-viewer-root',
-                            track_id: `area-${idx}`, 
+                            track_id: `area-${idx}`,
                             content: MapPolygonComponent,
                             full_size: true,
                             data: {
                                 ..._,
                                 ratio: this.ratio,
-                                data$: this._state.regions.pipe(
+                                data$: this._editor.regions.pipe(
                                     map((list) =>
                                         list.find((r) => r.id === _.id)
                                     ),

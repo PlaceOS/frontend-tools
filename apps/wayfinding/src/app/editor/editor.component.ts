@@ -1,6 +1,6 @@
 import { Component, Renderer2 } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { BaseClass } from '@placeos-tools/common';
+import { BaseClass, sendMessage } from '@placeos-tools/common';
 import { EditorStateService } from './editor-state.service';
 
 @Component({
@@ -168,8 +168,16 @@ export class WayfindingEditorComponent extends BaseClass {
     public ngOnInit() {
         this.subscription(
             'route.params',
-            this._route.paramMap.subscribe((params) => {
-                if (params.has('src')) this._editor.setURL(params.get('src'));
+            this._route.paramMap.subscribe(async (params) => {
+                if (params.has('src')) {
+                    const src = await sendMessage({
+                        type: 'backoffice',
+                        action: 'resource',
+                        name: params.get('src'),
+                        content: {},
+                    }).catch((_) => '');
+                    this._editor.setURL(src || params.get('src'));
+                }
             })
         );
     }
