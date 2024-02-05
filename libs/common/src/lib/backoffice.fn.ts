@@ -2,7 +2,7 @@ import { randomString } from './general';
 import type { HashMap } from './types';
 
 export interface FrameMessage {
-    id: string;
+    id?: string;
     type: 'backoffice';
     action: 'load' | 'update' | 'metadata' | 'resource';
     name?: string;
@@ -22,7 +22,6 @@ export function retrieveData<T = HashMap>(
     return new Promise((resolve, reject) => {
         if (isChildFrame()) {
             sendMessage<T>({
-                id: randomString(8),
                 type: 'backoffice',
                 action: 'load',
                 parent,
@@ -45,8 +44,8 @@ const resolve_map: Record<string, PromiseMethods> = {};
 export function onMessage(m: any) {
     if (typeof m.data !== 'string') return;
     const parsed: FrameMessage = JSON.parse(m.data);
-    if (!parsed.id && resolve_map[parsed.id]) return;
-    const { resolve, reject } = resolve_map[parsed.id];
+    if (!parsed.id && resolve_map[parsed.id!]) return;
+    const { resolve, reject } = resolve_map[parsed.id!];
     if (parsed && parsed.type === 'backoffice') {
         parsed.status === 'success' ? resolve(parsed.content) : reject(parsed);
         delete resolve_map[parsed.id];
