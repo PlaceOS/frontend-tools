@@ -42,6 +42,7 @@ interface PromiseMethods {
 const resolve_map: Record<string, PromiseMethods> = {};
 
 export function onMessage(m: any) {
+    console.log('Received Message:', m);
     if (typeof m.data !== 'string') return;
     const parsed: FrameMessage = JSON.parse(m.data);
     if (!parsed.id && resolve_map[parsed.id!]) return;
