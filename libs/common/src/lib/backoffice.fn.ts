@@ -2,12 +2,13 @@ import { randomString } from './general';
 import type { HashMap } from './types';
 
 export interface FrameMessage {
-    id?: string;
+    id: string;
     type: 'backoffice';
-    action: 'update' | 'metadata' | 'resource';
+    action: 'load' | 'update' | 'metadata' | 'resource';
     name?: string;
     status?: 'success' | 'error';
-    content: HashMap;
+    content?: HashMap;
+    parent?: boolean;
 }
 
 export function isChildFrame() {
@@ -20,25 +21,15 @@ export function retrieveData<T = HashMap>(
 ): Promise<T> {
     return new Promise((resolve, reject) => {
         if (isChildFrame()) {
-            const onMessage = (m: any) => {
-                if (typeof m.data !== 'string') return;
-                const parsed: FrameMessage = JSON.parse(m.data);
-                if (parsed && parsed.type === 'backoffice') {
-                    const data = parsed.content;
-                    resolve(data as any);
-                    window.removeEventListener('message', onMessage);
-                }
-            };
-            window.addEventListener('message', onMessage);
-            window.parent.postMessage(
-                JSON.stringify({
-                    type: 'backoffice',
-                    action: 'load',
-                    parent,
-                    name,
-                }),
-                '*'
-            );
+            sendMessage<T>({
+                id: randomString(8),
+                type: 'backoffice',
+                action: 'load',
+                parent,
+                name,
+            })
+                .then(resolve)
+                .catch(reject);
         } else {
             reject('Application is not in an iFrame.');
         }
@@ -63,8 +54,8 @@ export function onMessage(m: any) {
 }
 window.addEventListener('message', onMessage);
 
-export function sendMessage(msg: FrameMessage) {
-    return new Promise<any>((resolve, reject) => {
+export function sendMessage<T = void>(msg: FrameMessage) {
+    return new Promise<T>((resolve, reject) => {
         if (isChildFrame()) {
             if (!msg.id) msg.id = randomString(8);
             window.parent.postMessage(JSON.stringify(msg), '*');
