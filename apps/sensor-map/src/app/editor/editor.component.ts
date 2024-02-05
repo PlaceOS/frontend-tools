@@ -98,6 +98,7 @@ export class EditorComponent extends BaseClass implements OnInit {
                     console.log('Error:', _);
                     return '';
                 });
+                console.log('Resolved Source:', src);
                 this._editor.setURL(src || params.get('src'));
             }
         };
