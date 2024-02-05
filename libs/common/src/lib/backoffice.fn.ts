@@ -48,7 +48,7 @@ export function onMessage(m: any) {
     const { resolve, reject } = resolve_map[parsed.id!];
     if (parsed && parsed.type === 'backoffice') {
         parsed.status === 'success' ? resolve(parsed.content) : reject(parsed);
-        delete resolve_map[parsed.id];
+        delete resolve_map[parsed.id!];
     }
 }
 window.addEventListener('message', onMessage);
