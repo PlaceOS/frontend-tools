@@ -35,6 +35,7 @@ export interface PlaceSensorLocation {
     providedIn: 'root',
 })
 export class EditorStateService {
+    private _use_url = new BehaviorSubject<string>('');
     private _map_url = new BehaviorSubject<string>('');
     private _active_sensor = new BehaviorSubject<PlaceSensor>(null);
     private _embeded = new BehaviorSubject<boolean>(false);
@@ -105,8 +106,9 @@ export class EditorStateService {
     }
 
     /** Update the map URL */
-    public setURL(url: string) {
+    public setURL(url: string, use_url: string = '') {
         this._map_url.next(url);
+        this._use_url.next(use_url || url);
     }
 
     /** Update the map URL */

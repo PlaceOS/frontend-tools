@@ -29,6 +29,7 @@ const RES = 0.01;
     providedIn: 'root',
 })
 export class EditorStateService {
+    private _use_url = new BehaviorSubject<string>('');
     private _map_url = new BehaviorSubject<string>('');
     private _embeded = new BehaviorSubject<boolean>(false);
     private _method = new BehaviorSubject<ActionMethod>('add');
@@ -40,14 +41,17 @@ export class EditorStateService {
     private _waypoints_links = new BehaviorSubject<[GridPoint, GridPoint][]>(
         []
     );
-    public readonly navpath = combineLatest([this._navpath, this._grid_size]).pipe(switchMap(async ([path, [width]]) => {
-        const viewer = await getViewerByURL(this._map_url.getValue());
-        const height = Math.floor(width * (viewer?.ratio || 1));
-        const angle = 0;
-        for (let i = 1; i < path.length; i++) {
-            
-        }
-    }));
+    public readonly navpath = combineLatest([
+        this._navpath,
+        this._grid_size,
+    ]).pipe(
+        switchMap(async ([path, [width]]) => {
+            const viewer = await getViewerByURL(this._map_url.getValue());
+            const height = Math.floor(width * (viewer?.ratio || 1));
+            const angle = 0;
+            for (let i = 1; i < path.length; i++) {}
+        })
+    );
     /** List of features to be displayed on the map */
     public readonly features = combineLatest([
         this._waypoints,
@@ -132,8 +136,9 @@ export class EditorStateService {
     }
 
     /** Update the map URL */
-    public setURL(url: string) {
+    public setURL(url: string, use_url: string = '') {
         this._map_url.next(url);
+        this._use_url.next(use_url || url);
         setTimeout(
             () => this._waypoints.next(this._waypoints.getValue()),
             1000
@@ -260,7 +265,7 @@ export class EditorStateService {
                 waypoints,
                 links,
                 this._active_point.getValue(),
-                [x, y, false],
+                [x, y, false]
             );
             this._navpath.next(path);
             this._active_point.next(null);

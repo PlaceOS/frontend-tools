@@ -176,7 +176,10 @@ export class WayfindingEditorComponent extends BaseClass {
                         name: params.get('src'),
                         content: {},
                     }).catch((_) => '');
-                    this._editor.setURL(src || params.get('src'));
+                    this._editor.setURL(
+                        src || params.get('src'),
+                        params.get('src')
+                    );
                 }
             })
         );
