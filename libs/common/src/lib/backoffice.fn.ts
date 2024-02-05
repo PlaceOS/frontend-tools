@@ -42,7 +42,6 @@ interface PromiseMethods {
 const resolve_map: Record<string, PromiseMethods> = {};
 
 export function onMessage(m: any) {
-    console.log('Received Message:', m);
     if (typeof m.data !== 'string') return;
     const parsed: FrameMessage = JSON.parse(m.data);
     if (!parsed.id && resolve_map[parsed.id!]) return;
@@ -58,7 +57,6 @@ export function sendMessage<T = void>(msg: FrameMessage) {
     return new Promise<T>((resolve, reject) => {
         if (isChildFrame()) {
             if (!msg.id) msg.id = randomString(8);
-            console.log('Send Message:', msg);
             window.parent.postMessage(JSON.stringify(msg), '*');
             resolve_map[msg.id] = { resolve, reject };
         } else {
