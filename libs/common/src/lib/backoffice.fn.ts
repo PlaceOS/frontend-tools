@@ -53,7 +53,7 @@ export function sendMessage(msg: FrameMessage) {
                 if (parsed && parsed.type === 'backoffice') {
                     parsed.status === 'success'
                         ? resolve(parsed.content)
-                        : reject();
+                        : reject(parsed);
                     window.removeEventListener('message', onMessage);
                 }
             };
