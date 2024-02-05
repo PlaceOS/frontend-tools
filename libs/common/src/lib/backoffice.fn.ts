@@ -57,6 +57,7 @@ export function sendMessage<T = void>(msg: FrameMessage) {
     return new Promise<T>((resolve, reject) => {
         if (isChildFrame()) {
             if (!msg.id) msg.id = randomString(8);
+            console.log('Send Message:', msg);
             window.parent.postMessage(JSON.stringify(msg), '*');
             resolve_map[msg.id] = { resolve, reject };
         } else {
