@@ -1,0 +1,120 @@
+{
+    "name": "map-builder",
+    "$schema": "../../node_modules/nx/schemas/project-schema.json",
+    "projectType": "application",
+    "sourceRoot": "apps/map-builder/src",
+    "prefix": "placeos-tools",
+    "tags": [],
+    "targets": {
+        "build": {
+            "executor": "@angular-devkit/build-angular:browser",
+            "options": {
+                "baseHref": ".",
+                "outputPath": "dist/apps/map-builder",
+                "index": "apps/map-builder/src/index.html",
+                "main": "apps/map-builder/src/main.ts",
+                "polyfills": "apps/map-builder/src/polyfills.ts",
+                "tsConfig": "apps/map-builder/tsconfig.app.json",
+                "assets": [
+                    "apps/map-builder/src/favicon.ico",
+                    "apps/map-builder/src/assets",
+                    {
+                        "glob": "**",
+                        "input": "shared/assets",
+                        "output": "/assets/"
+                    },
+                    "apps/map-builder/src/manifest.webmanifest"
+                ],
+                "styles": [
+                    "apps/map-builder/src/styles.css",
+                    "shared/styles/application.scss",
+                    "shared/styles/custom-elements.scss",
+                    "shared/styles/native-elements.scss"
+                ],
+                "scripts": [],
+                "vendorChunk": true,
+                "extractLicenses": false,
+                "buildOptimizer": false,
+                "sourceMap": true,
+                "optimization": false,
+                "namedChunks": true
+            },
+            "configurations": {
+                "staging": {
+                    "fileReplacements": [
+                        {
+                            "replace": "apps/map-builder/src/environments/environment.ts",
+                            "with": "apps/map-builder/src/environments/environment.prod.ts"
+                        }
+                    ],
+                    "optimization": true,
+                    "outputHashing": "all",
+                    "namedChunks": false,
+                    "vendorChunk": false,
+                    "buildOptimizer": true,
+                    "serviceWorker": true,
+                    "ngswConfigPath": "apps/map-builder/ngsw-config.json"
+                },
+                "production": {
+                    "fileReplacements": [
+                        {
+                            "replace": "apps/map-builder/src/environments/environment.ts",
+                            "with": "apps/map-builder/src/environments/environment.prod.ts"
+                        }
+                    ],
+                    "optimization": true,
+                    "outputHashing": "all",
+                    "sourceMap": false,
+                    "namedChunks": false,
+                    "extractLicenses": true,
+                    "vendorChunk": false,
+                    "buildOptimizer": true,
+                    "budgets": [
+                        {
+                            "type": "initial",
+                            "maximumWarning": "2mb",
+                            "maximumError": "5mb"
+                        },
+                        {
+                            "type": "anyComponentStyle",
+                            "maximumWarning": "6kb",
+                            "maximumError": "10kb"
+                        }
+                    ],
+                    "serviceWorker": true,
+                    "ngswConfigPath": "apps/map-builder/ngsw-config.json"
+                }
+            },
+            "defaultConfiguration": ""
+        },
+        "serve": {
+            "executor": "@angular-devkit/build-angular:dev-server",
+            "options": {
+                "proxyConfig": "config/proxy.conf.js",
+                "buildTarget": "map-builder:build"
+            },
+            "configurations": {
+                "production": {
+                    "buildTarget": "map-builder:build:production"
+                }
+            }
+        },
+        "extract-i18n": {
+            "executor": "@angular-devkit/build-angular:extract-i18n",
+            "options": {
+                "buildTarget": "map-builder:build"
+            }
+        },
+        "lint": {
+            "executor": "@nx/eslint:lint",
+            "outputs": ["{options.outputFile}"]
+        },
+        "test": {
+            "executor": "@nx/jest:jest",
+            "outputs": ["{workspaceRoot}/coverage/apps/map-builder"],
+            "options": {
+                "jestConfig": "apps/map-builder/jest.config.ts"
+            }
+        }
+    }
+}

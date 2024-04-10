@@ -15,23 +15,15 @@ import { EditorStateService } from './editor-state.service';
                 [actions]="actions"
             ></i-map>
             <div
-                class="absolute bottom-2 right-2 flex items-center space-x-2 w-[26rem]"
+                class="absolute bottom-2 right-2 flex flex-wrap items-center justify-end"
             >
-                <button
-                    mat-button
-                    class="bg-white text-black flex-1"
-                    (click)="saveMetadata()"
-                >
+                <button btn matRipple class="m-1" (click)="saveMetadata()">
                     <div class="flex items-center">
                         <app-icon class="mr-4">save_alt</app-icon>
                         {{ (embeded | async) ? 'Save' : 'Download' }} Metadata
                     </div>
                 </button>
-                <button
-                    mat-button
-                    class="bg-white text-black flex-1"
-                    (click)="copyMetadata()"
-                >
+                <button btn matRipple class="m-1" (click)="copyMetadata()">
                     <div class="flex items-center">
                         <app-icon class="mr-4">content_copy</app-icon>
                         Copy Metadata

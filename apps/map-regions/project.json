@@ -1,0 +1,104 @@
+{
+    "name": "map-regions",
+    "$schema": "../../node_modules/nx/schemas/project-schema.json",
+    "projectType": "application",
+    "sourceRoot": "apps/map-regions/src",
+    "prefix": "placeos-tools",
+    "tags": [],
+    "targets": {
+        "build": {
+            "executor": "@angular-devkit/build-angular:browser",
+            "options": {
+                "baseHref": ".",
+                "outputPath": "dist/apps/map-regions",
+                "index": "apps/map-regions/src/index.html",
+                "main": "apps/map-regions/src/main.ts",
+                "polyfills": "apps/map-regions/src/polyfills.ts",
+                "tsConfig": "apps/map-regions/tsconfig.app.json",
+                "assets": [
+                    "apps/map-regions/src/favicon.ico",
+                    "apps/map-regions/src/assets",
+                    {
+                        "glob": "**",
+                        "input": "shared/assets",
+                        "output": "/assets/"
+                    },
+                    "apps/map-regions/src/manifest.webmanifest"
+                ],
+                "styles": [
+                    "apps/map-regions/src/styles.css",
+                    "shared/styles/application.scss",
+                    "shared/styles/custom-elements.scss",
+                    "shared/styles/native-elements.scss"
+                ],
+                "scripts": [],
+                "vendorChunk": true,
+                "extractLicenses": false,
+                "buildOptimizer": false,
+                "sourceMap": true,
+                "optimization": false,
+                "namedChunks": true
+            },
+            "configurations": {
+                "production": {
+                    "fileReplacements": [
+                        {
+                            "replace": "apps/map-regions/src/environments/environment.ts",
+                            "with": "apps/map-regions/src/environments/environment.prod.ts"
+                        }
+                    ],
+                    "optimization": true,
+                    "outputHashing": "all",
+                    "sourceMap": false,
+                    "namedChunks": false,
+                    "extractLicenses": true,
+                    "vendorChunk": false,
+                    "buildOptimizer": true,
+                    "budgets": [
+                        {
+                            "type": "initial",
+                            "maximumWarning": "2mb",
+                            "maximumError": "5mb"
+                        },
+                        {
+                            "type": "anyComponentStyle",
+                            "maximumWarning": "6kb",
+                            "maximumError": "10kb"
+                        }
+                    ],
+                    "serviceWorker": true,
+                    "ngswConfigPath": "apps/map-regions/ngsw-config.json"
+                }
+            },
+            "defaultConfiguration": ""
+        },
+        "serve": {
+            "executor": "@angular-devkit/build-angular:dev-server",
+            "options": {
+                "buildTarget": "map-regions:build"
+            },
+            "configurations": {
+                "production": {
+                    "buildTarget": "map-regions:build:production"
+                }
+            }
+        },
+        "extract-i18n": {
+            "executor": "@angular-devkit/build-angular:extract-i18n",
+            "options": {
+                "buildTarget": "map-regions:build"
+            }
+        },
+        "lint": {
+            "executor": "@nx/eslint:lint",
+            "outputs": ["{options.outputFile}"]
+        },
+        "test": {
+            "executor": "@nx/jest:jest",
+            "outputs": ["{workspaceRoot}/coverage/apps/map-regions"],
+            "options": {
+                "jestConfig": "apps/map-regions/jest.config.ts"
+            }
+        }
+    }
+}

@@ -1,0 +1,27 @@
+{
+    "name": "wayfinding-e2e",
+    "$schema": "../../node_modules/nx/schemas/project-schema.json",
+    "sourceRoot": "apps/wayfinding-e2e/src",
+    "projectType": "application",
+    "tags": [],
+    "implicitDependencies": ["wayfinding"],
+    "targets": {
+        "e2e": {
+            "executor": "@nx/cypress:cypress",
+            "options": {
+                "cypressConfig": "apps/wayfinding-e2e/cypress.json",
+                "devServerTarget": "wayfinding:serve:development",
+                "tsConfig": "apps/wayfinding-e2e/tsconfig.json"
+            },
+            "configurations": {
+                "production": {
+                    "devServerTarget": "wayfinding:serve:production"
+                }
+            }
+        },
+        "lint": {
+            "executor": "@nx/eslint:lint",
+            "outputs": ["{options.outputFile}"]
+        }
+    }
+}

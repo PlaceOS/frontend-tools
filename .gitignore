@@ -43,3 +43,5 @@ libs/common/src/lib/version.ts
 migrations.json
 
 .angular
+
+.nx/cache

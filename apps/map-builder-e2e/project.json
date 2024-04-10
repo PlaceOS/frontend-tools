@@ -1,0 +1,27 @@
+{
+    "name": "map-builder-e2e",
+    "$schema": "../../node_modules/nx/schemas/project-schema.json",
+    "sourceRoot": "apps/map-builder-e2e/src",
+    "projectType": "application",
+    "tags": [],
+    "implicitDependencies": ["map-builder"],
+    "targets": {
+        "e2e": {
+            "executor": "@nx/cypress:cypress",
+            "options": {
+                "cypressConfig": "apps/map-builder-e2e/cypress.json",
+                "tsConfig": "apps/map-builder-e2e/tsconfig.e2e.json",
+                "devServerTarget": "map-builder:serve"
+            },
+            "configurations": {
+                "production": {
+                    "devServerTarget": "map-builder:serve:production"
+                }
+            }
+        },
+        "lint": {
+            "executor": "@nx/eslint:lint",
+            "outputs": ["{options.outputFile}"]
+        }
+    }
+}

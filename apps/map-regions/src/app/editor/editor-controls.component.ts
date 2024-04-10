@@ -5,10 +5,12 @@ import { EditorStateService } from './editor-state.service';
     selector: 'editor-controls',
     template: `
         <div
-            class="flex flex-col items-center bg-white rounded overflow-hidden shadow"
+            class="flex flex-col items-center bg-base-100 border border-base-300 rounded overflow-hidden shadow"
         >
             <button
-                mat-icon-button
+                icon
+                matRipple
+                class="rounded"
                 [class.bg-primary]="action === 'rect'"
                 [class.text-white]="action === 'rect'"
                 matTooltip="Draw Rectangle"
@@ -18,7 +20,9 @@ import { EditorStateService } from './editor-state.service';
                 <app-icon>aspect_ratio</app-icon>
             </button>
             <button
-                mat-icon-button
+                icon
+                matRipple
+                class="rounded"
                 [class.bg-primary]="action === 'add_points'"
                 [class.text-white]="action === 'add_points'"
                 matTooltip="Add Points"
@@ -28,7 +32,9 @@ import { EditorStateService } from './editor-state.service';
                 <app-icon>add_circle</app-icon>
             </button>
             <button
-                mat-icon-button
+                icon
+                matRipple
+                class="rounded"
                 [class.bg-primary]="action === 'remove_points'"
                 [class.text-white]="action === 'remove_points'"
                 matTooltip="Remove Points"

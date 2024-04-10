@@ -1,0 +1,98 @@
+{
+    "name": "app-settings",
+    "$schema": "../../node_modules/nx/schemas/project-schema.json",
+    "projectType": "application",
+    "sourceRoot": "apps/app-settings/src",
+    "prefix": "placeos-tools",
+    "tags": [],
+    "targets": {
+        "build": {
+            "executor": "@angular-devkit/build-angular:browser",
+            "outputs": ["{options.outputPath}"],
+            "options": {
+                "baseHref": ".",
+                "outputPath": "dist/apps/app-settings",
+                "index": "apps/app-settings/src/index.html",
+                "main": "apps/app-settings/src/main.ts",
+                "polyfills": "apps/app-settings/src/polyfills.ts",
+                "tsConfig": "apps/app-settings/tsconfig.app.json",
+                "assets": [
+                    "apps/app-settings/src/favicon.ico",
+                    "apps/app-settings/src/assets",
+                    "apps/app-settings/src/manifest.webmanifest"
+                ],
+                "styles": [
+                    "apps/app-settings/src/styles.css",
+                    "shared/styles/application.scss",
+                    "shared/styles/custom-elements.scss",
+                    "shared/styles/native-elements.scss",
+                    "./node_modules/@angular/material/prebuilt-themes/indigo-pink.css"
+                ],
+                "scripts": [],
+                "serviceWorker": true,
+                "ngswConfigPath": "apps/app-settings/ngsw-config.json"
+            },
+            "configurations": {
+                "production": {
+                    "budgets": [
+                        {
+                            "type": "initial",
+                            "maximumWarning": "500kb",
+                            "maximumError": "2mb"
+                        },
+                        {
+                            "type": "anyComponentStyle",
+                            "maximumWarning": "2kb",
+                            "maximumError": "4kb"
+                        }
+                    ],
+                    "fileReplacements": [
+                        {
+                            "replace": "apps/app-settings/src/environments/environment.ts",
+                            "with": "apps/app-settings/src/environments/environment.prod.ts"
+                        }
+                    ],
+                    "outputHashing": "all"
+                },
+                "development": {
+                    "buildOptimizer": false,
+                    "optimization": false,
+                    "vendorChunk": true,
+                    "extractLicenses": false,
+                    "sourceMap": true,
+                    "namedChunks": true
+                }
+            },
+            "defaultConfiguration": "production"
+        },
+        "serve": {
+            "executor": "@angular-devkit/build-angular:dev-server",
+            "configurations": {
+                "production": {
+                    "buildTarget": "app-settings:build:production"
+                },
+                "development": {
+                    "buildTarget": "app-settings:build:development"
+                }
+            },
+            "defaultConfiguration": "development"
+        },
+        "extract-i18n": {
+            "executor": "@angular-devkit/build-angular:extract-i18n",
+            "options": {
+                "buildTarget": "app-settings:build"
+            }
+        },
+        "lint": {
+            "executor": "@nx/eslint:lint",
+            "outputs": ["{options.outputFile}"]
+        },
+        "test": {
+            "executor": "@nx/jest:jest",
+            "outputs": ["{workspaceRoot}/coverage/apps/app-settings"],
+            "options": {
+                "jestConfig": "apps/app-settings/jest.config.ts"
+            }
+        }
+    }
+}

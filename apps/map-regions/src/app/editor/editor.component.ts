@@ -14,7 +14,7 @@ import { EditorStateService } from './editor-state.service';
         <div controls class="relative h-full">
             <editor-options></editor-options>
         </div>
-        <div class="relative h-full flex-1">
+        <div class="relative h-full flex-1 bg-base-200">
             <i-map
                 class="w-screen h-screen"
                 [src]="url | async"
@@ -24,7 +24,7 @@ import { EditorStateService } from './editor-state.service';
                 (aspect_ratio)="setRatio($event)"
             ></i-map>
             <editor-controls
-                class="absolute top-1/2 left-0 transform -translate-y-1/2"
+                class="absolute top-1/2 left-2 transform -translate-y-1/2"
             ></editor-controls>
         </div>
     `,
@@ -37,12 +37,11 @@ import { EditorStateService } from './editor-state.service';
                 right: 0;
                 bottom: 0;
                 overflow: hidden;
-                background-color: #f0f0f0;
                 display: flex;
             }
 
             [controls] {
-                width: 24rem;
+                width: 20rem;
             }
         `,
     ],

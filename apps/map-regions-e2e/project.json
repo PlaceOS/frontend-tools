@@ -1,0 +1,27 @@
+{
+    "name": "map-regions-e2e",
+    "$schema": "../../node_modules/nx/schemas/project-schema.json",
+    "sourceRoot": "apps/map-regions-e2e/src",
+    "projectType": "application",
+    "tags": [],
+    "implicitDependencies": ["map-regions"],
+    "targets": {
+        "e2e": {
+            "executor": "@nx/cypress:cypress",
+            "options": {
+                "cypressConfig": "apps/map-regions-e2e/cypress.json",
+                "tsConfig": "apps/map-regions-e2e/tsconfig.e2e.json",
+                "devServerTarget": "map-regions:serve"
+            },
+            "configurations": {
+                "production": {
+                    "devServerTarget": "map-regions:serve:production"
+                }
+            }
+        },
+        "lint": {
+            "executor": "@nx/eslint:lint",
+            "outputs": ["{options.outputFile}"]
+        }
+    }
+}

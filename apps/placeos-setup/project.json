@@ -1,0 +1,94 @@
+{
+    "name": "placeos-setup",
+    "$schema": "../../node_modules/nx/schemas/project-schema.json",
+    "projectType": "application",
+    "sourceRoot": "apps/placeos-setup/src",
+    "prefix": "placeos-tools",
+    "tags": [],
+    "targets": {
+        "build": {
+            "executor": "@angular-devkit/build-angular:browser",
+            "outputs": ["{options.outputPath}"],
+            "options": {
+                "baseHref": ".",
+                "outputPath": "dist/apps/placeos-setup",
+                "index": "apps/placeos-setup/src/index.html",
+                "main": "apps/placeos-setup/src/main.ts",
+                "polyfills": "apps/placeos-setup/src/polyfills.ts",
+                "tsConfig": "apps/placeos-setup/tsconfig.app.json",
+                "assets": [
+                    "apps/placeos-setup/src/favicon.ico",
+                    "apps/placeos-setup/src/assets"
+                ],
+                "styles": [
+                    "apps/placeos-setup/src/styles.css",
+                    "shared/styles/application.scss",
+                    "shared/styles/custom-elements.scss",
+                    "shared/styles/native-elements.scss",
+                    "./node_modules/@angular/material/prebuilt-themes/indigo-pink.css"
+                ],
+                "scripts": []
+            },
+            "configurations": {
+                "production": {
+                    "budgets": [
+                        {
+                            "type": "initial",
+                            "maximumWarning": "500kb",
+                            "maximumError": "2mb"
+                        },
+                        {
+                            "type": "anyComponentStyle",
+                            "maximumWarning": "2kb",
+                            "maximumError": "4kb"
+                        }
+                    ],
+                    "fileReplacements": [
+                        {
+                            "replace": "apps/placeos-setup/src/environments/environment.ts",
+                            "with": "apps/placeos-setup/src/environments/environment.prod.ts"
+                        }
+                    ],
+                    "outputHashing": "all"
+                },
+                "development": {
+                    "buildOptimizer": false,
+                    "optimization": false,
+                    "vendorChunk": true,
+                    "extractLicenses": false,
+                    "sourceMap": true,
+                    "namedChunks": true
+                }
+            },
+            "defaultConfiguration": "production"
+        },
+        "serve": {
+            "executor": "@angular-devkit/build-angular:dev-server",
+            "configurations": {
+                "production": {
+                    "buildTarget": "placeos-setup:build:production"
+                },
+                "development": {
+                    "buildTarget": "placeos-setup:build:development"
+                }
+            },
+            "defaultConfiguration": "development"
+        },
+        "extract-i18n": {
+            "executor": "@angular-devkit/build-angular:extract-i18n",
+            "options": {
+                "buildTarget": "placeos-setup:build"
+            }
+        },
+        "lint": {
+            "executor": "@nx/eslint:lint"
+        },
+        "test": {
+            "executor": "@nx/jest:jest",
+            "outputs": ["{workspaceRoot}/coverage/apps/placeos-setup"],
+            "options": {
+                "jestConfig": "apps/placeos-setup/jest.config.ts"
+            }
+        }
+    }
+}

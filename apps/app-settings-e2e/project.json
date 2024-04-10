@@ -1,0 +1,27 @@
+{
+    "name": "app-settings-e2e",
+    "$schema": "../../node_modules/nx/schemas/project-schema.json",
+    "sourceRoot": "apps/app-settings-e2e/src",
+    "projectType": "application",
+    "tags": [],
+    "implicitDependencies": ["app-settings"],
+    "targets": {
+        "e2e": {
+            "executor": "@nx/cypress:cypress",
+            "options": {
+                "cypressConfig": "apps/app-settings-e2e/cypress.json",
+                "tsConfig": "apps/app-settings-e2e/tsconfig.e2e.json",
+                "devServerTarget": "app-settings:serve:development"
+            },
+            "configurations": {
+                "production": {
+                    "devServerTarget": "app-settings:serve:production"
+                }
+            }
+        },
+        "lint": {
+            "executor": "@nx/eslint:lint",
+            "outputs": ["{options.outputFile}"]
+        }
+    }
+}

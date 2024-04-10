@@ -8,14 +8,14 @@ import { EditorStateService } from './editor-state.service';
     template: `
         <div class="flex flex-col items-center w-full h-full bg-white shadow">
             <input
-                class="w-full px-4 py-2 border-b border-gray-300"
+                class="w-full px-4 py-2 border-b border-base-300"
                 placeholder="Search sensors..."
                 [ngModel]="search$ | async"
                 (ngModelChange)="search$.next($event)"
             />
             <ul class="list-none p-0 w-full flex-1 overflow-auto">
                 <li
-                    class="flex items-center p-2 border-b border-gray-200 cursor-pointer"
+                    class="flex items-center p-2 border-b border-base-200 cursor-pointer"
                     *ngFor="let sensor of sensor_list | async"
                     [class.bg-primary]="
                         (active_sensor | async)?.id === sensor.id
