@@ -12,7 +12,7 @@ export interface MapPointData {
     template: `
         <div (click)="onClick($event)">
             <div
-                class="flex h-3 w-3 absolute transform -translate-x-1/2 -translate-y-1/2 pointer-events-auto "
+                class="flex h-3 w-3 absolute transform top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-auto "
                 customTooltip
                 [content]="name_display"
                 [hover]="true"
@@ -20,7 +20,10 @@ export interface MapPointData {
                 yPosition="bottom"
                 [backdrop]="false"
             >
-                <div class="absolute inset-0" [class.opacity-0]="!active">
+                <div
+                    class="absolute inset-0 -translate-x-1.5"
+                    [class.opacity-0]="!active"
+                >
                     <div
                         class="animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-75"
                     ></div>
