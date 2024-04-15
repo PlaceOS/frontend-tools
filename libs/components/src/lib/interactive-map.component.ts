@@ -2,6 +2,7 @@ import {
     AfterViewInit,
     Component,
     ElementRef,
+    EventEmitter,
     HostListener,
     InjectionToken,
     Injector,
@@ -9,6 +10,7 @@ import {
     OnChanges,
     OnDestroy,
     OnInit,
+    Output,
     QueryList,
     SimpleChanges,
     TemplateRef,
@@ -32,6 +34,7 @@ import {
     ViewerStyles,
     listenToViewerChanges,
 } from '@placeos/svg-viewer';
+import { apiKey, authority, token } from '@placeos/ts-client';
 import { BehaviorSubject } from 'rxjs';
 import { map } from 'rxjs/operators';
 
@@ -39,15 +42,27 @@ export const MAP_FEATURE_DATA = new InjectionToken<any>(
     'Data for Map Features'
 );
 
+function isSamePoint(p1: Point, p2: Point): boolean {
+    return p1.x === p2.x && p1.y === p2.y;
+}
+
 @Component({
     selector: `i-map,interactive-map`,
     template: `
-        <div #outlet tabindex="0" role="map" class="absolute inset-0"></div>
-        <mat-spinner
-            *ngIf="!viewer || loading"
-            class="absolute"
-            [diameter]="48"
-        ></mat-spinner>
+        <div
+            #outlet
+            tabindex="0"
+            role="map"
+            class="absolute inset-0"
+            [class.hidden]="!src"
+        ></div>
+        <ng-container *ngIf="src; else empty_state">
+            <mat-spinner
+                *ngIf="!viewer || loading"
+                class="absolute"
+                [diameter]="48"
+            ></mat-spinner>
+        </ng-container>
         <div hidden *ngIf="injectors?.length">
             <ng-container
                 *ngFor="
@@ -89,6 +104,11 @@ export const MAP_FEATURE_DATA = new InjectionToken<any>(
                 </div>
             </ng-container>
         </div>
+        <ng-template #empty_state>
+            <div class="absolute inset-0 flex items-center justify-center">
+                <div class="opacity-30">No map</div>
+            </div>
+        </ng-template>
     `,
     styles: [
         `
@@ -128,6 +148,10 @@ export class InteractiveMapComponent
 
     @Input() public focus: string;
 
+    @Output() public zoomChange = new EventEmitter<number>();
+
+    @Output() public centerChange = new EventEmitter<Point>();
+
     public loading: boolean;
 
     public injectors: Injector[] = [];
@@ -140,10 +164,10 @@ export class InteractiveMapComponent
     private _on_changes: BehaviorSubject<Viewer> = new BehaviorSubject(null);
 
     private _extra_data = {
-        ratio$: this._on_changes.pipe(map((_) => _.ratio)),
-        svg_ratio$: this._on_changes.pipe(map((_) => _.svg_ratio)),
-        zoom$: this._on_changes.pipe(map((_) => _.zoom)),
-        position: this._on_changes.pipe(map((_) => _.center)),
+        ratio$: this._on_changes.pipe(map((_) => _?.ratio || 1)),
+        svg_ratio$: this._on_changes.pipe(map((_) => _?.svg_ratio || 1)),
+        zoom$: this._on_changes.pipe(map((_) => _?.zoom || 1)),
+        position: this._on_changes.pipe(map((_) => _?.center)),
     };
 
     @ViewChild('outlet') private _outlet_el: ElementRef<HTMLDivElement>;
@@ -183,7 +207,7 @@ export class InteractiveMapComponent
 
     public ngOnChanges(changes: SimpleChanges): void {
         if (changes.src && this.src) {
-            this.createView();
+            this.createView().catch((e) => console.warn(e));
         }
         if (changes.features) {
             this.updateInjectors();
@@ -191,7 +215,15 @@ export class InteractiveMapComponent
         if (this.viewer) {
             if (changes.focus && this.focus) {
                 this.focusOn(this.focus);
-            } else if (changes.zoom || changes.center) {
+            } else if (
+                (changes.zoom &&
+                    changes.zoom.previousValue != changes.zoom.currentValue) ||
+                (changes.center &&
+                    !isSamePoint(
+                        changes.center.previousValue,
+                        changes.center.currentValue
+                    ))
+            ) {
                 this.updateDisplay();
             }
             if (
@@ -206,7 +238,7 @@ export class InteractiveMapComponent
     }
 
     public ngAfterViewInit() {
-        this.createView();
+        this.createView().catch((e) => console.warn(e));
     }
 
     /** Update overlays, styles and actions of viewer */
@@ -240,6 +272,8 @@ export class InteractiveMapComponent
     }
 
     private async createView() {
+        const simp_url = this.src.toLowerCase();
+        if (!simp_url.includes('svg') && !simp_url.includes('upload')) return;
         if (this.src && this._outlet_el?.nativeElement && !this.loading) {
             this.loading = true;
             if (this.viewer) {
@@ -252,6 +286,15 @@ export class InteractiveMapComponent
                 });
                 removeViewer(this.viewer);
             }
+            this.updateFeatureList();
+            const tkn = token();
+            document.cookie = `${
+                tkn === 'x-api-key'
+                    ? 'api-key=' + encodeURIComponent(apiKey())
+                    : 'bearer_token=' + encodeURIComponent(tkn)
+            };max-age=60;path=/api/;samesite=strict;${
+                location.protocol === 'https:' ? 'secure;' : ''
+            }`;
             this.viewer = await createViewer({
                 element: this._outlet_el?.nativeElement,
                 url: this.src,
@@ -271,6 +314,8 @@ export class InteractiveMapComponent
                     const box =
                         this._outlet_el.nativeElement.getBoundingClientRect();
                     this._on_changes.next({ ...v } as any);
+                    this.zoomChange.emit(v.zoom);
+                    this.centerChange.emit(v.center);
                 })
             );
             if (this.focus) this.focusOn(this.focus);
@@ -278,7 +323,9 @@ export class InteractiveMapComponent
             (this.src && !this._outlet_el?.nativeElement) ||
             this.loading
         ) {
-            this.timeout('create_view', () => this.createView());
+            this.timeout('create_view', () =>
+                this.createView().catch((e) => console.warn(e))
+            );
         }
     }
 
@@ -297,7 +344,7 @@ export class InteractiveMapComponent
 
     /* istanbul ignore next */
     public trackByFn(index: number, feature: ViewerFeature) {
-        return feature?.track_id || JSON.stringify({ ...feature });
+        return feature?.track_id;
     }
 
     private updateFeatureList() {
@@ -314,7 +361,9 @@ export class InteractiveMapComponent
         this.injectors = (this.features || []).map(
             (f: any) =>
                 old_injectors.find(
-                    (_) => _.get(MAP_FEATURE_DATA)?.track_id && _.get(MAP_FEATURE_DATA)?.track_id === f.track_id
+                    (_) =>
+                        _.get(MAP_FEATURE_DATA)?.track_id &&
+                        _.get(MAP_FEATURE_DATA)?.track_id === f.track_id
                 ) ||
                 Injector.create({
                     providers: [

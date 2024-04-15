@@ -1,19 +1,25 @@
-import { ChangeDetectorRef, Component, Inject, OnInit } from '@angular/core';
-import { BaseClass, HashMap } from '@placeos-tools/common';
-import { Observable } from 'rxjs';
+import {
+    Component,
+    ElementRef,
+    Inject,
+    OnInit,
+    ViewChild,
+} from '@angular/core';
+import { BaseClass } from '@placeos-tools/common';
+import { Observable, combineLatest } from 'rxjs';
 import { MAP_FEATURE_DATA } from './interactive-map.component';
 
-export interface MapPolygonData {
+export interface Polygon {
     /** Name of the region */
     name: string;
     /** Color to display region in on overlay */
     color: string;
-    /** Array of points that define the shape of the region */
+    /** List of x, y coordinates from 0 to 1 */
     points: [number, number][];
-    /**  */
-    ratio?: number;
-    svg_ratio?: number;
-    zoom_value?: number;
+}
+
+export interface MapPolygonData {
+    polygon: Polygon;
     ratio$?: Observable<number>;
     svg_ratio$?: Observable<number>;
     zoom$?: Observable<number>;
@@ -23,203 +29,105 @@ export interface MapPolygonData {
 @Component({
     selector: '[map-polygon]',
     template: `
-        <div
-            polygon
-            class="w-full h-full"
-            [style.transform]="'scale(' + scale + ')'"
-        >
-            <div
-                class="absolute -translate-x-1/2 -translate-y-1/2 pointer-events-auto"
-                [style.width]="width + '%'"
-                [style.height]="height + '%'"
-                [style.top]="center.y * 100 + '%'"
-                [style.left]="center.x * 100 + '%'"
-            >
-                <svg
-                    [attr.viewBox]="
-                        '-4 -4 ' +
-                        (this.width * 5 + 8) +
-                        ' ' +
-                        (this.height * ratio * 5 + 8)
-                    "
-                    preserveAspectRatio="none"
-                    class="absolute -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2"
-                    [style.width]="'calc(100% + 16px)'"
-                    [style.height]="'calc(100% + 16px)'"
-                >
-                    <polygon
-                        [attr.points]="points"
-                        [style.fill]="fill"
-                        [style.stroke]="stroke"
-                    />
-                    <circle
-                        *ngFor="let point of point_list"
-                        [attr.cx]="point[0] || 0"
-                        [attr.cy]="point[1] || 0"
-                        [attr.r]="4"
-                        [style.stroke]="'#000'"
-                        [style.fill]="'#fffd'"
-                    />
-                </svg>
-            </div>
-        </div>
-        <div
-            class="absolute  -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2"
-            [style.width]="100 * scale + '%'"
-            [style.height]="100 * scale + '%'"
-        >
-            <div
-                text
-                class="absolute -translate-x-1/2 -translate-y-1/2 text-shadow text-white text-xl text-center whitespace-pre-line"
-                [style.top]="center.y * 100 + '%'"
-                [style.left]="center.x * 100 + '%'"
-            >
-                {{ name }}
-            </div>
-        </div>
+        <canvas
+            #canvas
+            class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
+            [style.width]="width * svg_ratio * zoom + '%'"
+            [style.height]="height * ratio * svg_ratio * zoom + '%'"
+        ></canvas>
     `,
-    styles: [
-        `
-            :host {
-                position: absolute;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                width: 100%;
-                height: 100%;
-            }
-
-            polygon {
-                stroke-width: 2;
-            }
-
-            circle {
-                stroke-width: 2;
-            }
-
-            [text] {
-                width: 32rem;
-                max-width: 65vw;
-            }
-        `,
-    ],
+    styles: [],
 })
 export class MapPolygonComponent extends BaseClass implements OnInit {
-    /** Message to display above the pin */
-    public name = this._details.name;
-    /** Fill colour for the pin SVG */
-    public fill = `${this._details.color || '#e53935'}88`;
-    /** Stroke colour for the pin SVG */
-    public stroke = this._details.color || '#e53935';
-    public padding = 32;
-    public width = 1;
-    public height = 1;
-    public center = { x: 0, y: 0 };
-    public readonly svg_scale = 20;
+    public polygon: Polygon = this._data.polygon;
+    public zoom = 1;
+    public ratio = 1;
+    public svg_ratio = 1;
+    public width = 10000;
+    public height = 10000;
 
-    public get scale() {
-        return (this._details.svg_ratio || 1) * this._details.zoom_value || 1;
+    @ViewChild('canvas', { static: true })
+    private canvas_element: ElementRef<HTMLCanvasElement>;
+
+    public get ratioed_height(): number {
+        return +(this.height * this.ratio).toFixed(2);
     }
 
-    public get ratio() {
-        return Math.floor((this._details.svg_ratio || 1) * 100) / 100 || 1;
-    }
-
-    /** List of points for drawing the polygon */
-    public points = `0,0 0,${this.height} ${this.width},${this.height} ${this.width},0`;
-
-    public point_list: [number, number][] = [];
-
-    constructor(
-        @Inject(MAP_FEATURE_DATA) private _details: MapPolygonData,
-        private _cdr: ChangeDetectorRef
-    ) {
+    constructor(@Inject(MAP_FEATURE_DATA) private _data: MapPolygonData) {
         super();
     }
 
     public ngOnInit(): void {
-        if (this._details.data$) {
-            this.subscription(
-                'data',
-                this._details.data$.subscribe(({ name, color, points }) => {
-                    this.name = name;
-                    this.fill = `${color || '#e53935'}88`;
-                    this.stroke = color || '#e53935';
-                    if (points.length) this._details.points = points;
-                    this.processPoints();
-                })
-            );
-        }
+        this._handleStateChange(1, 1, 1);
         this.subscription(
-            'ratio',
-            this._details.ratio$?.subscribe((_) => {
-                this._details.ratio = _ || 1;
-                this.processPoints();
-            })
-        );
-        this.subscription(
-            'zoom',
-            this._details.zoom$?.subscribe((_) => {
-                this._details.zoom_value = _ || 1;
-                this.processPoints();
-            })
-        );
-        this.subscription(
-            'svg_ratio',
-            this._details.svg_ratio$?.subscribe(
-                (_) => (this._details.svg_ratio = _ || 1)
+            'state',
+            combineLatest([
+                this._data.ratio$,
+                this._data.zoom$,
+                this._data.svg_ratio$,
+            ]).subscribe(([ratio, zoom, sr]) =>
+                this._handleStateChange(ratio, zoom, sr)
             )
         );
-        this.processPoints();
     }
 
-    public processPoints() {
-        const { zoom_value, points } = this._details;
+    private _handleStateChange(ratio: number, zoom: number, svg_ratio): void {
+        const points = this.polygon.points;
+        this.zoom = zoom;
+        this.ratio = ratio;
+        this.svg_ratio = svg_ratio;
+        console.log('Polygon:', ratio, zoom, points);
         if (!points?.length) return;
-        const diff: any = points.reduce(
-            (m, [x, y]) => ({
-                x_min: x < m.x_min ? x : m.x_min,
-                x_max: x > m.x_max ? x : m.x_max,
-                y_min: y < m.y_min ? y : m.y_min,
-                y_max: y > m.y_max ? y : m.y_max,
-            }),
-            {
-                x_min: 100,
-                x_max: -100,
-                y_min: 100,
-                y_max: -100,
-            }
+        const width = this.width / 10;
+        const height = (this.height * this.ratio) / 10;
+        //
+        const canvas = this.canvas_element.nativeElement;
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, width, height);
+        // Draw polygon
+        ctx.fillStyle = this.polygon.color + '80';
+        ctx.beginPath();
+        ctx.moveTo(points[0][0] * width, points[0][1] * height);
+        points.forEach(([x, y]) => ctx.lineTo(x * width, y * height));
+        ctx.closePath();
+        ctx.fill();
+        // Draw Outline
+        ctx.strokeStyle = this.polygon.color;
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(points[0][0] * width, points[0][1] * height);
+        points.forEach(([x, y]) => ctx.lineTo(x * width, y * height));
+        ctx.closePath();
+        ctx.stroke();
+        // Draw Points
+        ctx.fillStyle = '#fff';
+        ctx.strokeStyle = this.polygon.color;
+        ctx.lineWidth = 4;
+        points.forEach(([x, y]) => {
+            ctx.beginPath();
+            ctx.arc(x * width, y * height, 8, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+        });
+        // Draw Text
+        const center = points.reduce(
+            (acc, [x, y]) => [acc[0] + x, acc[1] + y],
+            [0, 0]
         );
-        const range = {
-            x: diff.x_max - diff.x_min,
-            y: diff.y_max - diff.y_min,
-        };
-        this.center = {
-            x: range.x / 2 + diff.x_min,
-            y: range.y / 2 + diff.y_min,
-        };
-        this.width = range.x;
-        this.height = range.y;
-        this.width = Math.abs(Math.floor(this.width * 100) || 1);
-        this.height = Math.abs(Math.floor(this.height * 100) || 1);
-        this.points = points
-            .reduce(
-                (s, [x, y]) =>
-                    `${s}${s ? ' ' : ''}${
-                        ((x - diff.x_min) / range.x) * this.width * 5
-                    },${
-                        ((y - diff.y_min) / range.y) *
-                        this.height *
-                        this.ratio *
-                        5
-                    }`,
-                ''
-            )
-            .replace(/NaN/g, '0');
-        this.point_list = points.map(([x, y]) => [
-            ((x - diff.x_min) / range.x) * this.width * 5,
-            ((y - diff.y_min) / range.y) * this.height * this.ratio * 5,
-        ]);
-        this._cdr.detectChanges();
+        center[0] /= points.length;
+        center[1] /= points.length;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillStyle = '#FFF';
+        ctx.font = '32px sans-serif';
+        ctx.fillText(
+            this.polygon.name,
+            center[0] * width + 1,
+            center[1] * height + 2
+        );
+        ctx.fillStyle = '#000';
+        ctx.fillText(this.polygon.name, center[0] * width, center[1] * height);
     }
 }

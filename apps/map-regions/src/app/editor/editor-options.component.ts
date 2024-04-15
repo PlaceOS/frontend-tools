@@ -58,10 +58,14 @@ import { EditorStateService } from './editor-state.service';
                                 let region of regions | async;
                                 let i = index
                             "
-                            class="p-2 hover:bg-base-300 even:bg-base-200 rounded flex items-center space-x-1 cursor-pointer"
+                            class="p-2 hover:bg-base-300 even:bg-base-200 border border-base-100 rounded flex items-center space-x-1 cursor-pointer"
                             (click)="setActiveRegion(region)"
+                            [class.!border-primary]="
+                                region.id === (active_region | async)?.id
+                            "
                             matRipple
                         >
+                            <input type="color" [(ngModel)]="region.color" />
                             <mat-form-field appearance="outline" class="w-16">
                                 <input
                                     matInput
@@ -70,7 +74,6 @@ import { EditorStateService } from './editor-state.service';
                                     placeholder="Capacity"
                                 />
                             </mat-form-field>
-                            <input type="color" [(ngModel)]="region.color" />
                             <mat-form-field appearance="outline" class="flex-1">
                                 <input
                                     matInput

@@ -1,12 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { BaseClass, HashMap, sendMessage } from '@placeos-tools/common';
-import { MapPolygonComponent } from '@placeos-tools/components';
-import { ViewerFeature } from '@placeos/svg-viewer';
+import { BaseClass, sendMessage } from '@placeos-tools/common';
 
-import { filter, map } from 'rxjs/operators';
+import { map } from 'rxjs/operators';
 
 import { EditorStateService } from './editor-state.service';
+import { ViewerFeature } from '@placeos/svg-viewer';
+import { MapPolygonComponent } from '@placeos-tools/components';
 
 @Component({
     selector: '[map-regions-editor]',
@@ -18,7 +18,7 @@ import { EditorStateService } from './editor-state.service';
             <i-map
                 class="w-screen h-screen"
                 [src]="url | async"
-                [features]="regions"
+                [features]="features | async"
                 [actions]="actions"
                 [options]="{ disable_pan: true, disable_zoon: true }"
                 (aspect_ratio)="setRatio($event)"
@@ -51,7 +51,19 @@ export class EditorComponent extends BaseClass implements OnInit {
     public readonly url = this._editor.url;
     public actions = [];
     /** Map regions for active map URL */
-    public regions = [];
+    public features = this._editor.regions.pipe(
+        map((l) =>
+            l.map(
+                (p) =>
+                    ({
+                        location: { x: 0.5, y: 0.5 },
+                        content: MapPolygonComponent,
+                        data: { polygon: p },
+                        full_size: true,
+                    } as ViewerFeature)
+            )
+        )
+    );
     public region_string = '';
     public ratio = 1;
 
@@ -87,6 +99,7 @@ export class EditorComponent extends BaseClass implements OnInit {
                     name: params.get('src'),
                     content: {},
                 }).catch((_) => '');
+                console.log('Source:', src, params.get('src'));
                 this._editor.setURL(
                     src || params.get('src'),
                     params.get('src')
@@ -101,42 +114,5 @@ export class EditorComponent extends BaseClass implements OnInit {
             'route.params',
             this._route.paramMap.subscribe(handle_params)
         );
-
-        this._editor.regions
-            .pipe(
-                map((l) =>
-                    l.map((_, idx) => {
-                        return {
-                            location: 'svg-viewer-root',
-                            track_id: `area-${idx}`,
-                            content: MapPolygonComponent,
-                            full_size: true,
-                            data: {
-                                ..._,
-                                ratio: this.ratio,
-                                data$: this._editor.regions.pipe(
-                                    map((list) =>
-                                        list.find((r) => r.id === _.id)
-                                    ),
-                                    filter((_) => !!_)
-                                ),
-                            },
-                        } as ViewerFeature;
-                    })
-                )
-            )
-            .subscribe((_) => {
-                const str =
-                    JSON.stringify(
-                        _.map((_) => ({
-                            location: _.location,
-                            id: _.data.id,
-                        }))
-                    ) + `${this.ratio}`;
-                if (this.region_string !== str) {
-                    this.regions = _;
-                    this.region_string = str;
-                }
-            });
     }
 }
