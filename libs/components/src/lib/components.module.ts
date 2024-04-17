@@ -14,6 +14,7 @@ import { MapPointComponent } from './map-point.component';
 import { CustomTooltipComponent } from './custom-tooltip.component';
 import { PortalModule } from '@angular/cdk/portal';
 import { ConfirmModalComponent } from './confirm-modal.component';
+import { MapCanvasComponent } from './map-canvas.component';
 
 export * from './icon.component';
 export * from './interactive-map.component';
@@ -26,6 +27,7 @@ const COMPONENTS: Type<any>[] = [
     IconComponent,
     InteractiveMapComponent,
     MapPinComponent,
+    MapCanvasComponent,
     MapRadiusComponent,
     MapPolygonComponent,
     MapPointComponent,

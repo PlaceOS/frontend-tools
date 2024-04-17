@@ -2,11 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { BaseClass, sendMessage } from '@placeos-tools/common';
 
-import { map } from 'rxjs/operators';
-
 import { EditorStateService } from './editor-state.service';
-import { ViewerFeature } from '@placeos/svg-viewer';
-import { MapPolygonComponent } from '@placeos-tools/components';
+import { MapCanvasComponent } from 'libs/components/src/lib/map-canvas.component';
 
 @Component({
     selector: '[map-regions-editor]',
@@ -18,7 +15,7 @@ import { MapPolygonComponent } from '@placeos-tools/components';
             <i-map
                 class="w-screen h-screen"
                 [src]="url | async"
-                [features]="features | async"
+                [features]="features"
                 [actions]="actions"
                 [options]="{ disable_pan: true, disable_zoon: true }"
                 (aspect_ratio)="setRatio($event)"
@@ -51,19 +48,13 @@ export class EditorComponent extends BaseClass implements OnInit {
     public readonly url = this._editor.url;
     public actions = [];
     /** Map regions for active map URL */
-    public features = this._editor.regions.pipe(
-        map((l) =>
-            l.map(
-                (p) =>
-                    ({
-                        location: { x: 0.5, y: 0.5 },
-                        content: MapPolygonComponent,
-                        data: { polygon: p },
-                        full_size: true,
-                    } as ViewerFeature)
-            )
-        )
-    );
+    public features = [
+        {
+            location: { x: 0.5, y: 0.5 },
+            content: MapCanvasComponent,
+            data: { polygons$: this._editor.regions },
+        },
+    ];
     public region_string = '';
     public ratio = 1;
 
