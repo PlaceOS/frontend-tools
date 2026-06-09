@@ -1,8 +1,8 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { randomInt } from '@placeos-tools/common';
 import { openConfirmModal } from 'libs/components/src/lib/confirm-modal.component';
-import { BehaviorSubject } from 'rxjs';
+
 import { CarSpaceModalComponent } from './car-space-modal.component';
 
 export interface CarSpace {
@@ -30,7 +30,7 @@ export interface CarSpace {
 export class CarSpacesService {
     private _dialog = inject(MatDialog);
 
-    private _space_list = new BehaviorSubject<CarSpace[]>([
+    private _space_list = signal<CarSpace[]>([
         {
             id: 'test',
             map_id: 'carspace-01',
@@ -50,37 +50,37 @@ export class CarSpacesService {
             max_recurrence: 2,
         },
     ]);
-    private _selected = new BehaviorSubject<string[]>([]);
+    private _selected = signal<string[]>([]);
 
-    public readonly spaces = this._space_list.asObservable();
-    public readonly selected = this._selected.asObservable();
+    public readonly spaces = this._space_list.asReadonly();
+    public readonly selected = this._selected.asReadonly();
 
     constructor() {
         this._load();
     }
 
     public isSelected(id: string) {
-        const list = this._selected.getValue();
+        const list = this._selected();
         return !!list.find((_) => id === _);
     }
 
     public setSelected(id: string, state: boolean) {
-        const list = this._selected.getValue().filter((_) => _ !== id);
+        const list = this._selected().filter((_) => _ !== id);
         if (id === '*') {
-            this._selected.next(
-                !state ? [] : this._space_list.getValue().map((_) => _.id)
+            this._selected.set(
+                !state ? [] : this._space_list().map((_) => _.id),
             );
             return;
         }
-        if (!state) this._selected.next(list);
-        else this._selected.next([...list, id]);
+        if (!state) this._selected.set(list);
+        else this._selected.set([...list, id]);
     }
 
     public setCarSpace(carspace: CarSpace) {
         if (!carspace.id)
             carspace.id = `carspace-${randomInt(9999_9999, 1000_0000)}`;
-        this._space_list.next([
-            ...this._space_list.getValue().filter((_) => _.id !== carspace.id),
+        this._space_list.set([
+            ...this._space_list().filter((_) => _.id !== carspace.id),
             carspace,
         ]);
         this._store();
@@ -95,22 +95,22 @@ export class CarSpacesService {
                 }"?`,
                 icon: { content: 'delete' },
             },
-            this._dialog
+            this._dialog,
         );
         if (reason !== 'done') return;
-        this._space_list.next(
-            this._space_list.getValue().filter((_) => _.id !== carspace.id)
+        this._space_list.set(
+            this._space_list().filter((_) => _.id !== carspace.id),
         );
         this._store();
         close();
     }
 
     public async removeSelected() {
-        const list = this._selected.getValue();
+        const list = this._selected();
         if (!list.length) return;
         if (list.length === 1) {
             return this.removeCarSpace(
-                this._space_list.getValue().find((_) => _.id === list[0])
+                this._space_list().find((_) => _.id === list[0]),
             );
         }
         const { close, reason } = await openConfirmModal(
@@ -119,15 +119,13 @@ export class CarSpacesService {
                 content: `Are you sure you want to remove ${list.length} regions?`,
                 icon: { content: 'delete' },
             },
-            this._dialog
+            this._dialog,
         );
         if (reason !== 'done') return;
-        this._space_list.next(
-            this._space_list
-                .getValue()
-                .filter((_) => !list.find((id) => _.id === id))
+        this._space_list.set(
+            this._space_list().filter((_) => !list.find((id) => _.id === id)),
         );
-        this._selected.next([]);
+        this._selected.set([]);
         this._store();
         close();
     }
@@ -144,15 +142,15 @@ export class CarSpacesService {
 
     private _load() {
         const data = JSON.parse(
-            localStorage.getItem('PLACEOS_BUILD.CarSpaces') || '[]'
+            localStorage.getItem('PLACEOS_BUILD.CarSpaces') || '[]',
         );
-        this._space_list.next(data);
+        this._space_list.set(data);
     }
 
     private _store() {
         localStorage.setItem(
             'PLACEOS_BUILD.CarSpaces',
-            JSON.stringify(this._space_list.getValue())
+            JSON.stringify(this._space_list()),
         );
     }
 }

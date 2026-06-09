@@ -1,5 +1,5 @@
 import { Clipboard } from '@angular/cdk/clipboard';
-import { Injectable, inject } from '@angular/core';
+import { computed, inject, Injectable, signal } from '@angular/core';
 import {
     downloadFile,
     isChildFrame,
@@ -8,8 +8,6 @@ import {
     sendMessage,
 } from '@placeos-tools/common';
 import { MapPointComponent } from '@placeos-tools/components';
-import { BehaviorSubject, combineLatest } from 'rxjs';
-import { map, tap } from 'rxjs/operators';
 
 const TYPES = ['temperature', 'humidity', 'presense'];
 
@@ -37,91 +35,78 @@ export interface PlaceSensorLocation {
 export class EditorStateService {
     private _clipboard = inject(Clipboard);
 
-    private _use_url = new BehaviorSubject<string>('');
-    private _map_url = new BehaviorSubject<string>('');
-    private _active_sensor = new BehaviorSubject<PlaceSensor>(null);
-    private _embeded = new BehaviorSubject<boolean>(false);
+    private _use_url = signal<string>('');
+    private _map_url = signal<string>('');
+    private _active_sensor = signal<PlaceSensor>(null);
+    private _embeded = signal<boolean>(false);
 
-    private _sensor_locations = new BehaviorSubject<PlaceSensorLocation[]>([]);
+    private _sensor_locations = signal<PlaceSensorLocation[]>([]);
 
-    private _sensor_list = new BehaviorSubject([]);
+    private _sensor_list = signal([]);
 
-    public readonly sensor_details = combineLatest([
-        this._sensor_list,
-        this._sensor_locations,
-    ]).pipe(
-        map(([list, locations]) =>
-            list.map((_) => {
-                const location =
-                    locations.find((l) => l.id === _.id) || ({} as any);
-                return {
-                    ..._,
-                    ...location,
-                    has_location: location.x || location.y,
-                };
-            })
-        )
+    public readonly sensor_details = computed(() =>
+        this._sensor_list().map((_) => {
+            const location =
+                this._sensor_locations().find((l) => l.id === _.id) ||
+                ({} as any);
+            return {
+                ..._,
+                ...location,
+                has_location: location.x || location.y,
+            };
+        }),
     );
     /** List of features to be displayed on the map */
-    public readonly features = combineLatest([
-        this._sensor_locations,
-        this._active_sensor,
-    ]).pipe(
-        map(([locations, sensor]) => {
-            console.log('Locations:', locations, sensor);
-            return locations.map((loc) => ({
-                location: {
-                    x: loc.x + randomInt(50) / 100000,
-                    y: loc.y + randomInt(50) / 100000,
-                },
-                content: MapPointComponent,
-                data: {
-                    ...loc,
-                    active: sensor?.id === loc.id,
-                    clicked: () =>
-                        this._active_sensor.next(
-                            this._sensor_list
-                                .getValue()
-                                .find((_) => _.id === loc.id)
-                        ),
-                },
-            }));
-        }),
-        tap((l) => console.log('List:', l))
+    public readonly features = computed(() =>
+        this._sensor_locations().map((loc) => ({
+            location: {
+                x: loc.x + randomInt(50) / 100000,
+                y: loc.y + randomInt(50) / 100000,
+            },
+            content: MapPointComponent,
+            data: {
+                ...loc,
+                active: this._active_sensor()?.id === loc.id,
+                clicked: () =>
+                    this._active_sensor.set(
+                        this._sensor_list().find((_) => _.id === loc.id),
+                    ),
+            },
+        })),
     );
     /** URL of the map to be displayed */
-    public readonly url = this._map_url.asObservable();
+    public readonly url = this._map_url.asReadonly();
     /** List of available sensors */
-    public readonly sensor_list = this._sensor_list.asObservable();
+    public readonly sensor_list = this._sensor_list.asReadonly();
     /** Currently selected sensor */
-    public readonly active_sensor = this._active_sensor.asObservable();
+    public readonly active_sensor = this._active_sensor.asReadonly();
     /** Whether application is embeded within another */
-    public readonly embeded = this._embeded.asObservable();
+    public readonly embeded = this._embeded.asReadonly();
 
     constructor() {
         const is_child = isChildFrame();
-        this._embeded.next(is_child);
+        this._embeded.set(is_child);
     }
 
     public setActive(sensor: PlaceSensor) {
-        this._active_sensor.next(sensor);
+        this._active_sensor.set(sensor);
     }
 
     /** Update the map URL */
     public setURL(url: string, use_url: string = '') {
-        this._map_url.next(url);
-        this._use_url.next(use_url || url);
+        this._map_url.set(url);
+        this._use_url.set(use_url || url);
     }
 
     /** Update the map URL */
     public setSensorPosition(point: { x: number; y: number }) {
         console.log('Point:', point);
-        if (!this._active_sensor.getValue()) return;
-        const sensor = this._active_sensor.getValue();
-        const locations = this._sensor_locations
-            .getValue()
-            .filter((_) => _.id !== sensor.id);
-        this._sensor_locations.next([
+        if (!this._active_sensor()) return;
+        const sensor = this._active_sensor();
+        const locations = this._sensor_locations().filter(
+            (_) => _.id !== sensor.id,
+        );
+        this._sensor_locations.set([
             ...locations,
             {
                 ...sensor,
@@ -132,7 +117,7 @@ export class EditorStateService {
     }
 
     public async saveMetadata() {
-        const embeded = this._embeded.getValue();
+        const embeded = this._embeded();
         if (embeded) {
             await sendMessage({
                 type: 'backoffice',
@@ -143,13 +128,13 @@ export class EditorStateService {
         } else {
             downloadFile(
                 'sensor-location-data.json',
-                JSON.stringify(this.locationsToMap())
+                JSON.stringify(this.locationsToMap()),
             );
         }
     }
 
     public locationsToMap() {
-        const data = this._sensor_locations.getValue();
+        const data = this._sensor_locations();
         const data_map = {};
         for (const loc of data) {
             data_map[loc.id] = { ...loc };
@@ -163,7 +148,7 @@ export class EditorStateService {
     }
 
     public async loadSensorLocations() {
-        if (!this._embeded.getValue()) return;
+        if (!this._embeded()) return;
         const sensor_map = await retrieveData('sensor-discovered', true);
         const sensor_list = [];
         for (const id in sensor_map) {
@@ -172,7 +157,7 @@ export class EditorStateService {
                 id,
             });
         }
-        this._sensor_list.next(sensor_list);
+        this._sensor_list.set(sensor_list);
         const location_map = await retrieveData('sensor-locations');
         const location_list = [];
         for (const id in location_map) {
@@ -181,6 +166,6 @@ export class EditorStateService {
                 id,
             });
         }
-        this._sensor_locations.next(location_list);
+        this._sensor_locations.set(location_list);
     }
 }

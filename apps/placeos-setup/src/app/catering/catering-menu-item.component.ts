@@ -1,87 +1,88 @@
 import { Component, inject, input, signal } from '@angular/core';
 
+import { CurrencyPipe } from '@angular/common';
+import { MatIconButton } from '@angular/material/button';
+import { MatMenu, MatMenuItem, MatMenuTrigger } from '@angular/material/menu';
+import { IconComponent } from '../../../../../libs/components/src/lib/icon.component';
 import { CateringItem } from './catering-item.class';
 import { CateringStateService } from './catering-state.service';
 import { CateringOption } from './catering.interfaces';
-import { MatIconButton } from '@angular/material/button';
-import { MatMenuTrigger, MatMenu, MatMenuItem } from '@angular/material/menu';
-import { IconComponent } from '../../../../../libs/components/src/lib/icon.component';
-import { AsyncPipe, CurrencyPipe } from '@angular/common';
 
 @Component({
     selector: '[catering-menu-item]',
     template: `
         <div
-            class="w-full h-full bg-white dark:bg-neutral-700 border border-gray-300 dark:border-neutral-500 overflow-hidden rounded"
+            class="h-full w-full overflow-hidden rounded border border-gray-300 bg-white dark:border-neutral-500 dark:bg-neutral-700"
         >
             @if (item()) {
-            <div item class="flex items-center px-2">
-                <div class="flex items-center p-2 flex-1">
-                    <div class="flex-1">
-                        <div>{{ item().name }}</div>
-                        <div class="text-xs opacity-60">
-                            {{ item().category }}
+                <div item class="flex items-center px-2">
+                    <div class="flex flex-1 items-center p-2">
+                        <div class="flex-1">
+                            <div>{{ item().name }}</div>
+                            <div class="text-xs opacity-60">
+                                {{ item().category }}
+                            </div>
+                        </div>
+                        <div
+                            class="bg-primary m-2 rounded p-2 text-xs font-bold text-white"
+                        >
+                            {{ item().unit_price / 100 | currency: symbol() }}
                         </div>
                     </div>
-                    <div
-                        class="p-2 m-2 text-xs font-bold text-white rounded bg-primary"
+                    <button mat-icon-button [matMenuTriggerFor]="menu">
+                        <app-icon>more_vert</app-icon>
+                    </button>
+                    <button
+                        mat-icon-button
+                        [disabled]="!item().options.length"
+                        (click)="show_options.update((show) => !show)"
                     >
-                        {{
-                            item().unit_price / 100 | currency: (symbol | async)
-                        }}
-                    </div>
+                        <app-icon>expand_more</app-icon>
+                    </button>
                 </div>
-                <button mat-icon-button [matMenuTriggerFor]="menu">
-                    <app-icon>more_vert</app-icon>
-                </button>
-                <button
-                    mat-icon-button
-                    [disabled]="!item().options.length"
-                    (click)="show_options.update((show) => !show)"
-                >
-                    <app-icon>expand_more</app-icon>
-                </button>
-            </div>
-            } @if (item()) {
-            <div
-                options
-                class="bg-gray-100 dark:bg-neutral-700 overflow-hidden"
-                [style.height]="
-                    show_options() ? item().options.length * 3.5 + 'rem' : '0'
-                "
-            >
-                @for (option of item().options; track option) {
+            }
+            @if (item()) {
                 <div
-                    class="flex p-2 items-center border-t border-solid border-gray-300 dark:border-neutral-500 relative"
+                    options
+                    class="overflow-hidden bg-gray-100 dark:bg-neutral-700"
+                    [style.height]="
+                        show_options()
+                            ? item().options.length * 3.5 + 'rem'
+                            : '0'
+                    "
                 >
-                    <div
-                        class="absolute inset-y-0 left-0 w-2 bg-gray-400 dark:bg-neutral-600"
-                    ></div>
-                    <div class="flex-1 pl-4 pr-2">
-                        <div class="text">{{ option.name }}</div>
-                        <div class="text-xs opacity-60">
-                            {{ option.group }}
+                    @for (option of item().options; track option) {
+                        <div
+                            class="relative flex items-center border-t border-solid border-gray-300 p-2 dark:border-neutral-500"
+                        >
+                            <div
+                                class="absolute inset-y-0 left-0 w-2 bg-gray-400 dark:bg-neutral-600"
+                            ></div>
+                            <div class="flex-1 pr-2 pl-4">
+                                <div class="text">{{ option.name }}</div>
+                                <div class="text-xs opacity-60">
+                                    {{ option.group }}
+                                </div>
+                            </div>
+                            <button
+                                edit
+                                mat-icon-button
+                                class="mx-2"
+                                (click)="editOption(option)"
+                            >
+                                <app-icon>edit</app-icon>
+                            </button>
+                            <button
+                                remove
+                                mat-icon-button
+                                class="mx-2"
+                                (click)="removeOption(option)"
+                            >
+                                <app-icon>delete</app-icon>
+                            </button>
                         </div>
-                    </div>
-                    <button
-                        edit
-                        mat-icon-button
-                        class="mx-2"
-                        (click)="editOption(option)"
-                    >
-                        <app-icon>edit</app-icon>
-                    </button>
-                    <button
-                        remove
-                        mat-icon-button
-                        class="mx-2"
-                        (click)="removeOption(option)"
-                    >
-                        <app-icon>delete</app-icon>
-                    </button>
+                    }
                 </div>
-                }
-            </div>
             }
             <mat-menu #menu="matMenu">
                 <button
@@ -135,7 +136,6 @@ import { AsyncPipe, CurrencyPipe } from '@angular/common';
         IconComponent,
         MatMenu,
         MatMenuItem,
-        AsyncPipe,
         CurrencyPipe,
     ],
 })

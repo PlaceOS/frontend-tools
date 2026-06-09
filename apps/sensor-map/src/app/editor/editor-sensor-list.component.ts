@@ -1,50 +1,45 @@
-import { Component, inject } from '@angular/core';
-import { BehaviorSubject, combineLatest } from 'rxjs';
-import { debounceTime, map } from 'rxjs/operators';
-import { EditorStateService } from './editor-state.service';
+import { Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatRipple } from '@angular/material/core';
 import { IconComponent } from '../../../../../libs/components/src/lib/icon.component';
-import { AsyncPipe } from '@angular/common';
+import { EditorStateService } from './editor-state.service';
 
 @Component({
     selector: 'editor-sensor-list',
     template: `
-        <div class="flex flex-col items-center w-full h-full bg-white shadow">
+        <div class="flex h-full w-full flex-col items-center bg-white shadow">
             <input
-                class="w-full px-4 py-2 border-b border-base-300"
+                class="border-base-300 w-full border-b px-4 py-2"
                 placeholder="Search sensors..."
-                [ngModel]="search$ | async"
-                (ngModelChange)="search$.next($event)"
+                [ngModel]="search()"
+                (ngModelChange)="search.set($event)"
             />
-            <ul class="list-none p-0 w-full flex-1 overflow-auto">
-                @for (sensor of sensor_list | async; track sensor) {
-                <li
-                    class="flex items-center p-2 border-b border-base-200 cursor-pointer"
-                    [class.bg-primary]="
-                        (active_sensor | async)?.id === sensor.id
-                    "
-                    [class.text-white]="
-                        (active_sensor | async)?.id === sensor.id
-                    "
-                    matRipple
-                    (click)="setActive(sensor)"
-                >
-                    <div details class="flex-1 w-1/2">
-                        <div class="w-full truncate" [title]="sensor.id">
-                            {{ sensor.id }}
+            <ul class="w-full flex-1 list-none overflow-auto p-0">
+                @for (sensor of sensor_list(); track sensor) {
+                    <li
+                        class="border-base-200 flex cursor-pointer items-center border-b p-2"
+                        [class.bg-primary]="active_sensor()?.id === sensor.id"
+                        [class.text-white]="active_sensor()?.id === sensor.id"
+                        matRipple
+                        (click)="setActive(sensor)"
+                    >
+                        <div details class="w-1/2 flex-1">
+                            <div class="w-full truncate" [title]="sensor.id">
+                                {{ sensor.id }}
+                            </div>
+                            <div class="text-xs opacity-60">
+                                {{ sensor.name || '[No Name]' }}
+                            </div>
+                            <ng-template #no_location>
+                                <div class="text-xs opacity-60">
+                                    No location
+                                </div>
+                            </ng-template>
                         </div>
-                        <div class="text-xs opacity-60">
-                            {{ sensor.name || '[No Name]' }}
-                        </div>
-                        <ng-template #no_location>
-                            <div class="text-xs opacity-60">No location</div>
-                        </ng-template>
-                    </div>
-                    @if (sensor.has_location) {
-                    <app-icon class="text-2xl"> pin_drop </app-icon>
-                    }
-                </li>
+                        @if (sensor.has_location) {
+                            <app-icon class="text-2xl"> pin_drop </app-icon>
+                        }
+                    </li>
                 }
             </ul>
         </div>
@@ -57,22 +52,18 @@ import { AsyncPipe } from '@angular/common';
             }
         `,
     ],
-    imports: [FormsModule, MatRipple, IconComponent, AsyncPipe],
+    imports: [FormsModule, MatRipple, IconComponent],
 })
 export class EditorSensorListComponent {
     private _state = inject(EditorStateService);
 
-    public readonly search$ = new BehaviorSubject('');
-    public readonly sensor_list = combineLatest([
-        this._state.sensor_details,
-        this.search$,
-    ]).pipe(
-        debounceTime(100),
-        map(([list, search]) =>
-            list.filter((_) =>
-                _.name?.toLowerCase().includes(search?.toLowerCase())
-            )
-        )
+    public readonly search = signal('');
+    public readonly sensor_list = computed(() =>
+        this._state
+            .sensor_details()
+            .filter((_) =>
+                _.name?.toLowerCase().includes(this.search()?.toLowerCase()),
+            ),
     );
     public readonly active_sensor = this._state.active_sensor;
 

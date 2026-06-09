@@ -1,8 +1,11 @@
-import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, Subscription } from 'rxjs';
+import { Injectable, WritableSignal, effect, signal } from '@angular/core';
 
-import { HashMap } from './types';
 import { unique } from './general';
+import { HashMap } from './types';
+
+interface Unsubscribable {
+    unsubscribe: () => void;
+}
 
 /** List of keys that cannot be in a combination by themselves or with each other */
 const INVALID_STANDALONE_KEYS: string[] = [
@@ -32,9 +35,7 @@ const IGNORE_KEYS_WHEN_INPUT: string[] = [
 })
 export class HotkeyService {
     /** Map of subjects which store press states of keys */
-    private keydown_states: HashMap<BehaviorSubject<number>> = {};
-    /** Map of obserers for key state subjects */
-    private keydown_observers: HashMap<Observable<number>> = {};
+    private keydown_states: HashMap<WritableSignal<number>> = {};
     /** List of keys at the end of a combination */
     private combo_end: string[] = [];
     /** List of registered hotkey combinations */
@@ -55,12 +56,9 @@ export class HotkeyService {
                 return;
             if (this.last_down !== code) {
                 if (!this.keydown_states[code]) {
-                    this.keydown_states[code] = new BehaviorSubject(-1);
-                    this.keydown_observers[code] = this.keydown_states[
-                        code
-                    ].asObservable();
+                    this.keydown_states[code] = signal(-1);
                 }
-                this.keydown_states[code].next(++this.counter);
+                this.keydown_states[code].set(++this.counter);
                 if (this.combo_end.indexOf(code) >= 0) {
                     event.preventDefault();
                 }
@@ -70,7 +68,7 @@ export class HotkeyService {
 
         window.addEventListener('keyup', (event: KeyboardEvent) => {
             const code = this.mapKey((event.code || '').toLowerCase());
-            this.keydown_states[code].next(-1);
+            this.keydown_states[code]?.set(-1);
             if (this.last_down === code) {
                 this.last_down = '';
             }
@@ -82,29 +80,30 @@ export class HotkeyService {
      * @param combo Array of key codes to listen to or a hotkey string e.g. `Alt+Shift+KeyK`
      * @param next Callback for combination presses
      */
-    public listen(combo: string | string[], next: () => void): Subscription | null {
+    public listen(
+        combo: string | string[],
+        next: () => void,
+    ): Unsubscribable | null {
         combo = combo instanceof Array ? combo : combo.split('+');
         const combination: string[] = combo.map((i) =>
-            this.mapKey(i.toLowerCase())
+            this.mapKey(i.toLowerCase()),
         );
         if (combination.length > 0 && this.validCombination(combination)) {
             this.registered_combos.push(combination);
             const last_key = combination[combination.length - 1];
             if (!this.keydown_states[last_key]) {
-                this.keydown_states[last_key] = new BehaviorSubject(NaN);
-                this.keydown_observers[last_key] = this.keydown_states[
-                    last_key
-                ].asObservable();
+                this.keydown_states[last_key] = signal(NaN);
             }
             this.updateCombinationEndList();
-            return this.keydown_observers[last_key].subscribe((count) => {
+            const listener = effect(() => {
+                const count = this.keydown_states[last_key]();
                 if (count) {
                     const presses: number[] = [];
                     if (combination.length > 0) {
                         // Check that keys are pressed
                         for (const key of combination) {
                             const state = this.keydown_states[key];
-                            presses.push(state ? state.getValue() || -1 : -1);
+                            presses.push(state ? state() || -1 : -1);
                         }
                         // Check that keys are pressed in the correct order
                         for (let i = 0; i < combination.length - 1; i++) {
@@ -115,13 +114,14 @@ export class HotkeyService {
                     }
                     const total = presses.reduce(
                         (a, v) => a + (v > 0 ? 1 : -1),
-                        0
+                        0,
                     );
                     if (total >= combination.length) {
                         next();
                     }
                 }
             });
+            return { unsubscribe: () => listener.destroy() };
         }
         return null;
     }

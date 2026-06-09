@@ -1,68 +1,59 @@
-import { Component, inject, input } from '@angular/core';
-import { combineLatest } from 'rxjs';
-import { map, tap } from 'rxjs/operators';
-import { OrganisationService } from '../organisation/organisation.service';
+import { Component, computed, inject, input } from '@angular/core';
 import { MatButton } from '@angular/material/button';
 import { RouterLink } from '@angular/router';
-import { AsyncPipe } from '@angular/common';
+import { OrganisationService } from '../organisation/organisation.service';
 
 @Component({
     selector: 'data-warning',
     template: `
-        @if ( (levels() && !(has_both | async)) || (!levels() && !(has_building
-        | async)) ) {
-        <div
-            class="absolute inset-0 bg-black/60 flex flex-col items-center justify-center space-y-2"
-        >
-            @if (levels() && !(has_both | async)) {
-            <div>A building and level is required for this features</div>
-            } @if (!levels() && !(has_building | async)) {
-            <div>A building is required for this feature</div>
-            }
-            <a
-                button
-                mat-button
-                [routerLink]="['/organisation']"
-                [queryParams]="{ add: 'building' }"
-                class="w-48"
+        @if ((levels() && !has_both()) || (!levels() && !has_building())) {
+            <div
+                class="absolute inset-0 flex flex-col items-center justify-center space-y-2 bg-black/60"
             >
-                Add Building
-            </a>
-            @if (levels() && (has_building | async)) {
-            <a
-                button
-                mat-button
-                [routerLink]="['/organisation']"
-                [queryParams]="{ add: 'level' }"
-                class="w-48"
-            >
-                Add Level
-            </a>
-            }
-        </div>
+                @if (levels() && !has_both()) {
+                    <div>
+                        A building and level is required for this features
+                    </div>
+                }
+                @if (!levels() && !has_building()) {
+                    <div>A building is required for this feature</div>
+                }
+                <a
+                    button
+                    mat-button
+                    [routerLink]="['/organisation']"
+                    [queryParams]="{ add: 'building' }"
+                    class="w-48"
+                >
+                    Add Building
+                </a>
+                @if (levels() && has_building()) {
+                    <a
+                        button
+                        mat-button
+                        [routerLink]="['/organisation']"
+                        [queryParams]="{ add: 'level' }"
+                        class="w-48"
+                    >
+                        Add Level
+                    </a>
+                }
+            </div>
         }
     `,
     styles: [``],
-    imports: [MatButton, RouterLink, AsyncPipe],
+    imports: [MatButton, RouterLink],
 })
 export class DataWarningComponent {
     private _org = inject(OrganisationService);
 
     public readonly levels = input(false);
 
-    public readonly has_building = this._org.buildings.pipe(
-        map((_) => _.length > 0),
-        tap((_) => console.log('Has Building:', _))
+    public readonly has_building = computed(
+        () => this._org.buildings().length > 0,
     );
-    public readonly has_level = this._org.levels.pipe(
-        map((_) => _.length > 0),
-        tap((_) => console.log('Has Level:', _))
-    );
-    public readonly has_both = combineLatest([
-        this.has_building,
-        this.has_level,
-    ]).pipe(
-        map(([b, l]) => b && l),
-        tap((_) => console.log('Has Both:', _))
+    public readonly has_level = computed(() => this._org.levels().length > 0);
+    public readonly has_both = computed(
+        () => this.has_building() && this.has_level(),
     );
 }

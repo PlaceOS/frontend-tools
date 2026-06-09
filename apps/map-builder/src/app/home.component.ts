@@ -1,17 +1,17 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
-import { randomInt, randomString } from '@placeos-tools/common';
+import { randomString } from '@placeos-tools/common';
 
-import { MapDataService } from './data/map-data.service';
+import { SlicePipe } from '@angular/common';
 import { MatButton } from '@angular/material/button';
 import { RouterLink } from '@angular/router';
 import { IconComponent } from '../../../../libs/components/src/lib/icon.component';
-import { AsyncPipe, SlicePipe } from '@angular/common';
+import { MapDataService } from './data/map-data.service';
 
 @Component({
     selector: '[map-builder-home]',
     template: `
         <div
-            class="flex flex-col items-center bg-white border border-gray-200 rounded p-4 mx-auto space-y-4 shadow"
+            class="mx-auto flex flex-col items-center space-y-4 rounded border border-gray-200 bg-white p-4 shadow"
         >
             <img src="assets/logo-light.svg" alt="PlaceOS" />
             <h2>Map Builder</h2>
@@ -30,30 +30,34 @@ import { AsyncPipe, SlicePipe } from '@angular/common';
             </a>
 
             <h3 class="underline">Recent Maps</h3>
-            @if ((map_list | async)?.length) { @for (map of map_list | async |
-            slice: 0:5; track map) {
-            <a
-                button
-                mat-button
-                class="w-full"
-                [routerLink]="['/editor', map.id]"
-            >
-                <div class="flex items-center">
-                    <app-icon>map</app-icon>
-                    <div class="flex-1 text-left ml-4">{{ map.name }}</div>
-                    <div class="text-xs text-white text-opacity-60">
-                        {{ map.last_edited }}
+            @if (map_list()?.length) {
+                @for (map of map_list() | slice: 0 : 5; track map) {
+                    <a
+                        button
+                        mat-button
+                        class="w-full"
+                        [routerLink]="['/editor', map.id]"
+                    >
+                        <div class="flex items-center">
+                            <app-icon>map</app-icon>
+                            <div class="ml-4 flex-1 text-left">
+                                {{ map.name }}
+                            </div>
+                            <div class="text-opacity-60 text-xs text-white">
+                                {{ map.last_edited }}
+                            </div>
+                        </div>
+                    </a>
+                }
+            } @else {
+                <p>No recently edited maps on this machine.</p>
+            }
+            @if (map_list()?.length > 5) {
+                <button mat-button class="inverse mb-4 w-full">
+                    <div class="flex items-center justify-center">
+                        {{ map_list()?.length - 5 }} More Maps
                     </div>
-                </div>
-            </a>
-            } } @else {
-            <p>No recently edited maps on this machine.</p>
-            } @if ((map_list | async)?.length > 5) {
-            <button mat-button class="inverse w-full mb-4">
-                <div class="flex items-center justify-center">
-                    {{ (map_list | async)?.length - 5 }} More Maps
-                </div>
-            </button>
+                </button>
             }
         </div>
     `,
@@ -80,13 +84,13 @@ import { AsyncPipe, SlicePipe } from '@angular/common';
             }
         `,
     ],
-    imports: [MatButton, RouterLink, IconComponent, AsyncPipe, SlicePipe],
+    imports: [MatButton, RouterLink, IconComponent, SlicePipe],
 })
 export class HomeComponent implements OnInit {
     private _data = inject(MapDataService);
 
-    /** Observable for list of maps */
-    public readonly map_list = this._data.maps$;
+    /** Signal for list of maps */
+    public readonly map_list = this._data.maps;
     /** Store for new map ID */
     public readonly new_id = signal('');
 

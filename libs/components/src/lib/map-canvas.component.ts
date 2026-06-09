@@ -2,13 +2,13 @@ import {
     Component,
     ElementRef,
     OnInit,
+    Signal,
+    effect,
     inject,
     viewChild,
 } from '@angular/core';
 import { BaseClass } from '@placeos-tools/common';
-import { Observable, combineLatest, of } from 'rxjs';
 import { MAP_FEATURE_DATA } from './map-viewer/map-types';
-import { take } from 'rxjs/operators';
 
 export interface Polygon {
     /** Name of the region */
@@ -22,11 +22,11 @@ export interface Polygon {
 export interface MapPolygonData {
     draw_labels?: boolean;
     draw_points?: boolean;
-    polygons$: Observable<Polygon[]>;
-    ratio$?: Observable<number>;
-    svg_ratio$?: Observable<number>;
-    zoom$?: Observable<number>;
-    data$?: Observable<MapPolygonData>;
+    polygons: Signal<Polygon[]>;
+    ratio?: Signal<number>;
+    svg_ratio?: Signal<number>;
+    zoom?: Signal<number>;
+    data?: Signal<MapPolygonData>;
 }
 
 @Component({
@@ -34,7 +34,7 @@ export interface MapPolygonData {
     template: `
         <canvas
             #canvas
-            class="absolute inset-0 h-full w-full pointer-events-none"
+            class="pointer-events-none absolute inset-0 h-full w-full"
         ></canvas>
     `,
     styles: [],
@@ -50,33 +50,30 @@ export class MapCanvasComponent extends BaseClass implements OnInit {
     private readonly canvas_element =
         viewChild<ElementRef<HTMLCanvasElement>>('canvas');
 
+    constructor() {
+        super();
+        effect(() => {
+            this._handleMapChange(
+                this._data.ratio?.() ?? 1,
+                this._data.zoom?.() ?? 1,
+                this._data.svg_ratio?.() ?? 1,
+            );
+        });
+        effect(() => this._handleStateChange(this._data.polygons()));
+    }
+
     public get ratioed_height(): number {
         return +(this.width * this.ratio).toFixed(2);
     }
 
     public ngOnInit(): void {
-        this.subscription(
-            'state',
-            combineLatest([
-                this._data.ratio$,
-                this._data.zoom$,
-                this._data.svg_ratio$,
-            ]).subscribe(([ratio, zoom, sr]) =>
-                this._handleMapChange(ratio, zoom, sr)
-            )
-        );
-        this.subscription(
-            'polygons',
-            this._data.polygons$.subscribe((list) =>
-                this._handleStateChange(list)
-            )
-        );
+        this._handleStateChange(this._data.polygons());
     }
 
     private async _handleMapChange(
         ratio: number,
         zoom: number,
-        svg_ratio: number
+        svg_ratio: number,
     ) {
         const old_ratio = this.ratio;
         this.zoom = zoom;
@@ -84,7 +81,8 @@ export class MapCanvasComponent extends BaseClass implements OnInit {
         this.svg_ratio = svg_ratio;
         const width = this.width / 10;
         const height = (this.width * this.ratio) / 10;
-        const canvas = this.canvas_element().nativeElement;
+        const canvas = this.canvas_element()?.nativeElement;
+        if (!canvas) return;
 
         if (
             old_ratio === ratio &&
@@ -96,12 +94,12 @@ export class MapCanvasComponent extends BaseClass implements OnInit {
         canvas.width = width;
         canvas.height = height;
 
-        const polygons = await this._data.polygons$.pipe(take(1)).toPromise();
-        this._handleStateChange(polygons);
+        this._handleStateChange(this._data.polygons());
     }
 
     private _handleStateChange(polygon_list: Polygon[]): void {
-        const canvas = this.canvas_element().nativeElement;
+        const canvas = this.canvas_element()?.nativeElement;
+        if (!canvas) return;
         const ctx = canvas.getContext('2d');
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         polygon_list.forEach((poly) => this._drawPolygon(poly));
@@ -110,7 +108,8 @@ export class MapCanvasComponent extends BaseClass implements OnInit {
     private _drawPolygon(polygon: Polygon) {
         const points = polygon.points;
         if (!points?.length) return;
-        const canvas = this.canvas_element().nativeElement;
+        const canvas = this.canvas_element()?.nativeElement;
+        if (!canvas) return;
         const ctx = canvas.getContext('2d');
         const width = canvas.width;
         const height = canvas.height;
@@ -145,7 +144,7 @@ export class MapCanvasComponent extends BaseClass implements OnInit {
         if (this._data.draw_labels !== false) {
             const center = points.reduce(
                 (acc, [x, y]) => [acc[0] + x, acc[1] + y],
-                [0, 0]
+                [0, 0],
             );
             center[0] /= points.length;
             center[1] /= points.length;
@@ -156,7 +155,7 @@ export class MapCanvasComponent extends BaseClass implements OnInit {
             ctx.fillText(
                 polygon.name,
                 center[0] * width + 1,
-                center[1] * height + 2
+                center[1] * height + 2,
             );
             ctx.fillStyle = '#000';
             ctx.fillText(polygon.name, center[0] * width, center[1] * height);

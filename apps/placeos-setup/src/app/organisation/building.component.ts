@@ -1,33 +1,38 @@
-import { Component, SimpleChanges, inject, input, signal } from '@angular/core';
-import { ANIMATION_SHOW_CONTRACT_EXPAND } from '@placeos-tools/common';
-import { BehaviorSubject, combineLatest } from 'rxjs';
-import { map } from 'rxjs/operators';
-import { Building, OrganisationService } from './organisation.service';
-import { MatCheckbox } from '@angular/material/checkbox';
+import {
+    Component,
+    SimpleChanges,
+    computed,
+    inject,
+    input,
+    signal,
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatIconButton } from '@angular/material/button';
-import { IconComponent } from '../../../../../libs/components/src/lib/icon.component';
+import { MatCheckbox } from '@angular/material/checkbox';
 import { MatTooltip } from '@angular/material/tooltip';
+import { ANIMATION_SHOW_CONTRACT_EXPAND } from '@placeos-tools/common';
+import { IconComponent } from '../../../../../libs/components/src/lib/icon.component';
 import { OrganisationLevelComponent } from './level.component';
-import { AsyncPipe } from '@angular/common';
+import { Building, OrganisationService } from './organisation.service';
 
 @Component({
     selector: `org-building,[org-building]`,
     template: `
         <div
             details
-            class="flex items-center border-b border-neutral-500 text-sm hover:bg-black/10 relative"
+            class="relative flex items-center border-b border-neutral-500 text-sm hover:bg-black/10"
         >
             <div thead class="min-w-0">
-                <mat-checkbox [ngModel]="selected"
+                <mat-checkbox
+                    [ngModel]="selected"
                     (ngModelChange)="setSelected($event)"
-                 />
+                />
             </div>
-            <div class="min-w-0 flex items-center w-10 p-0 justify-end">
+            <div class="flex w-10 min-w-0 items-center justify-end p-0">
                 <button
                     mat-icon-button
                     (click)="show.update((value) => !value)"
-                    [disabled]="!(levels | async)?.length"
+                    [disabled]="!levels()?.length"
                 >
                     <app-icon>{{
                         show() ? 'expand_less' : 'expand_more'
@@ -38,13 +43,13 @@ import { AsyncPipe } from '@angular/common';
             <div>{{ building().country }}</div>
             <div class="w-32">{{ building().city }}</div>
             <div class="w-56">{{ building().address }}</div>
-            <div>{{ (levels | async)?.length || 0 }}</div>
+            <div>{{ levels()?.length || 0 }}</div>
             <div>{{ building().currency }}</div>
             <div>{{ building().allow_visitors ? 'YES' : 'NO' }}</div>
             <div>{{ building().catering_available ? 'YES' : 'NO' }}</div>
             <div
                 actions
-                class="absolute top-1/2 -translate-y-1/2 left-24 rounded-3xl flex items-center bg-white dark:bg-neutral-700 shadow !p-0 min-w-0"
+                class="absolute top-1/2 left-24 flex min-w-0 -translate-y-1/2 items-center rounded-3xl bg-white !p-0 shadow dark:bg-neutral-700"
             >
                 <button
                     mat-icon-button
@@ -62,16 +67,20 @@ import { AsyncPipe } from '@angular/common';
                 </button>
             </div>
         </div>
-        @if ((levels | async)?.length) {
-        <ul
-            class="list-none p-0 m-0 w-full relative z-0"
-            [class.shown]="show()"
-            [@show]="show() ? 'show' : 'hide'"
-        >
-            @for (item of levels | async; track item; let i = $index) {
-            <li org-level class="flex items-center w-full" [level]="item"></li>
-            }
-        </ul>
+        @if (levels()?.length) {
+            <ul
+                class="relative z-0 m-0 w-full list-none p-0"
+                [class.shown]="show()"
+                [@show]="show() ? 'show' : 'hide'"
+            >
+                @for (item of levels(); track item; let i = $index) {
+                    <li
+                        org-level
+                        class="flex w-full items-center"
+                        [level]="item"
+                    ></li>
+                }
+            </ul>
         }
     `,
     styles: [
@@ -106,7 +115,6 @@ import { AsyncPipe } from '@angular/common';
         IconComponent,
         MatTooltip,
         OrganisationLevelComponent,
-        AsyncPipe,
     ],
 })
 export class BuildingComponent {
@@ -114,14 +122,13 @@ export class BuildingComponent {
 
     public readonly building = input<Building>(undefined);
 
-    private _bld_id = new BehaviorSubject('');
+    private _bld_id = signal('');
 
     public readonly show = signal(false);
 
-    public readonly levels = combineLatest([
-        this._bld_id,
-        this._org.levels,
-    ]).pipe(map(([id, l]) => l.filter((lvl) => lvl.parent_id === id)));
+    public readonly levels = computed(() =>
+        this._org.levels().filter((lvl) => lvl.parent_id === this._bld_id()),
+    );
 
     public readonly edit = () => this._org.openBuildingModal(this.building());
     public readonly remove = () => this._org.removeBuilding(this.building());
@@ -134,7 +141,7 @@ export class BuildingComponent {
 
     public ngOnChanges(changes: SimpleChanges) {
         if (changes.building) {
-            this._bld_id.next(this.building()?.id || '');
+            this._bld_id.set(this.building()?.id || '');
         }
     }
 }

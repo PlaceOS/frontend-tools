@@ -1,6 +1,7 @@
-import { NgTemplateOutlet, NgComponentOutlet } from '@angular/common';
+import { NgComponentOutlet, NgTemplateOutlet } from '@angular/common';
 import {
     Component,
+    computed,
     effect,
     ElementRef,
     inject,
@@ -26,8 +27,6 @@ import {
     ViewerLabel,
     ViewerStyles,
 } from './map-types';
-import { BehaviorSubject } from 'rxjs';
-import { map } from 'rxjs/operators';
 import {
     MapAction,
     MapDetails,
@@ -57,9 +56,7 @@ export interface MapMetadata {
         <div #mapContainer map-container></div>
         <ng-content />
         @if (options()?.controls) {
-            <div
-                zoom
-            >
+            <div zoom>
                 <button
                     icon
                     matRipple
@@ -108,25 +105,25 @@ export interface MapMetadata {
                             >
                                 @switch (contentType(element.content)) {
                                     @case ('component') {
-                                        <ng-container *ngComponentOutlet="
+                                        <ng-container
+                                            *ngComponentOutlet="
                                                 $any(element.content);
                                                 injector: injectors()[i]
                                             "
-                                         />
+                                        />
                                     }
                                     @case ('html') {
                                         <div
-                                            [innerHTML]="
-                                                element.content
-                                            "
+                                            [innerHTML]="element.content"
                                         ></div>
                                     }
                                     @default {
-                                        <ng-container *ngTemplateOutlet="
+                                        <ng-container
+                                            *ngTemplateOutlet="
                                                 $any(element.content);
                                                 context: $any(element).data
                                             "
-                                         />
+                                        />
                                     }
                                 }
                             </div>
@@ -198,7 +195,7 @@ export class DynamicMapComponent implements OnInit, OnDestroy {
         viewChild<ElementRef<HTMLDivElement>>('mapContainer');
     private _feature_elements = viewChildren<ElementRef<HTMLDivElement>>(
         'feature',
-        {}
+        {},
     );
 
     public src = input('');
@@ -218,7 +215,7 @@ export class DynamicMapComponent implements OnInit, OnDestroy {
     public readonly injectors = signal<Injector[]>([]);
     public loading = signal(false);
 
-    private _view_changes = new BehaviorSubject<{
+    private _view_changes = signal<{
         zoom: number;
         center: Vec2;
         ratio: number;
@@ -228,11 +225,11 @@ export class DynamicMapComponent implements OnInit, OnDestroy {
     private _syncing_from_viewer = false;
 
     private _extra_data = {
-        ratio$: this._view_changes.pipe(map((_) => _.ratio)),
-        svg_ratio$: this._view_changes.pipe(map((_) => _.svg_ratio)),
-        zoom$: this._view_changes.pipe(map((_) => _.zoom)),
-        center$: this._view_changes.pipe(map((_) => _.center)),
-        position: this._view_changes.pipe(map((_) => _.center)),
+        ratio: computed(() => this._view_changes().ratio),
+        svg_ratio: computed(() => this._view_changes().svg_ratio),
+        zoom: computed(() => this._view_changes().zoom),
+        center: computed(() => this._view_changes().center),
+        position: computed(() => this._view_changes().center),
     };
 
     constructor() {
@@ -302,7 +299,7 @@ export class DynamicMapComponent implements OnInit, OnDestroy {
             const center_val = this.center();
             if (this._map_viewer && !this._syncing_from_viewer) {
                 this._map_viewer.setCenter(
-                    center_val ? { ...center_val } : { x: 0, y: 0 }
+                    center_val ? { ...center_val } : { x: 0, y: 0 },
                 );
             }
         });
@@ -324,11 +321,12 @@ export class DynamicMapComponent implements OnInit, OnDestroy {
         effect(() => {
             const zoom_val = this.zoom() ?? 1;
             const center_val = this.center() ?? { x: 0, y: 0 };
-            this._view_changes.next({
+            const view_changes = untracked(this._view_changes);
+            this._view_changes.set({
                 zoom: zoom_val,
                 center: center_val,
-                ratio: this._view_changes.value.ratio,
-                svg_ratio: this._view_changes.value.svg_ratio,
+                ratio: view_changes.ratio,
+                svg_ratio: view_changes.svg_ratio,
             });
         });
     }
@@ -354,7 +352,7 @@ export class DynamicMapComponent implements OnInit, OnDestroy {
             });
             this._map_viewer.setZoom(this.zoom() ?? 1);
             this._map_viewer.setCenter(
-                this.center() ? { ...this.center() } : { x: 0, y: 0 }
+                this.center() ? { ...this.center() } : { x: 0, y: 0 },
             );
 
             const src = this.src();
@@ -388,15 +386,15 @@ export class DynamicMapComponent implements OnInit, OnDestroy {
      * Determine the type of content for rendering in template
      */
     public contentType(
-        content: string | HTMLElement | TemplateRef<any> | Type<any>
+        content: string | HTMLElement | TemplateRef<any> | Type<any>,
     ): 'html' | 'element' | 'template' | 'component' {
         return typeof content === 'string'
             ? 'html'
             : content instanceof HTMLElement
-            ? 'element'
-            : content instanceof TemplateRef
-            ? 'template'
-            : 'component';
+              ? 'element'
+              : content instanceof TemplateRef
+                ? 'template'
+                : 'component';
     }
 
     private _applyStyles(styles: ViewerStyles) {
@@ -416,14 +414,14 @@ export class DynamicMapComponent implements OnInit, OnDestroy {
     }
 
     private _objectToCssText(
-        style_obj: Record<string, string | number>
+        style_obj: Record<string, string | number>,
     ): string {
         return Object.entries(style_obj)
             .map(([prop, value]) => {
                 // Convert camelCase to kebab-case
                 const kebab_prop = prop.replace(
                     /[A-Z]/g,
-                    (match) => `-${match.toLowerCase()}`
+                    (match) => `-${match.toLowerCase()}`,
                 );
                 return `${kebab_prop}: ${value}`;
             })
@@ -435,8 +433,8 @@ export class DynamicMapComponent implements OnInit, OnDestroy {
         this.loading.set(true);
         try {
             const map = await this._map_viewer.setMap(src);
-            this._view_changes.next({
-                ...this._view_changes.value,
+            this._view_changes.set({
+                ...this._view_changes(),
                 ratio: map.aspect_ratio ? 1 / map.aspect_ratio : 1,
                 svg_ratio: 1,
             });
@@ -450,7 +448,7 @@ export class DynamicMapComponent implements OnInit, OnDestroy {
     private _applyOverlays(
         features: ViewerFeature[],
         labels: ViewerLabel[],
-        feature_elements: readonly ElementRef<HTMLDivElement>[]
+        feature_elements: readonly ElementRef<HTMLDivElement>[],
     ) {
         if (!this._map_viewer) return;
 
@@ -573,7 +571,7 @@ export class DynamicMapComponent implements OnInit, OnDestroy {
                         'pointerdown',
                         'pointerup',
                         'pointerenter',
-                        'pointerleave'
+                        'pointerleave',
                     );
                     break;
                 default:
@@ -594,7 +592,7 @@ export class DynamicMapComponent implements OnInit, OnDestroy {
                     old_injectors.find(
                         (_) =>
                             _.get(MAP_FEATURE_DATA)?.track_id &&
-                            _.get(MAP_FEATURE_DATA)?.track_id === f.track_id
+                            _.get(MAP_FEATURE_DATA)?.track_id === f.track_id,
                     ) ||
                     Injector.create({
                         providers: [
@@ -608,8 +606,8 @@ export class DynamicMapComponent implements OnInit, OnDestroy {
                             },
                         ],
                         parent: this._injector,
-                    })
-            )
+                    }),
+            ),
         );
     }
 }

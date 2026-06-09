@@ -1,8 +1,8 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { randomInt } from '@placeos-tools/common';
 import { openConfirmModal } from 'libs/components/src/lib/confirm-modal.component';
-import { BehaviorSubject } from 'rxjs';
+
 import { InterfaceDetailsModalComponent } from './interface-details-modal.component';
 import { InterfaceModalComponent } from './interface-modal.component';
 
@@ -55,7 +55,7 @@ export interface Interface {
 export class InterfacesService {
     private _dialog = inject(MatDialog);
 
-    private _interface_list = new BehaviorSubject<Interface[]>([
+    private _interface_list = signal<Interface[]>([
         {
             id: 'default',
             building_id: 'default',
@@ -99,36 +99,36 @@ export class InterfacesService {
             },
         },
     ]);
-    private _selected = new BehaviorSubject<string[]>([]);
+    private _selected = signal<string[]>([]);
 
-    public readonly interfaces = this._interface_list.asObservable();
-    public readonly selected = this._selected.asObservable();
+    public readonly interfaces = this._interface_list.asReadonly();
+    public readonly selected = this._selected.asReadonly();
 
     constructor() {
         this._load();
     }
 
     public isSelected(id: string) {
-        const list = this._selected.getValue();
+        const list = this._selected();
         return !!list.find((_) => id === _);
     }
 
     public setSelected(id: string, state: boolean) {
-        const list = this._selected.getValue().filter((_) => _ !== id);
+        const list = this._selected().filter((_) => _ !== id);
         if (id === '*') {
-            this._selected.next(
-                !state ? [] : this._interface_list.getValue().map((_) => _.id)
+            this._selected.set(
+                !state ? [] : this._interface_list().map((_) => _.id),
             );
             return;
         }
-        if (!state) this._selected.next(list);
-        else this._selected.next([...list, id]);
+        if (!state) this._selected.set(list);
+        else this._selected.set([...list, id]);
     }
 
     public setInterface(item: Interface) {
         if (!item.id) item.id = `interface-${randomInt(9999_9999, 1000_0000)}`;
-        this._interface_list.next([
-            ...this._interface_list.getValue().filter((_) => _.id !== item.id),
+        this._interface_list.set([
+            ...this._interface_list().filter((_) => _.id !== item.id),
             item,
         ]);
         this._store();
@@ -141,22 +141,22 @@ export class InterfacesService {
                 content: `Are you sure you want to remove interface config for "${item.building_name}"?`,
                 icon: { content: 'delete' },
             },
-            this._dialog
+            this._dialog,
         );
         if (reason !== 'done') return;
-        this._interface_list.next(
-            this._interface_list.getValue().filter((_) => _.id !== item.id)
+        this._interface_list.set(
+            this._interface_list().filter((_) => _.id !== item.id),
         );
         this._store();
         close();
     }
 
     public async removeSelected() {
-        const list = this._selected.getValue();
+        const list = this._selected();
         if (!list.length) return;
         if (list.length === 1) {
             return this.removeInterface(
-                this._interface_list.getValue().find((_) => _.id === list[0])
+                this._interface_list().find((_) => _.id === list[0]),
             );
         }
         const { close, reason } = await openConfirmModal(
@@ -165,15 +165,15 @@ export class InterfacesService {
                 content: `Are you sure you want to remove ${list.length} regions?`,
                 icon: { content: 'delete' },
             },
-            this._dialog
+            this._dialog,
         );
         if (reason !== 'done') return;
-        this._interface_list.next(
-            this._interface_list
-                .getValue()
-                .filter((_) => !list.find((id) => _.id === id))
+        this._interface_list.set(
+            this._interface_list().filter(
+                (_) => !list.find((id) => _.id === id),
+            ),
         );
-        this._selected.next([]);
+        this._selected.set([]);
         this._store();
         close();
     }
@@ -196,15 +196,15 @@ export class InterfacesService {
 
     private _load() {
         const data = JSON.parse(
-            localStorage.getItem('PLACEOS_BUILD.Interfaces') || '[]'
+            localStorage.getItem('PLACEOS_BUILD.Interfaces') || '[]',
         );
-        this._interface_list.next(data);
+        this._interface_list.set(data);
     }
 
     private _store() {
         localStorage.setItem(
             'PLACEOS_BUILD.Interfaces',
-            JSON.stringify(this._interface_list.getValue())
+            JSON.stringify(this._interface_list()),
         );
     }
 }

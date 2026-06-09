@@ -1,7 +1,5 @@
-import { Injectable, inject } from '@angular/core';
+import { computed, inject, Injectable } from '@angular/core';
 import { downloadFile } from '@placeos-tools/common';
-import { combineLatest } from 'rxjs';
-import { map, take } from 'rxjs/operators';
 import { AccessControlService } from '../access-control/access-control.service';
 import { AssetsService } from '../assets/assets.service';
 import { CarSpacesService } from '../car-spaces/car-spaces.service';
@@ -32,95 +30,56 @@ export class ExportService {
     private _monitoring = inject(MonitoringService);
     private _access_control = inject(AccessControlService);
 
-    public readonly building_count = this._org.buildings.pipe(
-        map((_) => _.length)
+    public readonly building_count = computed(
+        () => this._org.buildings().length,
     );
-    public readonly level_count = this._org.levels.pipe(map((_) => _.length));
-    public readonly org_zone_count = combineLatest([
-        this.building_count,
-        this.level_count,
-    ]).pipe(map(([b, l]) => b + l));
-    public readonly interface_count = this._interfaces.interfaces.pipe(
-        map((_) => _.length)
+    public readonly level_count = computed(() => this._org.levels().length);
+    public readonly org_zone_count = computed(
+        () => this.building_count() + this.level_count(),
     );
-    public readonly floorplan_count = this._floorplan.floorplans.pipe(
-        map((_) => _.length)
+    public readonly interface_count = computed(
+        () => this._interfaces.interfaces().length,
     );
-    public readonly space_count = this._spaces.spaces.pipe(
-        map((_) => _.length)
+    public readonly floorplan_count = computed(
+        () => this._floorplan.floorplans().length,
     );
-    public readonly desk_count = this._desks.desks.pipe(map((_) => _.length));
-    public readonly locker_count = this._lockers.lockers.pipe(
-        map((_) => _.length)
+    public readonly space_count = computed(() => this._spaces.spaces().length);
+    public readonly desk_count = computed(() => this._desks.desks().length);
+    public readonly locker_count = computed(
+        () => this._lockers.lockers().length,
     );
-    public readonly zone_count = this._zones.zones.pipe(map((_) => _.length));
-    public readonly catering_count = this._catering.menu_list.pipe(
-        map((_) => _.length > 1)
+    public readonly zone_count = computed(() => this._zones.zones().length);
+    public readonly catering_count = computed(
+        () => this._catering.menu_list().length > 1,
     );
-    public readonly parking_count = this._parking.spaces.pipe(
-        map((_) => _.length)
+    public readonly parking_count = computed(
+        () => this._parking.spaces().length,
     );
-    public readonly asset_count = this._assets.assets.pipe(
-        map((_) => _.length)
+    public readonly asset_count = computed(() => this._assets.assets().length);
+    public readonly region_count = computed(
+        () => this._monitoring.item_list().length,
     );
-    public readonly region_count = this._monitoring.item_list.pipe(
-        map((_) => _.length)
+    public readonly access_control_count = computed(
+        () => this._access_control.access_controls().length,
     );
-    public readonly access_control_count =
-        this._access_control.access_controls.pipe(map((_) => _.length));
 
     public async exportData() {
         console.log('Export');
-        const data = await combineLatest([
-            this._org.buildings,
-            this._org.levels,
-            this._interfaces.interfaces,
-            this._floorplan.floorplans,
-            this._spaces.spaces,
-            this._desks.desks,
-            this._lockers.lockers,
-            this._zones.zones,
-            this._catering.menu_list,
-            this._parking.spaces,
-            this._assets.assets,
-            this._monitoring.item_list,
-            this._access_control.access_controls,
-        ])
-            .pipe(
-                take(1),
-                map(
-                    ([
-                        buildings,
-                        levels,
-                        interfaces,
-                        floorplans,
-                        rooms,
-                        desks,
-                        lockers,
-                        zones,
-                        catering,
-                        parking_spaces,
-                        assets,
-                        regions,
-                        access_controls,
-                    ]) => ({
-                        buildings,
-                        levels,
-                        interfaces,
-                        floorplans,
-                        rooms,
-                        desks,
-                        lockers,
-                        zones,
-                        catering,
-                        parking_spaces,
-                        assets,
-                        regions,
-                        access_controls,
-                    })
-                )
-            )
-            .toPromise();
+        const data = {
+            buildings: this._org.buildings(),
+            levels: this._org.levels(),
+            interfaces: this._interfaces.interfaces(),
+            floorplans: this._floorplan.floorplans(),
+            rooms: this._spaces.spaces(),
+            desks: this._desks.desks(),
+            lockers: this._lockers.lockers(),
+            zones: this._zones.zones(),
+            catering: this._catering.menu_list(),
+            parking_spaces: this._parking.spaces(),
+            assets: this._assets.assets(),
+            regions: this._monitoring.item_list(),
+            access_controls: this._access_control.access_controls(),
+        };
         console.log('Data:', data);
         downloadFile('placeos-build.json', JSON.stringify(data, undefined, 4));
     }

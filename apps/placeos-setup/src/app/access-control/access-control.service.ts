@@ -1,8 +1,8 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { randomInt } from '@placeos-tools/common';
 import { openConfirmModal } from 'libs/components/src/lib/confirm-modal.component';
-import { BehaviorSubject } from 'rxjs';
+
 import { AccessControlModalComponent } from './access-control-modal.component';
 
 export interface AccessControl {
@@ -21,7 +21,7 @@ export interface AccessControl {
 export class AccessControlService {
     private _dialog = inject(MatDialog);
 
-    private _access_control_list = new BehaviorSubject<AccessControl[]>([
+    private _access_control_list = signal<AccessControl[]>([
         {
             id: 'test',
             building_id: 'bld-01',
@@ -33,41 +33,39 @@ export class AccessControlService {
         },
     ]);
 
-    private _selected = new BehaviorSubject<string[]>([]);
+    private _selected = signal<string[]>([]);
 
-    public readonly access_controls = this._access_control_list.asObservable();
-    public readonly selected = this._selected.asObservable();
+    public readonly access_controls = this._access_control_list.asReadonly();
+    public readonly selected = this._selected.asReadonly();
 
     constructor() {
         this._load();
     }
 
     public isSelected(id: string) {
-        const list = this._selected.getValue();
+        const list = this._selected();
         return !!list.find((_) => id === _);
     }
 
     public setSelected(id: string, state: boolean) {
-        const list = this._selected.getValue().filter((_) => _ !== id);
+        const list = this._selected().filter((_) => _ !== id);
         if (id === '*') {
-            this._selected.next(
-                !state
-                    ? []
-                    : this._access_control_list.getValue().map((_) => _.id)
+            this._selected.set(
+                !state ? [] : this._access_control_list().map((_) => _.id),
             );
             return;
         }
-        if (!state) this._selected.next(list);
-        else this._selected.next([...list, id]);
+        if (!state) this._selected.set(list);
+        else this._selected.set([...list, id]);
     }
 
     public setAccessControl(accesscontrol: AccessControl) {
         if (!accesscontrol.id)
             accesscontrol.id = `ac-${randomInt(9999_9999, 1000_0000)}`;
-        this._access_control_list.next([
-            ...this._access_control_list
-                .getValue()
-                .filter((_) => _.id !== accesscontrol.id),
+        this._access_control_list.set([
+            ...this._access_control_list().filter(
+                (_) => _.id !== accesscontrol.id,
+            ),
             accesscontrol,
         ]);
         this._store();
@@ -80,24 +78,22 @@ export class AccessControlService {
                 content: `Are you sure you want to remove settings for "${item.building_id}" of "${item.type}"?`,
                 icon: { content: 'delete' },
             },
-            this._dialog
+            this._dialog,
         );
         if (reason !== 'done') return;
-        this._access_control_list.next(
-            this._access_control_list.getValue().filter((_) => _.id !== item.id)
+        this._access_control_list.set(
+            this._access_control_list().filter((_) => _.id !== item.id),
         );
         this._store();
         close();
     }
 
     public async removeSelected() {
-        const list = this._selected.getValue();
+        const list = this._selected();
         if (!list.length) return;
         if (list.length === 1) {
             return this.removeAccessControl(
-                this._access_control_list
-                    .getValue()
-                    .find((_) => _.id === list[0])
+                this._access_control_list().find((_) => _.id === list[0]),
             );
         }
         const { close, reason } = await openConfirmModal(
@@ -106,15 +102,15 @@ export class AccessControlService {
                 content: `Are you sure you want to remove ${list.length} regions?`,
                 icon: { content: 'delete' },
             },
-            this._dialog
+            this._dialog,
         );
         if (reason !== 'done') return;
-        this._access_control_list.next(
-            this._access_control_list
-                .getValue()
-                .filter((_) => !list.find((id) => _.id === id))
+        this._access_control_list.set(
+            this._access_control_list().filter(
+                (_) => !list.find((id) => _.id === id),
+            ),
         );
-        this._selected.next([]);
+        this._selected.set([]);
         this._store();
         close();
     }
@@ -131,15 +127,15 @@ export class AccessControlService {
 
     private _load() {
         const data = JSON.parse(
-            localStorage.getItem('PLACEOS_BUILD.AccessControls') || '[]'
+            localStorage.getItem('PLACEOS_BUILD.AccessControls') || '[]',
         );
-        this._access_control_list.next(data);
+        this._access_control_list.set(data);
     }
 
     private _store() {
         localStorage.setItem(
             'PLACEOS_BUILD.AccessControls',
-            JSON.stringify(this._access_control_list.getValue())
+            JSON.stringify(this._access_control_list()),
         );
     }
 }

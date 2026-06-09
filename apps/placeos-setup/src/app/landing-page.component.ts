@@ -1,24 +1,23 @@
 import { Component, inject } from '@angular/core';
-import { ExportService } from './data/export.service';
-import { IconComponent } from '../../../../libs/components/src/lib/icon.component';
-import { RouterLink } from '@angular/router';
 import { MatButton } from '@angular/material/button';
-import { AsyncPipe } from '@angular/common';
+import { RouterLink } from '@angular/router';
+import { IconComponent } from '../../../../libs/components/src/lib/icon.component';
+import { ExportService } from './data/export.service';
 
 @Component({
     selector: 'app-landing-page',
     template: `
         <div
-            class="flex flex-col items-center w-full h-full overflow-auto p-4 space-y-2"
+            class="flex h-full w-full flex-col items-center space-y-2 overflow-auto p-4"
         >
-            <h2 class="text-2xl font-medium w-[640px] mx-auto">
+            <h2 class="mx-auto w-[640px] text-2xl font-medium">
                 Welcome to the PlaceOS Build Sheet Application
             </h2>
             <div
-                class="flex flex-col w-[640px] bg-white dark:bg-neutral-700 border border-gray-200 dark:border-neutral-500 rounded p-4 space-y-2"
+                class="flex w-[640px] flex-col space-y-2 rounded border border-gray-200 bg-white p-4 dark:border-neutral-500 dark:bg-neutral-700"
             >
                 <div
-                    class="flex items-center p-2 bg-pending rounded shadow text-black text-sm space-x-2"
+                    class="bg-pending flex items-center space-x-2 rounded p-2 text-sm text-black shadow"
                 >
                     <app-icon class="text-xl">warning</app-icon>
                     <div>Before continuing please read this carefully.</div>
@@ -34,37 +33,37 @@ import { AsyncPipe } from '@angular/common';
                     assigned to the floorplan.
                 </p>
             </div>
-            <h3 class="text-xl pt-4 font-medium w-[640px] mx-auto">
+            <h3 class="mx-auto w-[640px] pt-4 text-xl font-medium">
                 Available Resources to setup
             </h3>
             <div
-                class="flex flex-wrap w-[640px] bg-white dark:bg-neutral-700 border border-gray-200 dark:border-neutral-500 rounded p-4"
+                class="flex w-[640px] flex-wrap rounded border border-gray-200 bg-white p-4 dark:border-neutral-500 dark:bg-neutral-700"
             >
                 @for (item of resources; track item) {
-                <a
-                    menu
-                    matRipple
-                    class="flex items-center px-2 rounded m-2 w-[30%] border border-gray-200 dark:border-neutral-500 space-x-2"
-                    [routerLink]="[item.route]"
-                >
-                    <app-icon [icon]="item.icon" />
-                    <p class="flex-1 py-2">{{ item?.name }}</p>
-                    @if (item.count && (item.count | async) > 0) {
-                    <app-icon class="text-green-600 text-2xl -mr-2">
-                        done
-                    </app-icon>
-                    }
-                </a>
+                    <a
+                        menu
+                        matRipple
+                        class="m-2 flex w-[30%] items-center space-x-2 rounded border border-gray-200 px-2 dark:border-neutral-500"
+                        [routerLink]="[item.route]"
+                    >
+                        <app-icon [icon]="item.icon" />
+                        <p class="flex-1 py-2">{{ item?.name }}</p>
+                        @if (item.count && item.count() > 0) {
+                            <app-icon class="-mr-2 text-2xl text-green-600">
+                                done
+                            </app-icon>
+                        }
+                    </a>
                 }
             </div>
-            <h3 class="text-xl pt-4 font-medium w-[640px] mx-auto">
+            <h3 class="mx-auto w-[640px] pt-4 text-xl font-medium">
                 Finialising and finishing up
             </h3>
             <div
-                class="flex flex-col w-[640px] bg-white dark:bg-neutral-700 border border-gray-200 dark:border-neutral-500 rounded p-4 space-y-2"
+                class="flex w-[640px] flex-col space-y-2 rounded border border-gray-200 bg-white p-4 dark:border-neutral-500 dark:bg-neutral-700"
             >
                 <div
-                    class="flex items-center p-2 bg-pending rounded shadow text-black text-sm space-x-2"
+                    class="bg-pending flex items-center space-x-2 rounded p-2 text-sm text-black shadow"
                 >
                     <app-icon class="text-xl">warning</app-icon>
                     <div>
@@ -84,7 +83,7 @@ import { AsyncPipe } from '@angular/common';
         </div>
     `,
     styles: [``],
-    imports: [IconComponent, RouterLink, MatButton, AsyncPipe],
+    imports: [IconComponent, RouterLink, MatButton],
 })
 export class LandingPageComponent {
     private _export = inject(ExportService);

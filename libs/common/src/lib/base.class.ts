@@ -1,9 +1,11 @@
+import { Injectable, signal } from '@angular/core';
 
-import { Injectable } from '@angular/core';
-import { Subscription, BehaviorSubject } from "rxjs";
+interface Unsubscribable {
+    unsubscribe: () => void;
+}
 
 @Injectable({
-    providedIn: 'root'
+    providedIn: 'root',
 })
 export class BaseClass {
     /** Store for named timers */
@@ -11,15 +13,17 @@ export class BaseClass {
     /** Store for named intervals */
     protected _intervals: { [name: string]: number } = {};
     /** Store for named subscription unsub callbacks */
-    protected _subscriptions: { [name: string]: (Subscription | (() => void)) } = {};
+    protected _subscriptions: {
+        [name: string]: Unsubscribable | (() => void);
+    } = {};
     /** Subject which stores the initialised state of the object */
-    protected readonly _initialised = new BehaviorSubject<boolean>(false);
-    /** Observable of the initialised state of the object */
-    public readonly initialised = this._initialised.asObservable();
+    protected readonly _initialised = signal<boolean>(false);
+    /** Signal of the initialised state of the object */
+    public readonly initialised = this._initialised.asReadonly();
 
     /** Whether the object has been initialised */
     public get is_initialised(): boolean {
-        return this._initialised.getValue();
+        return this._initialised();
     }
 
     public ngOnDestroy(): void {
@@ -59,7 +63,9 @@ export class BaseClass {
             }, delay);
         } else {
             throw new Error(
-                name ? 'Cannot create named timeout without a name' : 'Cannot create a timeout without a callback'
+                name
+                    ? 'Cannot create named timeout without a name'
+                    : 'Cannot create a timeout without a callback',
             );
         }
     }
@@ -87,7 +93,9 @@ export class BaseClass {
             this._intervals[name] = <any>setInterval(() => fn(), delay);
         } else {
             throw new Error(
-                name ? 'Cannot create named interval without a name' : 'Cannot create a interval without a callback'
+                name
+                    ? 'Cannot create named interval without a name'
+                    : 'Cannot create a interval without a callback',
             );
         }
     }
@@ -108,9 +116,9 @@ export class BaseClass {
      * @param name Name of the subscription
      * @param unsub Unsubscribe callback or Subscription object
      */
-    protected subscription(name: string, unsub: Subscription | (() => void)) {
+    protected subscription(name: string, unsub: Unsubscribable | (() => void)) {
         this.unsub(name);
-        this._subscriptions[name] = unsub
+        this._subscriptions[name] = unsub;
     }
 
     /**
@@ -119,8 +127,8 @@ export class BaseClass {
      */
     protected unsub(name: string) {
         if (this._subscriptions && this._subscriptions[name]) {
-            this._subscriptions[name] instanceof Subscription
-                ? (this._subscriptions[name] as Subscription).unsubscribe()
+            typeof this._subscriptions[name] !== 'function'
+                ? (this._subscriptions[name] as Unsubscribable).unsubscribe()
                 : (this._subscriptions[name] as any)();
             this._subscriptions[name] = null as any;
         }

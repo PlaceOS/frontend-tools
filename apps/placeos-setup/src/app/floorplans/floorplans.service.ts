@@ -1,8 +1,8 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { randomInt } from '@placeos-tools/common';
 import { openConfirmModal } from 'libs/components/src/lib/confirm-modal.component';
-import { BehaviorSubject } from 'rxjs';
+
 import { FloorPlanModalComponent } from './floorplan-modal.component';
 
 export interface FloorPlan {
@@ -21,7 +21,7 @@ export interface FloorPlan {
 export class FloorPlansService {
     private _dialog = inject(MatDialog);
 
-    private _floorplan_list = new BehaviorSubject<FloorPlan[]>([
+    private _floorplan_list = signal<FloorPlan[]>([
         {
             id: 'test',
             building_id: 'bld-01',
@@ -33,36 +33,36 @@ export class FloorPlansService {
         },
     ]);
 
-    private _selected = new BehaviorSubject<string[]>([]);
+    private _selected = signal<string[]>([]);
 
-    public readonly floorplans = this._floorplan_list.asObservable();
-    public readonly selected = this._selected.asObservable();
+    public readonly floorplans = this._floorplan_list.asReadonly();
+    public readonly selected = this._selected.asReadonly();
 
     constructor() {
         this._load();
     }
 
     public isSelected(id: string) {
-        const list = this._selected.getValue();
+        const list = this._selected();
         return !!list.find((_) => id === _);
     }
 
     public setSelected(id: string, state: boolean) {
-        const list = this._selected.getValue().filter((_) => _ !== id);
+        const list = this._selected().filter((_) => _ !== id);
         if (id === '*') {
-            this._selected.next(
-                !state ? [] : this._floorplan_list.getValue().map((_) => _.id)
+            this._selected.set(
+                !state ? [] : this._floorplan_list().map((_) => _.id),
             );
             return;
         }
-        if (!state) this._selected.next(list);
-        else this._selected.next([...list, id]);
+        if (!state) this._selected.set(list);
+        else this._selected.set([...list, id]);
     }
 
     public setFloorPlan(item: FloorPlan) {
         if (!item.id) item.id = `floorplan-${randomInt(9999_9999, 1000_0000)}`;
-        this._floorplan_list.next([
-            ...this._floorplan_list.getValue().filter((_) => _.id !== item.id),
+        this._floorplan_list.set([
+            ...this._floorplan_list().filter((_) => _.id !== item.id),
             item,
         ]);
         this._store();
@@ -75,22 +75,22 @@ export class FloorPlansService {
                 content: `Are you sure you want to remove floorplan "${item.building_id}" "${item.level_id}" ?`,
                 icon: { content: 'delete' },
             },
-            this._dialog
+            this._dialog,
         );
         if (reason !== 'done') return;
-        this._floorplan_list.next(
-            this._floorplan_list.getValue().filter((_) => _.id !== item.id)
+        this._floorplan_list.set(
+            this._floorplan_list().filter((_) => _.id !== item.id),
         );
         this._store();
         close();
     }
 
     public async removeSelected() {
-        const list = this._selected.getValue();
+        const list = this._selected();
         if (!list.length) return;
         if (list.length === 1) {
             return this.removeFloorPlan(
-                this._floorplan_list.getValue().find((_) => _.id === list[0])
+                this._floorplan_list().find((_) => _.id === list[0]),
             );
         }
         const { close, reason } = await openConfirmModal(
@@ -99,15 +99,15 @@ export class FloorPlansService {
                 content: `Are you sure you want to remove ${list.length} regions?`,
                 icon: { content: 'delete' },
             },
-            this._dialog
+            this._dialog,
         );
         if (reason !== 'done') return;
-        this._floorplan_list.next(
-            this._floorplan_list
-                .getValue()
-                .filter((_) => !list.find((id) => _.id === id))
+        this._floorplan_list.set(
+            this._floorplan_list().filter(
+                (_) => !list.find((id) => _.id === id),
+            ),
         );
-        this._selected.next([]);
+        this._selected.set([]);
         this._store();
         close();
     }
@@ -124,15 +124,15 @@ export class FloorPlansService {
 
     private _load() {
         const data = JSON.parse(
-            localStorage.getItem('PLACEOS_BUILD.FloorPlans') || '[]'
+            localStorage.getItem('PLACEOS_BUILD.FloorPlans') || '[]',
         );
-        this._floorplan_list.next(data);
+        this._floorplan_list.set(data);
     }
 
     private _store() {
         localStorage.setItem(
             'PLACEOS_BUILD.FloorPlans',
-            JSON.stringify(this._floorplan_list.getValue())
+            JSON.stringify(this._floorplan_list()),
         );
     }
 }

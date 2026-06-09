@@ -1,31 +1,35 @@
-import { Component, SimpleChanges, inject, input } from '@angular/core';
-import { BehaviorSubject, combineLatest } from 'rxjs';
-import { map } from 'rxjs/operators';
+import {
+    Component,
+    computed,
+    inject,
+    input,
+    signal,
+    SimpleChanges,
+} from '@angular/core';
+import { MatIconButton } from '@angular/material/button';
+import { MatCheckbox } from '@angular/material/checkbox';
+import { MatTooltip } from '@angular/material/tooltip';
+import { IconComponent } from '../../../../../libs/components/src/lib/icon.component';
 import {
     CateringMenuConfig,
     CateringStateService,
 } from './catering-state.service';
-import { MatCheckbox } from '@angular/material/checkbox';
-import { MatIconButton } from '@angular/material/button';
-import { MatTooltip } from '@angular/material/tooltip';
-import { IconComponent } from '../../../../../libs/components/src/lib/icon.component';
-import { AsyncPipe } from '@angular/common';
 
 @Component({
     selector: `catering-menu-details,[catering-menu-details]`,
     template: `
         <div
             details
-            class="flex items-center border-b border-neutral-500 text-sm hover:bg-black/10 relative"
+            class="relative flex items-center border-b border-neutral-500 text-sm hover:bg-black/10"
         >
-            <div thead class="min-w-0 w-10">
+            <div thead class="w-10 min-w-0">
                 <mat-checkbox />
             </div>
             <div thead>{{ item().name }}</div>
-            <div thead>{{ item_count | async }}</div>
+            <div thead>{{ item_count() }}</div>
             <div
                 actions
-                class="absolute top-1/2 -translate-y-1/2 left-12 rounded-3xl flex items-center bg-white dark:bg-neutral-700 shadow !p-0 min-w-0 w-auto"
+                class="absolute top-1/2 left-12 flex w-auto min-w-0 -translate-y-1/2 items-center rounded-3xl bg-white !p-0 shadow dark:bg-neutral-700"
             >
                 <button mat-icon-button matTooltip="Edit Menu" (click)="edit()">
                     <app-icon>edit</app-icon>
@@ -65,26 +69,25 @@ import { AsyncPipe } from '@angular/common';
             }
         `,
     ],
-    imports: [MatCheckbox, MatIconButton, MatTooltip, IconComponent, AsyncPipe],
+    imports: [MatCheckbox, MatIconButton, MatTooltip, IconComponent],
 })
 export class CateringMenuDetailsComponent {
     private _service = inject(CateringStateService);
 
     public readonly item = input<CateringMenuConfig>(undefined);
 
-    private _id = new BehaviorSubject('');
+    private _id = signal('');
 
-    public readonly item_count = combineLatest([
-        this._id,
-        this._service.menu_list,
-    ]).pipe(map(([id, _]) => this._service.menuForID(id)?.length || 0));
+    public readonly item_count = computed(
+        () => this._service.menuForID(this._id())?.length || 0,
+    );
 
     public readonly edit = () => this._service.openMenuModal(this.item());
     public readonly remove = () => this._service.removeMenu(this.item());
 
     public ngOnChange(changes: SimpleChanges) {
         if (changes.item) {
-            this._id.next(this.item()?.id || '');
+            this._id.set(this.item()?.id || '');
         }
     }
 }

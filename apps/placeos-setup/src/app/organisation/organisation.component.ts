@@ -1,46 +1,44 @@
-import { Component, inject } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { BaseClass } from '@placeos-tools/common';
-import { combineLatest } from 'rxjs';
-import { map } from 'rxjs/operators';
-import { OrganisationService } from './organisation.service';
+import { Component, computed, inject } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { MatButton } from '@angular/material/button';
 import { MatCheckbox } from '@angular/material/checkbox';
-import { FormsModule } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
+import { BaseClass } from '@placeos-tools/common';
 import { BuildingComponent } from './building.component';
-import { AsyncPipe } from '@angular/common';
+import { OrganisationService } from './organisation.service';
 
 @Component({
     selector: 'app-organisation',
     template: `
-        <div class="flex flex-col h-full w-full overflow-hidden relative">
-            <header class="bg-neutral-700 p-2 space-x-2">
+        <div class="relative flex h-full w-full flex-col overflow-hidden">
+            <header class="space-x-2 bg-neutral-700 p-2">
                 <button mat-button class="w-32" (click)="newBuilding()">
                     Add Building
                 </button>
                 <button
                     mat-button
                     class="w-32"
-                    [disabled]="!(buildings | async)?.length"
+                    [disabled]="!buildings()?.length"
                     (click)="newLevel()"
                 >
                     Add Level
                 </button>
             </header>
-            <main class="w-full h-1/2 flex-1 overflow-auto">
+            <main class="h-1/2 w-full flex-1 overflow-auto">
                 <div table>
                     <div
-                        class="sticky top-0 flex items-center bg-neutral-800 border-b border-neutral-500 w-full"
+                        class="sticky top-0 flex w-full items-center border-b border-neutral-500 bg-neutral-800"
                     >
                         <div thead class="min-w-0">
-                            <mat-checkbox [ngModel]="all_selected | async"
-                                [indeterminate]="some_selected | async"
+                            <mat-checkbox
+                                [ngModel]="all_selected()"
+                                [indeterminate]="some_selected()"
                                 (ngModelChange)="setSelected($event)"
-                             />
+                            />
                         </div>
                         <div
                             thead
-                            class="min-w-0 w-10 text-black/0 select-none h-full"
+                            class="h-full w-10 min-w-0 text-black/0 select-none"
                         >
                             Actions
                         </div>
@@ -53,17 +51,18 @@ import { AsyncPipe } from '@angular/common';
                         <div thead>Visitors?</div>
                         <div thead>Catering?</div>
                     </div>
-                    @if ((buildings | async)?.length) { @for (bld of buildings |
-                    async; track bld) {
-                    <div org-building [building]="bld"></div>
-                    } } @else {
-                    <div
-                        class="w-full h-full flex items-center justify-center p-8"
-                    >
-                        <p class="opacity-60">
-                            No buildings setup for organisation
-                        </p>
-                    </div>
+                    @if (buildings()?.length) {
+                        @for (bld of buildings(); track bld) {
+                            <div org-building [building]="bld"></div>
+                        }
+                    } @else {
+                        <div
+                            class="flex h-full w-full items-center justify-center p-8"
+                        >
+                            <p class="opacity-60">
+                                No buildings setup for organisation
+                            </p>
+                        </div>
                     }
                 </div>
             </main>
@@ -87,13 +86,7 @@ import { AsyncPipe } from '@angular/common';
             }
         `,
     ],
-    imports: [
-        MatButton,
-        MatCheckbox,
-        FormsModule,
-        BuildingComponent,
-        AsyncPipe,
-    ],
+    imports: [MatButton, MatCheckbox, FormsModule, BuildingComponent],
 })
 export class OrganisationComponent extends BaseClass {
     private _org = inject(OrganisationService);
@@ -104,20 +97,16 @@ export class OrganisationComponent extends BaseClass {
     public readonly newBuilding = () => this._org.openBuildingModal();
     public readonly newLevel = () => this._org.openLevelModal();
     public readonly setSelected = (s) => this._org.setSelected('*', s);
-    public readonly all_selected = combineLatest([
-        this._org.buildings,
-        this._org.levels,
-        this._org.selected,
-    ]).pipe(
-        map(([b, l, s]) => b.length + l.length === s.length && s.length > 0)
-    );
-    public readonly some_selected = combineLatest([
-        this._org.buildings,
-        this._org.levels,
-        this._org.selected,
-    ]).pipe(
-        map(([b, l, s]) => b.length + l.length !== s.length && s.length > 0)
-    );
+    public readonly all_selected = computed(() => {
+        const total = this._org.buildings().length + this._org.levels().length;
+        const selected = this._org.selected().length;
+        return total === selected && selected > 0;
+    });
+    public readonly some_selected = computed(() => {
+        const total = this._org.buildings().length + this._org.levels().length;
+        const selected = this._org.selected().length;
+        return total !== selected && selected > 0;
+    });
 
     public ngOnInit() {
         this.subscription(
@@ -130,7 +119,7 @@ export class OrganisationComponent extends BaseClass {
                         this.newLevel();
                     }
                 }
-            })
+            }),
         );
     }
 }

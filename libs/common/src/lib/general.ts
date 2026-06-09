@@ -1,7 +1,6 @@
-
-import { HashMap } from './types';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
-import { first } from 'rxjs/operators';
+import { firstValueFrom } from 'rxjs';
+import { HashMap } from './types';
 
 /** Available console output streams. */
 export type ConsoleStream = 'debug' | 'warn' | 'log' | 'error';
@@ -25,22 +24,22 @@ export async function openGenericModal<T, U>(
     modal_class: T,
     data: U,
     dialog: MatDialog,
-    metadata: any = {}
+    metadata: any = {},
 ): Promise<GenericModalResponse> {
-    const ref: MatDialogRef<any> = (dialog as any).open(
-        modal_class,
-        {
-            ...metadata,
-            data,
-        }
-    );
+    const ref: MatDialogRef<any> = (dialog as any).open(modal_class, {
+        ...metadata,
+        data,
+    });
+    const done = new Promise<any>((resolve) => {
+        const sub = ref.componentInstance.event.subscribe((event: any) => {
+            if (event.reason === 'done') {
+                sub.unsubscribe();
+                resolve(event);
+            }
+        });
+    });
     return {
-        ...(await Promise.race([
-            ref.componentInstance.event
-                .pipe(first((_: any) => _.reason === 'done'))
-                .toPromise(),
-            ref.afterClosed().toPromise(),
-        ])),
+        ...(await Promise.race([done, firstValueFrom(ref.afterClosed())])),
         loading: (s) => (ref.componentInstance.loading = s),
         close: () => ref.close(),
     };
@@ -64,12 +63,20 @@ export function log(
     args?: any,
     stream: ConsoleStream = 'debug',
     force: boolean = false,
-    app_name: string = _app_name
+    app_name: string = _app_name,
 ) {
     if (window.debug || force) {
-        const colors: string[] = ['color: #E91E63', 'color: #3F51B5', 'color: default'];
+        const colors: string[] = [
+            'color: #E91E63',
+            'color: #3F51B5',
+            'color: default',
+        ];
         if (args) {
-            console[stream](`%c[${app_name}]%c[${type}] %c${msg}`, ...colors, args);
+            console[stream](
+                `%c[${app_name}]%c[${type}] %c${msg}`,
+                ...colors,
+                args,
+            );
         } else {
             console[stream](`%c[${app_name}]%c[${type}] %c${msg}`, ...colors);
         }
@@ -97,8 +104,11 @@ export function getItemWithKeys(keys: string[], map: HashMap): any {
 export function unique(array: any[], key: string = '') {
     return array.filter(
         (el, pos, arr) =>
-            arr.indexOf(key ? arr.find((i) => i[key] === el[key]) : arr.find((i) => i === el)) ===
-            pos
+            arr.indexOf(
+                key
+                    ? arr.find((i) => i[key] === el[key])
+                    : arr.find((i) => i === el),
+            ) === pos,
     );
 }
 
@@ -120,7 +130,10 @@ const CHARS = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
  */
 export function randomString(length: number = 10, chars: string = CHARS) {
     if (length < 1) return '';
-    return new Array(length).fill(0).map(_ => chars[randomInt(chars.length)]).join('');
+    return new Array(length)
+        .fill(0)
+        .map((_) => chars[randomInt(chars.length)])
+        .join('');
 }
 
 /**
@@ -128,13 +141,19 @@ export function randomString(length: number = 10, chars: string = CHARS) {
  * @param csv CSV data to parse
  */
 export function csvToJson(csv: string, delimiter: string = ','): HashMap[] {
-    const objPattern = new RegExp(("(\\,|\\r?\\n|\\r|^)(?:\"([^\"]*(?:\"\"[^\"]*)*)\"|([^\\,\\r\\n]*))"),"gi");
-    let arrMatches: any = null, arrData: any = [[]];
-    while (arrMatches = objPattern.exec(csv)){
-        if (arrMatches[1].length && arrMatches[1] !== ",")arrData.push([]);
-        arrData[arrData.length - 1].push(arrMatches[2] ?
-            arrMatches[2].replace(new RegExp( "\"\"", "g" ), "\"") :
-            arrMatches[3]);
+    const objPattern = new RegExp(
+        '(\\,|\\r?\\n|\\r|^)(?:"([^"]*(?:""[^"]*)*)"|([^\\,\\r\\n]*))',
+        'gi',
+    );
+    let arrMatches: any = null,
+        arrData: any = [[]];
+    while ((arrMatches = objPattern.exec(csv))) {
+        if (arrMatches[1].length && arrMatches[1] !== ',') arrData.push([]);
+        arrData[arrData.length - 1].push(
+            arrMatches[2]
+                ? arrMatches[2].replace(new RegExp('""', 'g'), '"')
+                : arrMatches[3],
+        );
     }
     const headers: string[] = arrData.splice(0, 1)[0];
     const elements = arrData.map((row: any) => {
@@ -160,7 +179,9 @@ export function jsonToCsv(json: HashMap[]) {
         const keys = Object.keys(json[0]);
         const valid_keys = keys.filter((key) => json[0].hasOwnProperty(key));
         return `${valid_keys.join(',')}\n${json
-            .map((item) => valid_keys.map((key) => JSON.stringify(item[key])).join(','))
+            .map((item) =>
+                valid_keys.map((key) => JSON.stringify(item[key])).join(','),
+            )
             .join('\n')}`;
     }
     return '';
@@ -173,7 +194,10 @@ export function jsonToCsv(json: HashMap[]) {
  */
 export function downloadFile(filename: string, contents: string) {
     const element = document.createElement('a');
-    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(contents));
+    element.setAttribute(
+        'href',
+        'data:text/plain;charset=utf-8,' + encodeURIComponent(contents),
+    );
     element.setAttribute('download', filename);
 
     element.style.display = 'none';
@@ -193,7 +217,7 @@ export function parseJWT(token: string) {
             .map((c) => {
                 return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
             })
-            .join('')
+            .join(''),
     );
     return JSON.parse(jsonPayload);
 }
@@ -227,7 +251,12 @@ export function flatten<T = any>(an_array: T[]) {
  * @param start2 Unix epoch in ms of the second period's start time
  * @param end2 Unix epoch in ms of the second period's end time
  */
-export function timePeriodsIntersect(start1: number, end1: number, start2: number, end2: number) {
+export function timePeriodsIntersect(
+    start1: number,
+    end1: number,
+    start2: number,
+    end2: number,
+) {
     return (
         (start1 >= start2 && start1 < end2) ||
         (end1 > start2 && end1 < end2) ||
@@ -246,7 +275,8 @@ export function predictableRandomInt(ceil: number = 100, floor: number = 0) {
 // https://stackoverflow.com/questions/521295/seeding-the-random-number-generator-in-javascript
 function xmur3(str: string) {
     for (var i = 0, h = 1779033703 ^ str.length; i < str.length; i++)
-        (h = Math.imul(h ^ str.charCodeAt(i), 3432918353)), (h = (h << 13) | (h >>> 19));
+        ((h = Math.imul(h ^ str.charCodeAt(i), 3432918353)),
+            (h = (h << 13) | (h >>> 19)));
     return function () {
         h = Math.imul(h ^ (h >>> 16), 2246822507);
         h = Math.imul(h ^ (h >>> 13), 3266489909);
@@ -281,7 +311,8 @@ export function is24HourTime(): boolean {
     const date = new Date();
     const localeString = date
         .toLocaleTimeString(
-            document.querySelector('html')?.getAttribute('lang') || navigator.language
+            document.querySelector('html')?.getAttribute('lang') ||
+                navigator.language,
         )
         .toLowerCase();
     return localeString.indexOf('am') < 0 && localeString.indexOf('pm') < 0;

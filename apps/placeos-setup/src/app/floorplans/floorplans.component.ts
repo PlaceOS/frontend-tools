@@ -1,43 +1,41 @@
-import { Component, inject } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
-import { combineLatest } from 'rxjs';
-import { map } from 'rxjs/operators';
-import { FloorPlanExampleModalComponent } from './example-modal.component';
-import { FloorPlansService } from './floorplans.service';
+import { Component, computed, inject } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { MatButton } from '@angular/material/button';
 import { MatCheckbox } from '@angular/material/checkbox';
-import { FormsModule } from '@angular/forms';
-import { FloorPlanDetailsComponent } from './floorplan-details.component';
+import { MatDialog } from '@angular/material/dialog';
 import { DataWarningComponent } from '../components/data-warning.component';
-import { AsyncPipe } from '@angular/common';
+import { FloorPlanExampleModalComponent } from './example-modal.component';
+import { FloorPlanDetailsComponent } from './floorplan-details.component';
+import { FloorPlansService } from './floorplans.service';
 
 @Component({
     selector: 'app-organisation',
     template: `
-        <div class="flex flex-col h-full w-full overflow-hidden relative">
-            <header class="bg-neutral-700 p-2 space-x-2">
+        <div class="relative flex h-full w-full flex-col overflow-hidden">
+            <header class="space-x-2 bg-neutral-700 p-2">
                 <button mat-button class="w-32" (click)="newFloorPlan()">
                     Add Floor Plan
                 </button>
                 <button mat-button class="w-44" (click)="viewExample()">
                     View Example Map
                 </button>
-                @if ((all_selected | async) || (some_selected | async)) {
-                <button mat-button class="w-48" (click)="removeSelected()">
-                    Remove Selected
-                </button>
+                @if (all_selected() || some_selected()) {
+                    <button mat-button class="w-48" (click)="removeSelected()">
+                        Remove Selected
+                    </button>
                 }
             </header>
-            <main class="w-full h-1/2 flex-1 overflow-auto">
+            <main class="h-1/2 w-full flex-1 overflow-auto">
                 <div table>
                     <div
-                        class="sticky top-0 flex items-center bg-neutral-800 border-b border-neutral-500 w-full"
+                        class="sticky top-0 flex w-full items-center border-b border-neutral-500 bg-neutral-800"
                     >
-                        <div thead class="min-w-0 w-10">
-                            <mat-checkbox [ngModel]="all_selected | async"
-                                [indeterminate]="some_selected | async"
+                        <div thead class="w-10 min-w-0">
+                            <mat-checkbox
+                                [ngModel]="all_selected()"
+                                [indeterminate]="some_selected()"
                                 (ngModelChange)="setSelected($event)"
-                             />
+                            />
                         </div>
                         <div thead>Building</div>
                         <div thead>Level</div>
@@ -46,17 +44,18 @@ import { AsyncPipe } from '@angular/common';
                         <div thead>Zones setup?</div>
                         <div thead>Sensors setup?</div>
                     </div>
-                    @if ((floorplans | async)?.length) { @for (item of
-                    floorplans | async; track item) {
-                    <div floorplan-details [item]="item"></div>
-                    } } @else {
-                    <div
-                        class="w-full h-full flex items-center justify-center p-8"
-                    >
-                        <p class="opacity-60">
-                            No floor plans setup for organisation
-                        </p>
-                    </div>
+                    @if (floorplans()?.length) {
+                        @for (item of floorplans(); track item) {
+                            <div floorplan-details [item]="item"></div>
+                        }
+                    } @else {
+                        <div
+                            class="flex h-full w-full items-center justify-center p-8"
+                        >
+                            <p class="opacity-60">
+                                No floor plans setup for organisation
+                            </p>
+                        </div>
                     }
                 </div>
             </main>
@@ -88,7 +87,6 @@ import { AsyncPipe } from '@angular/common';
         FormsModule,
         FloorPlanDetailsComponent,
         DataWarningComponent,
-        AsyncPipe,
     ],
 })
 export class FloorPlansComponent {
@@ -100,14 +98,16 @@ export class FloorPlansComponent {
     public readonly newFloorPlan = () => this._service.openFloorPlanModal();
     public readonly setSelected = (s) => this._service.setSelected('*', s);
     public readonly removeSelected = () => this._service.removeSelected();
-    public readonly all_selected = combineLatest([
-        this._service.floorplans,
-        this._service.selected,
-    ]).pipe(map(([l, s]) => l.length === s.length && s.length > 0));
-    public readonly some_selected = combineLatest([
-        this._service.floorplans,
-        this._service.selected,
-    ]).pipe(map(([l, s]) => l.length !== s.length && s.length > 0));
+    public readonly all_selected = computed(() => {
+        const list = this._service.floorplans();
+        const selected = this._service.selected();
+        return list.length === selected.length && selected.length > 0;
+    });
+    public readonly some_selected = computed(() => {
+        const list = this._service.floorplans();
+        const selected = this._service.selected();
+        return list.length !== selected.length && selected.length > 0;
+    });
 
     public viewExample() {
         this._dialog.open(FloorPlanExampleModalComponent);

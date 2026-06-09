@@ -2,29 +2,29 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { ActivatedRoute, ParamMap } from '@angular/router';
 import { BaseClass, sendMessage } from '@placeos-tools/common';
 
-import { EditorStateService } from './editor-state.service';
-import { DynamicMapComponent } from '../../../../../libs/components/src/lib/map-viewer/dynamic-map.component';
 import { MatRipple } from '@angular/material/core';
 import { IconComponent } from '../../../../../libs/components/src/lib/icon.component';
+import { DynamicMapComponent } from '../../../../../libs/components/src/lib/map-viewer/dynamic-map.component';
 import { EditorSensorListComponent } from './editor-sensor-list.component';
-import { AsyncPipe } from '@angular/common';
+import { EditorStateService } from './editor-state.service';
 
 @Component({
     selector: '[sensor-map-editor]',
     template: `
         <div class="relative h-full flex-1">
-            <i-map class="w-screen h-screen"
-                [src]="url | async"
-                [features]="features | async"
+            <i-map
+                class="h-screen w-screen"
+                [src]="url()"
+                [features]="features()"
                 [actions]="actions()"
-             />
+            />
             <div
-                class="absolute bottom-2 right-2 flex flex-wrap items-center justify-end"
+                class="absolute right-2 bottom-2 flex flex-wrap items-center justify-end"
             >
                 <button btn matRipple class="m-1" (click)="saveMetadata()">
                     <div class="flex items-center">
                         <app-icon class="mr-4">save_alt</app-icon>
-                        {{ (embeded | async) ? 'Save' : 'Download' }} Metadata
+                        {{ embeded() ? 'Save' : 'Download' }} Metadata
                     </div>
                 </button>
                 <button btn matRipple class="m-1" (click)="copyMetadata()">
@@ -35,7 +35,7 @@ import { AsyncPipe } from '@angular/common';
                 </button>
             </div>
         </div>
-        <div class="w-64 h-full">
+        <div class="h-full w-64">
             <editor-sensor-list />
         </div>
     `,
@@ -62,7 +62,6 @@ import { AsyncPipe } from '@angular/common';
         MatRipple,
         IconComponent,
         EditorSensorListComponent,
-        AsyncPipe,
     ],
 })
 export class EditorComponent extends BaseClass implements OnInit {
@@ -95,17 +94,17 @@ export class EditorComponent extends BaseClass implements OnInit {
                 }).catch((_) => '');
                 this._editor.setURL(
                     src || params.get('src'),
-                    params.get('src')
+                    params.get('src'),
                 );
             }
         };
         this.subscription(
             'route.query',
-            this._route.queryParamMap.subscribe(handle_params)
+            this._route.queryParamMap.subscribe(handle_params),
         );
         this.subscription(
             'route.params',
-            this._route.paramMap.subscribe(handle_params)
+            this._route.paramMap.subscribe(handle_params),
         );
         this._editor.loadSensorLocations();
     }

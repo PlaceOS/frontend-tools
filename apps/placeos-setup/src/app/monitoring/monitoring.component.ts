@@ -1,38 +1,36 @@
-import { Component, inject } from '@angular/core';
-import { combineLatest } from 'rxjs';
-import { map } from 'rxjs/operators';
-import { MonitoringService } from './monitoring.service';
+import { Component, computed, inject } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { MatButton } from '@angular/material/button';
 import { MatCheckbox } from '@angular/material/checkbox';
-import { FormsModule } from '@angular/forms';
-import { MonitoringItemDetailsComponent } from './item-details.component';
 import { DataWarningComponent } from '../components/data-warning.component';
-import { AsyncPipe } from '@angular/common';
+import { MonitoringItemDetailsComponent } from './item-details.component';
+import { MonitoringService } from './monitoring.service';
 
 @Component({
     selector: 'app-monitoring',
     template: `
-        <div class="flex flex-col h-full w-full overflow-hidden relative">
-            <header class="bg-neutral-700 p-2 space-x-2">
+        <div class="relative flex h-full w-full flex-col overflow-hidden">
+            <header class="space-x-2 bg-neutral-700 p-2">
                 <button mat-button class="w-[18rem]" (click)="newLocker()">
                     Add Environmental Monitoring Region
                 </button>
-                @if ((all_selected | async) || (some_selected | async)) {
-                <button mat-button class="w-48" (click)="removeSelected()">
-                    Remove Selected
-                </button>
+                @if (all_selected() || some_selected()) {
+                    <button mat-button class="w-48" (click)="removeSelected()">
+                        Remove Selected
+                    </button>
                 }
             </header>
-            <main class="w-full h-1/2 flex-1 overflow-auto">
+            <main class="h-1/2 w-full flex-1 overflow-auto">
                 <div table>
                     <div
-                        class="sticky top-0 flex items-center bg-neutral-800 border-b border-neutral-500 w-full"
+                        class="sticky top-0 flex w-full items-center border-b border-neutral-500 bg-neutral-800"
                     >
-                        <div thead class="min-w-0 w-10">
-                            <mat-checkbox [ngModel]="all_selected | async"
-                                [indeterminate]="some_selected | async"
+                        <div thead class="w-10 min-w-0">
+                            <mat-checkbox
+                                [ngModel]="all_selected()"
+                                [indeterminate]="some_selected()"
                                 (ngModelChange)="setSelected($event)"
-                             />
+                            />
                         </div>
                         <div thead class="w-48">Building</div>
                         <div thead class="w-48">Level</div>
@@ -42,17 +40,19 @@ import { AsyncPipe } from '@angular/common';
                         <div thead>Display locations for Users?</div>
                         <div thead>Sensor data available in analytics?</div>
                     </div>
-                    @if ((items | async)?.length) { @for (item of items | async;
-                    track item) {
-                    <div monitoring-item-details [item]="item"></div>
-                    } } @else {
-                    <div
-                        class="w-full h-full flex items-center justify-center p-8"
-                    >
-                        <p class="opacity-60">
-                            No environmental monitoring setup for organisation
-                        </p>
-                    </div>
+                    @if (items()?.length) {
+                        @for (item of items(); track item) {
+                            <div monitoring-item-details [item]="item"></div>
+                        }
+                    } @else {
+                        <div
+                            class="flex h-full w-full items-center justify-center p-8"
+                        >
+                            <p class="opacity-60">
+                                No environmental monitoring setup for
+                                organisation
+                            </p>
+                        </div>
                     }
                 </div>
             </main>
@@ -84,7 +84,6 @@ import { AsyncPipe } from '@angular/common';
         FormsModule,
         MonitoringItemDetailsComponent,
         DataWarningComponent,
-        AsyncPipe,
     ],
 })
 export class MonitoringComponent {
@@ -95,12 +94,14 @@ export class MonitoringComponent {
     public readonly newLocker = () => this._service.openItemModal();
     public readonly setSelected = (s) => this._service.setSelected('*', s);
     public readonly removeSelected = () => this._service.removeSelected();
-    public readonly all_selected = combineLatest([
-        this._service.item_list,
-        this._service.selected,
-    ]).pipe(map(([l, s]) => l.length === s.length && s.length > 0));
-    public readonly some_selected = combineLatest([
-        this._service.item_list,
-        this._service.selected,
-    ]).pipe(map(([l, s]) => l.length !== s.length && s.length > 0));
+    public readonly all_selected = computed(() => {
+        const list = this._service.item_list();
+        const selected = this._service.selected();
+        return list.length === selected.length && selected.length > 0;
+    });
+    public readonly some_selected = computed(() => {
+        const list = this._service.item_list();
+        const selected = this._service.selected();
+        return list.length !== selected.length && selected.length > 0;
+    });
 }

@@ -1,10 +1,7 @@
-import { Injectable, inject } from '@angular/core';
+import { computed, inject, Injectable, signal } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { BaseClass, unique } from '@placeos-tools/common';
-import { randomInt } from '@placeos-tools/common';
 import { openConfirmModal } from 'libs/components/src/lib/confirm-modal.component';
-import { BehaviorSubject, combineLatest, Observable } from 'rxjs';
-import { map, take } from 'rxjs/operators';
 import { OrganisationService } from '../organisation/organisation.service';
 import { openCateringItemModal } from './catering-item-modal.component';
 
@@ -26,40 +23,39 @@ export class CateringStateService extends BaseClass {
     private _dialog = inject(MatDialog);
     private _org = inject(OrganisationService);
 
-    private _menu_map = new BehaviorSubject<Record<string, CateringItem[]>>({});
-    private _loading = new BehaviorSubject<boolean>(false);
-    private _currency = new BehaviorSubject<string>('USD');
-    private _active_id = new BehaviorSubject<string>('');
-    /** Observable for whether the menu for the active building is loadingg */
-    public readonly loading = this._loading.asObservable();
-    /** Observable for the currency code of the active building */
-    public readonly currency = this._currency.asObservable();
-    /** Observable for the id of active menu */
-    public readonly active_id = this._active_id.asObservable();
+    private _menu_map = signal<Record<string, CateringItem[]>>({});
+    private _loading = signal<boolean>(false);
+    private _currency = signal<string>('USD');
+    private _active_id = signal<string>('');
+    /** Signal for whether the menu for the active building is loadingg */
+    public readonly loading = this._loading.asReadonly();
+    /** Signal for the currency code of the active building */
+    public readonly currency = this._currency.asReadonly();
+    /** Signal for the id of active menu */
+    public readonly active_id = this._active_id.asReadonly();
 
     /** List of available menus */
-    public readonly menu_list: Observable<CateringMenuConfig[]> =
-        this._org.buildings.pipe(
-            map((_) =>
-                _.filter((bld) => bld.catering_available).map((bld) => ({
-                    id: `menu-${bld.id}`,
-                    building_id: bld.id,
-                    name: bld.display_name || bld.name,
-                }))
-            )
-        );
+    public readonly menu_list = computed(() =>
+        this._org
+            .buildings()
+            .filter((bld) => bld.catering_available)
+            .map((bld) => ({
+                id: `menu-${bld.id}`,
+                building_id: bld.id,
+                name: bld.display_name || bld.name,
+            })),
+    );
     /** Menu for the active ID */
-    public readonly menu = combineLatest([
-        this._active_id,
-        this._menu_map,
-    ]).pipe(map(([id, menu_map]) => menu_map[id] || []));
+    public readonly menu = computed(
+        () => this._menu_map()[this._active_id()] || [],
+    );
     /** List of existing categories for the menu */
-    public readonly categories = this.menu.pipe(
-        map((menu) => unique(menu.map((i) => i.category)))
+    public readonly categories = computed(() =>
+        unique(this.menu().map((i) => i.category)),
     );
 
     public menuForID(id: string) {
-        const menus = this._menu_map.getValue() || {};
+        const menus = this._menu_map() || {};
         return menus[id] || [];
     }
 
@@ -69,15 +65,15 @@ export class CateringStateService extends BaseClass {
     }
 
     public openMenuModal(item: CateringMenuConfig) {
-        this._active_id.next(item.id);
+        this._active_id.set(item.id);
         const ref = this._dialog.open(CateringMenuModalComponent, {
             data: item,
         });
         const add_subscription = ref.componentInstance.add.subscribe(() =>
-            this.addItem()
+            this.addItem(),
         );
         this.subscription('add-item', () => add_subscription.unsubscribe());
-        ref.afterClosed().subscribe(() => this._active_id.next(''));
+        ref.afterClosed().subscribe(() => this._active_id.set(''));
     }
 
     public async removeMenu(item: CateringMenuConfig) {
@@ -87,28 +83,28 @@ export class CateringStateService extends BaseClass {
                 content: `Are you sure you want to remove all the menu items for "${item.name}"?`,
                 icon: { content: 'delete_sweep' },
             },
-            this._dialog
+            this._dialog,
         );
         if (reason !== 'done') return;
-        const menu = { ...this._menu_map.getValue() };
+        const menu = { ...this._menu_map() };
         delete menu[item.id];
-        this._menu_map.next(menu);
+        this._menu_map.set(menu);
         this._store();
         close();
     }
 
     public async addItem(item: CateringItem = new CateringItem()) {
-        const categories = await this.categories.pipe(take(1)).toPromise();
+        const categories = this.categories();
         const { reason, close, metadata } = await openCateringItemModal(
             {
                 item,
                 categories,
             },
-            this._dialog
+            this._dialog,
         );
         if (reason !== 'done') return;
         console.log('Item:', metadata);
-        const menu = await this.menu.pipe(take(1)).toPromise();
+        const menu = [...this.menu()];
         const index = menu.findIndex((itm) => itm.id === item.id);
         if (index >= 0) menu.splice(index, 1, metadata.item);
         else menu.push(metadata.item);
@@ -119,7 +115,7 @@ export class CateringStateService extends BaseClass {
 
     public async addOption(
         item: CateringItem,
-        option: CateringOption = {} as any
+        option: CateringOption = {} as any,
     ) {
         const types = unique(item.options.map((i) => i.group));
         const { reason, close, metadata } = await openCateringItemOptionModal(
@@ -128,10 +124,10 @@ export class CateringStateService extends BaseClass {
                 option,
                 types,
             },
-            this._dialog
+            this._dialog,
         );
         if (reason !== 'done') return;
-        const menu = await this.menu.pipe(take(1)).toPromise();
+        const menu = [...this.menu()];
         const index = menu.findIndex((itm) => itm.id === item.id);
         if (index >= 0) menu.splice(index, 1, metadata.item);
         else menu.push(metadata.item);
@@ -150,11 +146,11 @@ export class CateringStateService extends BaseClass {
                     content: 'delete',
                 },
             },
-            this._dialog
+            this._dialog,
         );
         if (reason !== 'done') return;
         loading('Removing catering item...');
-        let menu = await this.menu.pipe(take(1)).toPromise();
+        let menu = this.menu();
         menu = menu.filter((itm) => item.id !== itm.id);
         this._updateMenu(menu);
         close();
@@ -171,42 +167,42 @@ export class CateringStateService extends BaseClass {
                     content: 'delete',
                 },
             },
-            this._dialog
+            this._dialog,
         );
         if (reason !== 'done') return;
         loading('Removing catering item option...');
-        const menu = await this.menu.pipe(take(1)).toPromise();
+        const menu = [...this.menu()];
         menu.splice(
             menu.findIndex((itm) => itm.id === item.id),
             1,
             new CateringItem({
                 ...item,
                 options: item.options.filter((opt) => opt.id !== option.id),
-            })
+            }),
         );
         this._updateMenu(menu);
         close();
     }
 
     private _updateMenu(menu: CateringItem[]) {
-        const old_menu = this._menu_map.getValue();
+        const old_menu = this._menu_map();
         const new_menu = { ...old_menu };
-        new_menu[this._active_id.getValue()] = menu;
-        this._menu_map.next(new_menu);
+        new_menu[this._active_id()] = menu;
+        this._menu_map.set(new_menu);
         this._store();
     }
 
     private _load() {
         const data = JSON.parse(
-            localStorage.getItem('PLACEOS_BUILD.MenuMap') || '{}'
+            localStorage.getItem('PLACEOS_BUILD.MenuMap') || '{}',
         );
-        this._menu_map.next(data);
+        this._menu_map.set(data);
     }
 
     private _store() {
         localStorage.setItem(
             'PLACEOS_BUILD.MenuMap',
-            JSON.stringify(this._menu_map.getValue())
+            JSON.stringify(this._menu_map()),
         );
     }
 }

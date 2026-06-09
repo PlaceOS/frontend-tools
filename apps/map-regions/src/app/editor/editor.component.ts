@@ -2,12 +2,11 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { BaseClass, sendMessage } from '@placeos-tools/common';
 
-import { EditorStateService } from './editor-state.service';
 import { MapCanvasComponent } from 'libs/components/src/lib/map-canvas.component';
-import { EditorOptionsComponent } from './editor-options.component';
 import { DynamicMapComponent } from '../../../../../libs/components/src/lib/map-viewer/dynamic-map.component';
 import { EditorControlsComponent } from './editor-controls.component';
-import { AsyncPipe } from '@angular/common';
+import { EditorOptionsComponent } from './editor-options.component';
+import { EditorStateService } from './editor-state.service';
 
 @Component({
     selector: '[map-regions-editor]',
@@ -15,16 +14,18 @@ import { AsyncPipe } from '@angular/common';
         <div controls class="relative h-full">
             <editor-options />
         </div>
-        <div class="relative h-full flex-1 bg-base-200">
-            <i-map class="w-screen h-screen"
-                [src]="url | async"
+        <div class="bg-base-200 relative h-full flex-1">
+            <i-map
+                class="h-screen w-screen"
+                [src]="url()"
                 [features]="features()"
                 [actions]="actions()"
                 [options]="{ disable_pan: true, disable_zoom: true }"
                 (aspect_ratio)="setRatio($event)"
-             />
-            <editor-controls class="absolute top-1/2 left-2 transform -translate-y-1/2"
-             />
+            />
+            <editor-controls
+                class="absolute top-1/2 left-2 -translate-y-1/2 transform"
+            />
         </div>
     `,
     styles: [
@@ -48,7 +49,6 @@ import { AsyncPipe } from '@angular/common';
         EditorOptionsComponent,
         DynamicMapComponent,
         EditorControlsComponent,
-        AsyncPipe,
     ],
 })
 export class EditorComponent extends BaseClass implements OnInit {
@@ -64,7 +64,7 @@ export class EditorComponent extends BaseClass implements OnInit {
             location: 'map-viewer-root',
             content: MapCanvasComponent,
             full_size: true,
-            data: { polygons$: this._editor.regions },
+            data: { polygons: this._editor.regions },
         },
     ]);
     public readonly ratio = signal(1);
@@ -96,17 +96,17 @@ export class EditorComponent extends BaseClass implements OnInit {
                 }).catch((_) => '');
                 this._editor.setURL(
                     src || params.get('src'),
-                    params.get('src')
+                    params.get('src'),
                 );
             }
         };
         this.subscription(
             'route.query',
-            this._route.queryParamMap.subscribe(handle_params)
+            this._route.queryParamMap.subscribe(handle_params),
         );
         this.subscription(
             'route.params',
-            this._route.paramMap.subscribe(handle_params)
+            this._route.paramMap.subscribe(handle_params),
         );
     }
 }

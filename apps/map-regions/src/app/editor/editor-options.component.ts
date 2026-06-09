@@ -1,4 +1,3 @@
-import { AsyncPipe } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatRipple } from '@angular/material/core';
@@ -26,7 +25,7 @@ import { EditorStateService } from './editor-state.service';
                         <label class="mb-2">Width:</label>
                         <compact-counter
                             placeholder="Map Width"
-                            [ngModel]="width | async"
+                            [ngModel]="width()"
                             (ngModelChange)="setWidth($event)"
                         />
                     </div>
@@ -34,7 +33,7 @@ import { EditorStateService } from './editor-state.service';
                         <label class="mb-2">Height:</label>
                         <compact-counter
                             placeholder="Map Height"
-                            [ngModel]="height | async"
+                            [ngModel]="height()"
                             (ngModelChange)="setHeight($event)"
                         />
                     </div>
@@ -59,8 +58,7 @@ import { EditorStateService } from './editor-state.service';
                         default
                         matRipple
                         [matTooltip]="
-                            ((embeded | async) ? 'Save' : 'Download') +
-                            ' Metadata'
+                            (embeded() ? 'Save' : 'Download') + ' Metadata'
                         "
                         (click)="saveMetadata()"
                     >
@@ -79,9 +77,9 @@ import { EditorStateService } from './editor-state.service';
                 <div
                     class="flex h-[50vh] w-full flex-1 flex-col gap-2 overflow-auto"
                 >
-                    @if ((regions | async)?.length) {
+                    @if (regions()?.length) {
                         @for (
-                            region of regions | async;
+                            region of regions();
                             track region.id;
                             let i = $index
                         ) {
@@ -89,7 +87,7 @@ import { EditorStateService } from './editor-state.service';
                                 class="hover:bg-base-200 even:bg-base-200 border-base-300 flex cursor-pointer items-center gap-2 rounded border p-1"
                                 (click)="setActiveRegion(region)"
                                 [class.!border-primary]="
-                                    region.id === (active_region | async)?.id
+                                    region.id === active_region()?.id
                                 "
                                 matRipple
                             >
@@ -165,7 +163,6 @@ import { EditorStateService } from './editor-state.service';
         FormsModule,
         MatRipple,
         IconComponent,
-        AsyncPipe,
         MatTooltipModule,
         CompactCounterComponent,
     ],
