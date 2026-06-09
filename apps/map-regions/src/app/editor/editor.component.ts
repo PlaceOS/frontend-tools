@@ -11,7 +11,7 @@ import { EditorStateService } from './editor-state.service';
 @Component({
     selector: '[map-regions-editor]',
     template: `
-        <div controls class="relative h-full">
+        <div controls class="bg-base-200 relative h-full">
             <editor-options />
         </div>
         <div class="bg-base-200 relative h-full flex-1">

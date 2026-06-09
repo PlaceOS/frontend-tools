@@ -12,7 +12,7 @@ import { EditorStateService } from './editor-state.service';
     selector: 'editor-options',
     template: `
         <div
-            class="bg-base-100 divide-base-300 border-base-300 flex h-full flex-col items-center divide-y border-r shadow"
+            class="bg-base-100 divide-base-300 border-base-300 my-2 ml-2 flex h-[calc(100vh-1rem)] flex-col items-center divide-y overflow-hidden rounded-xl border shadow-lg"
         >
             <div class="w-full">
                 <div
@@ -25,6 +25,7 @@ import { EditorStateService } from './editor-state.service';
                         <label class="mb-2">Width:</label>
                         <compact-counter
                             placeholder="Map Width"
+                            [render_fn]="size_fn"
                             [ngModel]="width()"
                             (ngModelChange)="setWidth($event)"
                         />
@@ -33,6 +34,7 @@ import { EditorStateService } from './editor-state.service';
                         <label class="mb-2">Height:</label>
                         <compact-counter
                             placeholder="Map Height"
+                            [render_fn]="size_fn"
                             [ngModel]="height()"
                             (ngModelChange)="setHeight($event)"
                         />
@@ -62,7 +64,7 @@ import { EditorStateService } from './editor-state.service';
                         "
                         (click)="saveMetadata()"
                     >
-                        <icon>save_alt</icon>
+                        <icon>{{ embeded() ? 'save' : 'save_alt' }}</icon>
                     </button>
                     <button
                         icon
@@ -180,6 +182,7 @@ export class EditorOptionsComponent {
     public readonly height = this._state.height;
     /** Map width */
     public readonly width = this._state.width;
+    public readonly size_fn = (v) => `${v}m`;
 
     public readonly setActiveRegion = (r) => this._state.setActiveRegion(r);
     public readonly newRegion = () => this._state.newRegion();
