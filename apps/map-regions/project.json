@@ -9,7 +9,7 @@
         "build": {
             "executor": "@angular/build:application",
             "options": {
-                "baseHref": ".",
+                "baseHref": "./",
                 "outputPath": "dist/apps/map-regions",
                 "index": "apps/map-regions/src/index.html",
                 "polyfills": ["apps/map-regions/src/polyfills.ts"],

@@ -9,7 +9,7 @@
         "build": {
             "executor": "@angular/build:application",
             "options": {
-                "baseHref": ".",
+                "baseHref": "./",
                 "outputPath": "dist/apps/app-settings",
                 "index": "apps/app-settings/src/index.html",
                 "polyfills": ["apps/app-settings/src/polyfills.ts"],

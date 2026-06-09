@@ -9,7 +9,7 @@
         "build": {
             "executor": "@angular/build:application",
             "options": {
-                "baseHref": ".",
+                "baseHref": "./",
                 "outputPath": "dist/apps/sensor-map",
                 "index": "apps/sensor-map/src/index.html",
                 "polyfills": ["apps/sensor-map/src/polyfills.ts"],

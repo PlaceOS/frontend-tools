@@ -9,7 +9,7 @@
         "build": {
             "executor": "@angular/build:application",
             "options": {
-                "baseHref": ".",
+                "baseHref": "./",
                 "outputPath": "dist/apps/placeos-setup",
                 "index": "apps/placeos-setup/src/index.html",
                 "polyfills": ["apps/placeos-setup/src/polyfills.ts"],
