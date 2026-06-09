@@ -3,6 +3,7 @@ import { Building, OrganisationService } from '../organisation/organisation.serv
 import { CarSpace, CarSpacesService } from './car-spaces.service';
 
 @Component({
+    standalone: false,
     selector: `car-space-details,[car-space-details]`,
     template: `
         <div
@@ -64,6 +65,7 @@ import { CarSpace, CarSpacesService } from './car-spaces.service';
             }
         `,
     ]
+
 })
 export class CarSpaceDetailsComponent {
     @Input() public item: CarSpace;

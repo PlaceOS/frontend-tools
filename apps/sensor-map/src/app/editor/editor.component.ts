@@ -5,6 +5,7 @@ import { BaseClass, sendMessage } from '@placeos-tools/common';
 import { EditorStateService } from './editor-state.service';
 
 @Component({
+    standalone: false,
     selector: '[sensor-map-editor]',
     template: `
         <div class="relative h-full flex-1">
@@ -53,6 +54,7 @@ import { EditorStateService } from './editor-state.service';
             }
         `,
     ],
+
 })
 export class EditorComponent extends BaseClass implements OnInit {
     /** URL of the map to display */

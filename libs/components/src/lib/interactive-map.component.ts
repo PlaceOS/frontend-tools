@@ -47,69 +47,71 @@ function isSamePoint(p1: Point, p2: Point): boolean {
 }
 
 @Component({
+    standalone: false,
     selector: `i-map,interactive-map`,
     template: `
         <div
-            #outlet
-            tabindex="0"
-            role="map"
-            class="absolute inset-0"
-            [class.hidden]="!src"
+          #outlet
+          tabindex="0"
+          role="map"
+          class="absolute inset-0"
+          [class.hidden]="!src"
         ></div>
-        <ng-container *ngIf="src; else empty_state">
+        @if (src) {
+          @if (!viewer || loading) {
             <mat-spinner
-                *ngIf="!viewer || loading"
-                class="absolute"
-                [diameter]="48"
+              class="absolute"
+              [diameter]="48"
             ></mat-spinner>
-        </ng-container>
-        <div hidden *ngIf="injectors?.length">
-            <ng-container
-                *ngFor="
-                    let element of features;
-                    let i = index;
-                    trackBy: trackByFn
-                "
-            >
-                <div *ngIf="element">
-                    <div
-                        #feature
-                        class="pointer-events-none"
-                        [attr.no-scale]="element.no_scale"
-                        [attr.el-id]="element.location"
-                        [attr.track-id]="element.track_id"
-                        [attr.view-id]="viewer"
-                        [ngSwitch]="type(element.content)"
+          }
+        } @else {
+          <div class="absolute inset-0 flex items-center justify-center">
+            <div class="opacity-30">No map</div>
+          </div>
+        }
+        @if (injectors?.length) {
+          <div hidden>
+            @for (
+              element of features; track trackByFn(i,
+              element); let i = $index) {
+              @if (element) {
+                <div>
+                  <div
+                    #feature
+                    class="pointer-events-none"
+                    [attr.no-scale]="element.no_scale"
+                    [attr.el-id]="element.location"
+                    [attr.track-id]="element.track_id"
+                    [attr.view-id]="viewer"
                     >
-                        <ng-container *ngSwitchCase="'component'">
-                            <ng-container
+                    @switch (type(element.content)) {
+                      @case ('component') {
+                        <ng-container
                                 *ngComponentOutlet="
                                     element.content;
                                     injector: injectors[i]
                                 "
-                            ></ng-container>
-                        </ng-container>
-                        <ng-container *ngSwitchCase="'html'">
-                            <div [innerHTML]="element.content | sanitize"></div>
-                        </ng-container>
-                        <ng-container *ngSwitchDefault>
-                            <ng-container
+                        ></ng-container>
+                      }
+                      @case ('html') {
+                        <div [innerHTML]="element.content | sanitize"></div>
+                      }
+                      @default {
+                        <ng-container
                                 *ngTemplateOutlet="
                                     element.content;
                                     context: element.data
                                 "
-                            ></ng-container>
-                        </ng-container>
-                    </div>
+                        ></ng-container>
+                      }
+                    }
+                  </div>
                 </div>
-            </ng-container>
-        </div>
-        <ng-template #empty_state>
-            <div class="absolute inset-0 flex items-center justify-center">
-                <div class="opacity-30">No map</div>
-            </div>
-        </ng-template>
-    `,
+              }
+            }
+          </div>
+        }
+        `,
     styles: [
         `
             :host {
@@ -124,6 +126,7 @@ function isSamePoint(p1: Point, p2: Point): boolean {
             }
         `,
     ],
+
 })
 export class InteractiveMapComponent
     extends BaseClass

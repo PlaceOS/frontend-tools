@@ -30,6 +30,7 @@ export interface MapPolygonData {
 }
 
 @Component({
+    standalone: false,
     selector: '[map-canvas]',
     template: `
         <canvas
@@ -40,6 +41,7 @@ export interface MapPolygonData {
         ></canvas>
     `,
     styles: [],
+
 })
 export class MapCanvasComponent extends BaseClass implements OnInit {
     public zoom = 1;

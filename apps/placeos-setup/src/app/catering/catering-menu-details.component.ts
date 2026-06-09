@@ -7,6 +7,7 @@ import {
 } from './catering-state.service';
 
 @Component({
+    standalone: false,
     selector: `catering-menu-details,[catering-menu-details]`,
     template: `
         <div
@@ -64,6 +65,7 @@ import {
             }
         `,
     ],
+
 })
 export class CateringMenuDetailsComponent {
     @Input() public item: CateringMenuConfig;

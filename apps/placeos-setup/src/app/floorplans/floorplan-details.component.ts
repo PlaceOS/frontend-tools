@@ -3,6 +3,7 @@ import { Building, OrganisationService } from '../organisation/organisation.serv
 import { FloorPlan, FloorPlansService } from './floorplans.service';
 
 @Component({
+    standalone: false,
     selector: `floorplan-details,[floorplan-details]`,
     template: `
         <div
@@ -56,6 +57,7 @@ import { FloorPlan, FloorPlansService } from './floorplans.service';
             }
         `,
     ]
+
 })
 export class FloorPlanDetailsComponent {
     @Input() public item: FloorPlan;

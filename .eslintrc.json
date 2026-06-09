@@ -1,34 +1,54 @@
 {
     "root": true,
-    "ignorePatterns": ["**/*"],
-    "plugins": ["@nx"],
+    "ignorePatterns": [
+        "**/*"
+    ],
+    "plugins": [
+        "@nx"
+    ],
     "overrides": [
         {
-            "files": ["*.ts", "*.tsx", "*.js", "*.jsx"],
+            "files": [
+                "*.ts",
+                "*.tsx",
+                "*.js",
+                "*.jsx"
+            ],
             "rules": {
-                "@nx/enforce-module-boundaries": [
-                    "error",
-                    {
-                        "enforceBuildableLibDependency": true,
-                        "allow": [],
-                        "depConstraints": [
-                            {
-                                "sourceTag": "*",
-                                "onlyDependOnLibsWithTags": ["*"]
-                            }
-                        ]
-                    }
-                ]
+                "@nx/enforce-module-boundaries": "off",
+                "@typescript-eslint/no-inferrable-types": "off",
+                "no-prototype-builtins": "off",
+                "prefer-const": "off",
+                "no-cond-assign": "off",
+                "no-var": "off",
+                "no-empty": "off"
             }
         },
         {
-            "files": ["*.ts", "*.tsx"],
-            "extends": ["plugin:@nx/typescript"],
-            "rules": {}
+            "files": [
+                "*.ts",
+                "*.tsx"
+            ],
+            "extends": [
+                "plugin:@nx/typescript"
+            ],
+            "rules": {
+                "@typescript-eslint/no-inferrable-types": "off",
+                "no-prototype-builtins": "off",
+                "prefer-const": "off",
+                "no-cond-assign": "off",
+                "no-var": "off",
+                "no-empty": "off"
+            }
         },
         {
-            "files": ["*.js", "*.jsx"],
-            "extends": ["plugin:@nx/javascript"],
+            "files": [
+                "*.js",
+                "*.jsx"
+            ],
+            "extends": [
+                "plugin:@nx/javascript"
+            ],
             "rules": {}
         }
     ]

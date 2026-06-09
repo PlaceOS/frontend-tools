@@ -2,6 +2,7 @@ import { Component, Input } from '@angular/core';
 import { BuildingLevel, OrganisationService } from './organisation.service';
 
 @Component({
+    standalone: false,
     selector: `org-level,[org-level]`,
     template: `
         <div class="absolute bg-neutral-800 left-0 top-0 bottom-px w-2 min-h-0"></div>
@@ -59,6 +60,7 @@ import { BuildingLevel, OrganisationService } from './organisation.service';
 }
         `,
     ],
+
 })
 export class OrganisationLevelComponent {
     @Input() public level: BuildingLevel;

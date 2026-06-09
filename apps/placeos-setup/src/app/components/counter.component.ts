@@ -2,6 +2,7 @@ import { Component, forwardRef, Input } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 @Component({
+    standalone: false,
     selector: 'a-counter',
     template: `
         <div
@@ -50,6 +51,7 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
             multi: true,
         },
     ],
+
 })
 export class CounterComponent implements ControlValueAccessor {
     /** Size of a single step */

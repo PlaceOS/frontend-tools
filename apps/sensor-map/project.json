@@ -75,7 +75,8 @@
                     "buildTarget": "sensor-map:build:development"
                 }
             },
-            "defaultConfiguration": "development"
+            "defaultConfiguration": "development",
+            "continuous": true
         },
         "extract-i18n": {
             "executor": "@angular-devkit/build-angular:extract-i18n",
@@ -91,7 +92,8 @@
             "executor": "@nx/jest:jest",
             "outputs": ["{workspaceRoot}/coverage/apps/sensor-map"],
             "options": {
-                "jestConfig": "apps/sensor-map/jest.config.ts"
+                "jestConfig": "apps/sensor-map/jest.config.ts",
+                "tsConfig": "apps/sensor-map/tsconfig.spec.json"
             }
         }
     }

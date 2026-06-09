@@ -4,66 +4,66 @@ import { map } from 'rxjs/operators';
 import { ZonesService } from './zoning.service';
 
 @Component({
+    standalone: false,
     selector: 'app-organisation',
     template: `
         <div class="flex flex-col h-full w-full overflow-hidden relative">
-            <header class="bg-neutral-700 p-2 space-x-2">
-                <button mat-button class="w-32" (click)="newZone()">
-                    Add Zone
-                </button>
-                <button
-                    mat-button
-                    class="w-48"
-                    *ngIf="(all_selected | async) || (some_selected | async)"
-                    (click)="removeSelected()"
+          <header class="bg-neutral-700 p-2 space-x-2">
+            <button mat-button class="w-32" (click)="newZone()">
+              Add Zone
+            </button>
+            @if ((all_selected | async) || (some_selected | async)) {
+              <button
+                mat-button
+                class="w-48"
+                (click)="removeSelected()"
                 >
-                    Remove Selected
-                </button>
-            </header>
-            <main class="w-full h-1/2 flex-1 overflow-auto">
-                <div table>
-                    <div
-                        class="sticky top-0 flex items-center bg-neutral-800 border-b border-neutral-500 w-full"
-                    >
-                        <div thead class="min-w-0 w-10">
-                            <mat-checkbox
-                                [ngModel]="all_selected | async"
-                                [indeterminate]="some_selected | async"
-                                (ngModelChange)="setSelected($event)"
-                            ></mat-checkbox>
-                        </div>
-                        <div thead>Name</div>
-                        <div thead>Building</div>
-                        <div thead>Level</div>
-                        <div thead>Capacity</div>
-                        <div thead class="w-64">Access Groups</div>
-                        <div thead>People Counting?</div>
-                        <div thead>Counting Method</div>
-                        <div thead>People Finding?</div>
-                        <div thead>Finding Method</div>
-                        <div thead>Locate Firewardens</div>
-                        <div thead>Locate First Aiders</div>
-                        <div thead>Locate COVID Marshalls</div>
-                    </div>
-                    <ng-container
-                        *ngIf="(zones | async)?.length; else empty_state"
-                    >
-                        <div
-                            zone-details
-                            *ngFor="let item of zones | async"
-                            [item]="item"
-                        ></div>
-                    </ng-container>
+                Remove Selected
+              </button>
+            }
+          </header>
+          <main class="w-full h-1/2 flex-1 overflow-auto">
+            <div table>
+              <div
+                class="sticky top-0 flex items-center bg-neutral-800 border-b border-neutral-500 w-full"
+                >
+                <div thead class="min-w-0 w-10">
+                  <mat-checkbox
+                    [ngModel]="all_selected | async"
+                    [indeterminate]="some_selected | async"
+                    (ngModelChange)="setSelected($event)"
+                  ></mat-checkbox>
                 </div>
-            </main>
-             <data-warning [levels]="true"></data-warning>
-        </div>
-        <ng-template #empty_state>
-            <div class="w-full h-full flex items-center justify-center p-8">
-                <p class="opacity-60">No zones setup for organisation</p>
+                <div thead>Name</div>
+                <div thead>Building</div>
+                <div thead>Level</div>
+                <div thead>Capacity</div>
+                <div thead class="w-64">Access Groups</div>
+                <div thead>People Counting?</div>
+                <div thead>Counting Method</div>
+                <div thead>People Finding?</div>
+                <div thead>Finding Method</div>
+                <div thead>Locate Firewardens</div>
+                <div thead>Locate First Aiders</div>
+                <div thead>Locate COVID Marshalls</div>
+              </div>
+              @if ((zones | async)?.length) {
+                @for (item of zones | async; track item) {
+                  <div
+                    zone-details
+                    [item]="item"
+                  ></div>
+                }
+              } @else {
+                <div class="w-full h-full flex items-center justify-center p-8">
+                  <p class="opacity-60">No zones setup for organisation</p>
+                </div>
+              }
             </div>
-        </ng-template>
-    `,
+          </main>
+          <data-warning [levels]="true"></data-warning>
+        </div>
+        `,
     styles: [
         `
             [table] {
@@ -83,6 +83,7 @@ import { ZonesService } from './zoning.service';
             }
         `,
     ],
+
 })
 export class ZonesComponent {
     public readonly zones = this._service.zones;

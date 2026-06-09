@@ -6,67 +6,66 @@ import { map } from 'rxjs/operators';
 import { OrganisationService } from './organisation.service';
 
 @Component({
+    standalone: false,
     selector: 'app-organisation',
     template: `
         <div class="flex flex-col h-full w-full overflow-hidden relative">
-            <header class="bg-neutral-700 p-2 space-x-2">
-                <button mat-button class="w-32" (click)="newBuilding()">
-                    Add Building
-                </button>
-                <button
-                    mat-button
-                    class="w-32"
-                    [disabled]="!(buildings | async)?.length"
-                    (click)="newLevel()"
+          <header class="bg-neutral-700 p-2 space-x-2">
+            <button mat-button class="w-32" (click)="newBuilding()">
+              Add Building
+            </button>
+            <button
+              mat-button
+              class="w-32"
+              [disabled]="!(buildings | async)?.length"
+              (click)="newLevel()"
+              >
+              Add Level
+            </button>
+          </header>
+          <main class="w-full h-1/2 flex-1 overflow-auto">
+            <div table>
+              <div
+                class="sticky top-0 flex items-center bg-neutral-800 border-b border-neutral-500 w-full"
                 >
-                    Add Level
-                </button>
-            </header>
-            <main class="w-full h-1/2 flex-1 overflow-auto">
-                <div table>
-                    <div
-                        class="sticky top-0 flex items-center bg-neutral-800 border-b border-neutral-500 w-full"
-                    >
-                        <div thead class="min-w-0">
-                            <mat-checkbox
-                                [ngModel]="all_selected | async"
-                                [indeterminate]="some_selected | async"
-                                (ngModelChange)="setSelected($event)"
-                            ></mat-checkbox>
-                        </div>
-                        <div
-                            thead
-                            class="min-w-0 w-10 text-black/0 select-none h-full"
-                        >
-                            Actions
-                        </div>
-                        <div thead class="w-56">Display Name</div>
-                        <div thead>Country</div>
-                        <div thead class="w-32">City</div>
-                        <div thead class="w-56">Street Address</div>
-                        <div thead>Floors</div>
-                        <div thead>Currency</div>
-                        <div thead>Visitors?</div>
-                        <div thead>Catering?</div>
-                    </div>
-                    <ng-container
-                        *ngIf="(buildings | async)?.length; else empty_state"
-                    >
-                        <div
-                            org-building
-                            *ngFor="let bld of buildings | async"
-                            [building]="bld"
-                        ></div>
-                    </ng-container>
+                <div thead class="min-w-0">
+                  <mat-checkbox
+                    [ngModel]="all_selected | async"
+                    [indeterminate]="some_selected | async"
+                    (ngModelChange)="setSelected($event)"
+                  ></mat-checkbox>
                 </div>
-            </main>
-        </div>
-        <ng-template #empty_state>
-            <div class="w-full h-full flex items-center justify-center p-8">
-                <p class="opacity-60">No buildings setup for organisation</p>
+                <div
+                  thead
+                  class="min-w-0 w-10 text-black/0 select-none h-full"
+                  >
+                  Actions
+                </div>
+                <div thead class="w-56">Display Name</div>
+                <div thead>Country</div>
+                <div thead class="w-32">City</div>
+                <div thead class="w-56">Street Address</div>
+                <div thead>Floors</div>
+                <div thead>Currency</div>
+                <div thead>Visitors?</div>
+                <div thead>Catering?</div>
+              </div>
+              @if ((buildings | async)?.length) {
+                @for (bld of buildings | async; track bld) {
+                  <div
+                    org-building
+                    [building]="bld"
+                  ></div>
+                }
+              } @else {
+                <div class="w-full h-full flex items-center justify-center p-8">
+                  <p class="opacity-60">No buildings setup for organisation</p>
+                </div>
+              }
             </div>
-        </ng-template>
-    `,
+          </main>
+        </div>
+        `,
     styles: [
         `
             [table] {
@@ -85,6 +84,7 @@ import { OrganisationService } from './organisation.service';
             }
         `,
     ],
+
 })
 export class OrganisationComponent extends BaseClass {
     public readonly buildings = this._org.buildings;

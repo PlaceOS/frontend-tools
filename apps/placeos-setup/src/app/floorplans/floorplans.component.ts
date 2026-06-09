@@ -6,63 +6,63 @@ import { FloorPlanExampleModalComponent } from './example-modal.component';
 import { FloorPlansService } from './floorplans.service';
 
 @Component({
+    standalone: false,
     selector: 'app-organisation',
     template: `
         <div class="flex flex-col h-full w-full overflow-hidden relative">
-            <header class="bg-neutral-700 p-2 space-x-2">
-                <button mat-button class="w-32" (click)="newFloorPlan()">
-                    Add Floor Plan
-                </button>
-                <button mat-button class="w-44" (click)="viewExample()">
-                    View Example Map
-                </button>
-                <button
-                    mat-button
-                    class="w-48"
-                    *ngIf="(all_selected | async) || (some_selected | async)"
-                    (click)="removeSelected()"
+          <header class="bg-neutral-700 p-2 space-x-2">
+            <button mat-button class="w-32" (click)="newFloorPlan()">
+              Add Floor Plan
+            </button>
+            <button mat-button class="w-44" (click)="viewExample()">
+              View Example Map
+            </button>
+            @if ((all_selected | async) || (some_selected | async)) {
+              <button
+                mat-button
+                class="w-48"
+                (click)="removeSelected()"
                 >
-                    Remove Selected
-                </button>
-            </header>
-            <main class="w-full h-1/2 flex-1 overflow-auto">
-                <div table>
-                    <div
-                        class="sticky top-0 flex items-center bg-neutral-800 border-b border-neutral-500 w-full"
-                    >
-                        <div thead class="min-w-0 w-10">
-                            <mat-checkbox
-                                [ngModel]="all_selected | async"
-                                [indeterminate]="some_selected | async"
-                                (ngModelChange)="setSelected($event)"
-                            ></mat-checkbox>
-                        </div>
-                        <div thead>Building</div>
-                        <div thead>Level</div>
-                        <div thead>Map File Available?</div>
-                        <div thead>Fix locations setup?</div>
-                        <div thead>Zones setup?</div>
-                        <div thead>Sensors setup?</div>
-                    </div>
-                    <ng-container
-                        *ngIf="(floorplans | async)?.length; else empty_state"
-                    >
-                        <div
-                            floorplan-details
-                            *ngFor="let item of floorplans | async"
-                            [item]="item"
-                        ></div>
-                    </ng-container>
+                Remove Selected
+              </button>
+            }
+          </header>
+          <main class="w-full h-1/2 flex-1 overflow-auto">
+            <div table>
+              <div
+                class="sticky top-0 flex items-center bg-neutral-800 border-b border-neutral-500 w-full"
+                >
+                <div thead class="min-w-0 w-10">
+                  <mat-checkbox
+                    [ngModel]="all_selected | async"
+                    [indeterminate]="some_selected | async"
+                    (ngModelChange)="setSelected($event)"
+                  ></mat-checkbox>
                 </div>
-            </main>
-             <data-warning [levels]="true"></data-warning>
-        </div>
-        <ng-template #empty_state>
-            <div class="w-full h-full flex items-center justify-center p-8">
-                <p class="opacity-60">No floor plans setup for organisation</p>
+                <div thead>Building</div>
+                <div thead>Level</div>
+                <div thead>Map File Available?</div>
+                <div thead>Fix locations setup?</div>
+                <div thead>Zones setup?</div>
+                <div thead>Sensors setup?</div>
+              </div>
+              @if ((floorplans | async)?.length) {
+                @for (item of floorplans | async; track item) {
+                  <div
+                    floorplan-details
+                    [item]="item"
+                  ></div>
+                }
+              } @else {
+                <div class="w-full h-full flex items-center justify-center p-8">
+                  <p class="opacity-60">No floor plans setup for organisation</p>
+                </div>
+              }
             </div>
-        </ng-template>
-    `,
+          </main>
+          <data-warning [levels]="true"></data-warning>
+        </div>
+        `,
     styles: [
         `
             [table] {
@@ -82,6 +82,7 @@ import { FloorPlansService } from './floorplans.service';
             }
         `,
     ],
+
 })
 export class FloorPlansComponent {
     public readonly floorplans = this._service.floorplans;

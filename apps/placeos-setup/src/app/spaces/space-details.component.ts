@@ -3,6 +3,7 @@ import { Building, OrganisationService } from '../organisation/organisation.serv
 import { Space, SpacesService } from './spaces.service';
 
 @Component({
+    standalone: false,
     selector: `space-details,[space-details]`,
     template: `
         <div
@@ -71,6 +72,7 @@ import { Space, SpacesService } from './spaces.service';
             }
         `,
     ]
+
 })
 export class SpaceDetailsComponent {
     @Input() public item: Space;

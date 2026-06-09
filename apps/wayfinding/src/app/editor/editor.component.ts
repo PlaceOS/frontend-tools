@@ -4,128 +4,133 @@ import { BaseClass, sendMessage } from '@placeos-tools/common';
 import { EditorStateService } from './editor-state.service';
 
 @Component({
+    standalone: false,
     selector: 'wayfinding-editor',
     template: `
         <div class="relative h-full flex-1">
-            <i-map
-                class="w-screen h-screen"
-                [src]="url | async"
-                [features]="features | async"
-                [actions]="actions"
-            ></i-map>
+          <i-map
+            class="w-screen h-screen"
+            [src]="url | async"
+            [features]="features | async"
+            [actions]="actions"
+          ></i-map>
         </div>
-        <div
+        @if ((method | async) !== 'testing') {
+          <div
             class="absolute top-2 left-2 bg-white rounded shadow p-2 w-52 space-y-2"
-            *ngIf="(method | async) !== 'testing'"
-        >
+            >
             <div class="flex flex-col flex-1">
-                <mat-form-field appearance="outline" class="w-full h-16">
-                    <mat-label>Map width</mat-label>
-                    <input
-                        matInput
-                        type="number"
-                        [ngModel]="(size | async)[0] / 100"
-                    />
-                    <span matSuffix>m</span>
-                </mat-form-field>
+              <mat-form-field appearance="outline" class="w-full h-16">
+                <mat-label>Map width</mat-label>
+                <input
+                  matInput
+                  type="number"
+                  [ngModel]="(size | async)[0] / 100"
+                  />
+                <span matSuffix>m</span>
+              </mat-form-field>
             </div>
-        </div>
-        <div
+          </div>
+        }
+        @if ((method | async) !== 'testing') {
+          <div
             class="absolute top-1/2 left-2 -translate-y-1/2 bg-white rounded shadow overflow-hidden flex flex-col divide-y divide-solid divide-gray-200"
-            *ngIf="(method | async) !== 'testing'"
-        >
-            <button
-                mat-icon-button
-                class="rounded-none border-x-0"
-                matTooltip="Add Waypoints"
-                matTooltipPosition="right"
-                [class.bg-primary]="(method | async) === 'add'"
-                [class.text-white]="(method | async) === 'add'"
-                (click)="setMethod('add')"
             >
-                <app-icon>add_location_alt</app-icon>
+            <button
+              mat-icon-button
+              class="rounded-none border-x-0"
+              matTooltip="Add Waypoints"
+              matTooltipPosition="right"
+              [class.bg-primary]="(method | async) === 'add'"
+              [class.text-white]="(method | async) === 'add'"
+              (click)="setMethod('add')"
+              >
+              <app-icon>add_location_alt</app-icon>
             </button>
             <button
-                mat-icon-button
-                class="rounded-none border-x-0"
-                matTooltip="Connect Waypoints"
-                matTooltipPosition="right"
-                [class.bg-primary]="(method | async) === 'link'"
-                [class.text-white]="(method | async) === 'link'"
-                (click)="setMethod('link')"
-            >
-                <app-icon>share</app-icon>
+              mat-icon-button
+              class="rounded-none border-x-0"
+              matTooltip="Connect Waypoints"
+              matTooltipPosition="right"
+              [class.bg-primary]="(method | async) === 'link'"
+              [class.text-white]="(method | async) === 'link'"
+              (click)="setMethod('link')"
+              >
+              <app-icon>share</app-icon>
             </button>
             <button
-                mat-icon-button
-                class="rounded-none border-x-0"
-                matTooltip="Remove Waypoints"
-                matTooltipPosition="right"
-                [class.bg-primary]="(method | async) === 'remove'"
-                [class.text-white]="(method | async) === 'remove'"
-                (click)="setMethod('remove')"
-            >
-                <app-icon>wrong_location</app-icon>
+              mat-icon-button
+              class="rounded-none border-x-0"
+              matTooltip="Remove Waypoints"
+              matTooltipPosition="right"
+              [class.bg-primary]="(method | async) === 'remove'"
+              [class.text-white]="(method | async) === 'remove'"
+              (click)="setMethod('remove')"
+              >
+              <app-icon>wrong_location</app-icon>
             </button>
             <button
-                mat-icon-button
-                class="rounded-none border-x-0"
-                matTooltip="Set Feature Location"
-                matTooltipPosition="right"
-                [class.bg-primary]="(method | async) === 'set-feature'"
-                [class.text-white]="(method | async) === 'set-feature'"
-                (click)="setMethod('set-feature')"
-            >
-                <app-icon>push_pin</app-icon>
+              mat-icon-button
+              class="rounded-none border-x-0"
+              matTooltip="Set Feature Location"
+              matTooltipPosition="right"
+              [class.bg-primary]="(method | async) === 'set-feature'"
+              [class.text-white]="(method | async) === 'set-feature'"
+              (click)="setMethod('set-feature')"
+              >
+              <app-icon>push_pin</app-icon>
             </button>
-        </div>
+          </div>
+        }
         <div
-            class="absolute bottom-2 right-2 flex items-center space-x-2 w-[36rem]"
-        >
+          class="absolute bottom-2 right-2 flex items-center space-x-2 w-[36rem]"
+          >
+          @if ((method | async) !== 'testing') {
             <button
-                mat-button
-                class="bg-white text-black flex-1"
-                *ngIf="(method | async) !== 'testing'"
-                (click)="setMethod('testing')"
-            >
-                <div class="flex items-center">
-                    <app-icon class="mr-4">save_alt</app-icon>
-                    Test Wayfinding
-                </div>
+              mat-button
+              class="bg-white text-black flex-1"
+              (click)="setMethod('testing')"
+              >
+              <div class="flex items-center">
+                <app-icon class="mr-4">save_alt</app-icon>
+                Test Wayfinding
+              </div>
             </button>
+          }
+          @if ((method | async) === 'testing') {
             <button
-                mat-button
-                class="bg-white text-black flex-1"
-                *ngIf="(method | async) === 'testing'"
-                (click)="setMethod('add')"
-            >
-                <div class="flex items-center">
-                    <app-icon class="mr-4">save_alt</app-icon>
-                    Configure Wayfinding
-                </div>
+              mat-button
+              class="bg-white text-black flex-1"
+              (click)="setMethod('add')"
+              >
+              <div class="flex items-center">
+                <app-icon class="mr-4">save_alt</app-icon>
+                Configure Wayfinding
+              </div>
             </button>
-            <button
-                mat-button
-                class="bg-white text-black flex-1"
-                (click)="saveMetadata()"
+          }
+          <button
+            mat-button
+            class="bg-white text-black flex-1"
+            (click)="saveMetadata()"
             >
-                <div class="flex items-center">
-                    <app-icon class="mr-4">save_alt</app-icon>
-                    {{ (embeded | async) ? 'Save' : 'Download' }} Metadata
-                </div>
-            </button>
-            <button
-                mat-button
-                class="bg-white text-black flex-1"
-                (click)="copyMetadata()"
+            <div class="flex items-center">
+              <app-icon class="mr-4">save_alt</app-icon>
+              {{ (embeded | async) ? 'Save' : 'Download' }} Metadata
+            </div>
+          </button>
+          <button
+            mat-button
+            class="bg-white text-black flex-1"
+            (click)="copyMetadata()"
             >
-                <div class="flex items-center">
-                    <app-icon class="mr-4">content_copy</app-icon>
-                    Copy Metadata
-                </div>
-            </button>
+            <div class="flex items-center">
+              <app-icon class="mr-4">content_copy</app-icon>
+              Copy Metadata
+            </div>
+          </button>
         </div>
-    `,
+        `,
     styles: [
         `
             :host {
@@ -141,6 +146,7 @@ import { EditorStateService } from './editor-state.service';
             }
         `,
     ],
+
 })
 export class WayfindingEditorComponent extends BaseClass {
     public readonly url = this._editor.url;

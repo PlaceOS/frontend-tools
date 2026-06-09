@@ -6,6 +6,7 @@ import { EditorStateService } from './editor-state.service';
 import { MapCanvasComponent } from 'libs/components/src/lib/map-canvas.component';
 
 @Component({
+    standalone: false,
     selector: '[map-regions-editor]',
     template: `
         <div controls class="relative h-full">
@@ -42,6 +43,7 @@ import { MapCanvasComponent } from 'libs/components/src/lib/map-canvas.component
             }
         `,
     ],
+
 })
 export class EditorComponent extends BaseClass implements OnInit {
     /** URL of the map to display */

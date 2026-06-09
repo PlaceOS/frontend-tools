@@ -9,236 +9,246 @@ import { OrganisationService } from '../organisation/organisation.service';
 import { Zone } from './zoning.service';
 
 @Component({
+    standalone: false,
     selector: 'zone-modal',
     template: `
         <div
-            class="absolute inset-0 bg-white dark:bg-neutral-600 dark:text-white flex flex-col"
-        >
-            <header
-                class="w-full bg-blue-300 dark:bg-neutral-700 border-b border-gray-200 dark:border-neutral-500"
+          class="absolute inset-0 bg-white dark:bg-neutral-600 dark:text-white flex flex-col"
+          >
+          <header
+            class="w-full bg-blue-300 dark:bg-neutral-700 border-b border-gray-200 dark:border-neutral-500"
             >
-                <div class="mx-auto w-[640px] relative p-4 text-center">
-                    <div class="font-medium">
-                        {{ form.value.id ? 'Edit' : 'New' }} Zone
-                    </div>
-                    <button
-                        mat-icon-button
-                        mat-dialog-close
-                        class="absolute top-1/2 right-0 -translate-y-1/2"
-                        *ngIf="!loading"
+            <div class="mx-auto w-[640px] relative p-4 text-center">
+              <div class="font-medium">
+                {{ form.value.id ? 'Edit' : 'New' }} Zone
+              </div>
+              @if (!loading) {
+                <button
+                  mat-icon-button
+                  mat-dialog-close
+                  class="absolute top-1/2 right-0 -translate-y-1/2"
+                  >
+                  <app-icon>close</app-icon>
+                </button>
+              }
+            </div>
+          </header>
+          @if (!loading) {
+            <main
+              class="mx-auto w-[640px] p-4 flex-1 h-1/2 overflow-auto"
+              [formGroup]="form"
+              >
+              <div class="w-full">
+                <label for="name">
+                  Name <span class="text-pending">*</span>
+                </label>
+                <mat-form-field appearance="outline" class="w-full">
+                  <input
+                    matInput
+                    name="name"
+                    formControlName="name"
+                    placeholder="Level Name"
+                    />
+                  <mat-hint>
+                    Organisational name for the zone
+                  </mat-hint>
+                  <mat-error>Name is required</mat-error>
+                </mat-form-field>
+              </div>
+              <div class="w-full">
+                <label for="building">Building</label>
+                <mat-form-field appearance="outline" class="w-full">
+                  <mat-select
+                    name="building"
+                    formControlName="building_id"
+                    placeholder="Building"
                     >
-                        <app-icon>close</app-icon>
-                    </button>
-                </div>
-            </header>
-            <ng-container *ngIf="!loading; else load_state">
-                <main
-                    class="mx-auto w-[640px] p-4 flex-1 h-1/2 overflow-auto"
-                    [formGroup]="form"
-                >
-                    <div class="w-full">
-                        <label for="name">
-                            Name <span class="text-pending">*</span>
-                        </label>
-                        <mat-form-field appearance="outline" class="w-full">
-                            <input
-                                matInput
-                                name="name"
-                                formControlName="name"
-                                placeholder="Level Name"
-                            />
-                            <mat-hint>
-                                Organisational name for the zone
-                            </mat-hint>
-                            <mat-error>Name is required</mat-error>
-                        </mat-form-field>
-                    </div>
-                    <div class="w-full">
-                        <label for="building">Building</label>
-                        <mat-form-field appearance="outline" class="w-full">
-                            <mat-select
-                                name="building"
-                                formControlName="building_id"
-                                placeholder="Building"
-                            >
-                                <mat-option
-                                    *ngFor="let item of building_list | async"
-                                    [value]="item.id"
-                                >
-                                    {{ item.display_name || item.name }}
-                                </mat-option>
-                            </mat-select>
-                            <mat-hint>
-                                Building that the level resides in
-                            </mat-hint>
-                            <mat-error>Building is required</mat-error>
-                        </mat-form-field>
-                    </div>
-                    <div class="w-full">
-                        <label for="level">Level</label>
-                        <mat-form-field appearance="outline" class="w-full">
-                            <mat-select
-                                name="level"
-                                formControlName="level_id"
-                                placeholder="Level"
-                            >
-                                <mat-option
-                                    *ngFor="let item of level_list | async"
-                                    [value]="item.id"
-                                >
-                                    {{ item.display_name || item.name }}
-                                </mat-option>
-                            </mat-select>
-                            <mat-hint>
-                                Building Level that the zone resides in
-                            </mat-hint>
-                            <mat-error>Building Level is required</mat-error>
-                        </mat-form-field>
-                    </div>
-                    <div class="w-full">
-                        <label for="whi">Whitelist User Groups</label>
-                        <mat-form-field appearance="outline" class="w-full">
-                            <mat-chip-list
-                                #groupList
-                                aria-label="Whitelist User Groups"
-                            >
-                                <mat-chip
-                                    *ngFor="
-                                        let item of form.value.whitelist_groups
-                                    "
+                    @for (item of building_list | async; track item) {
+                      <mat-option
+                        [value]="item.id"
+                        >
+                        {{ item.display_name || item.name }}
+                      </mat-option>
+                    }
+                  </mat-select>
+                  <mat-hint>
+                    Building that the level resides in
+                  </mat-hint>
+                  <mat-error>Building is required</mat-error>
+                </mat-form-field>
+              </div>
+              <div class="w-full">
+                <label for="level">Level</label>
+                <mat-form-field appearance="outline" class="w-full">
+                  <mat-select
+                    name="level"
+                    formControlName="level_id"
+                    placeholder="Level"
+                    >
+                    @for (item of level_list | async; track item) {
+                      <mat-option
+                        [value]="item.id"
+                        >
+                        {{ item.display_name || item.name }}
+                      </mat-option>
+                    }
+                  </mat-select>
+                  <mat-hint>
+                    Building Level that the zone resides in
+                  </mat-hint>
+                  <mat-error>Building Level is required</mat-error>
+                </mat-form-field>
+              </div>
+              <div class="w-full">
+                <label for="whi">Whitelist User Groups</label>
+                <mat-form-field appearance="outline" class="w-full">
+                  <mat-chip-list
+                    #groupList
+                    aria-label="Whitelist User Groups"
+                    >
+                    @for (
+                      item of form.value.whitelist_groups
+                      ; track
+                      item) {
+                      <mat-chip
                                     (removed)="
                                         remove(
                                             item,
                                             form.get('whitelist_groups')
                                         )
                                     "
-                                >
-                                    {{ item }}
-                                    <button matChipRemove>
-                                        <app-icon>cancel</app-icon>
-                                    </button>
-                                </mat-chip>
-                                <input
-                                    placeholder="New group..."
-                                    [matChipInputFor]="groupList"
+                        >
+                        {{ item }}
+                        <button matChipRemove>
+                          <app-icon>cancel</app-icon>
+                        </button>
+                      </mat-chip>
+                    }
+                    <input
+                      placeholder="New group..."
+                      [matChipInputFor]="groupList"
                                     [matChipInputSeparatorKeyCodes]="
                                         separatorKeysCodes
                                     "
-                                    [matChipInputAddOnBlur]="addOnBlur"
+                      [matChipInputAddOnBlur]="addOnBlur"
                                     (matChipInputTokenEnd)="
                                         add(
                                             $event,
                                             form.get('whitelist_groups')
                                         )
                                     "
-                                />
-                            </mat-chip-list>
-                            <mat-hint>
-                                Users groups to limit access to this zone
-                            </mat-hint>
-                            <mat-error>Display name is required</mat-error>
-                        </mat-form-field>
-                    </div>
-                    <div class="w-full py-2">
-                        <mat-checkbox
-                            name="people-counting"
-                            formControlName="people_counting"
+                      />
+                  </mat-chip-list>
+                  <mat-hint>
+                    Users groups to limit access to this zone
+                  </mat-hint>
+                  <mat-error>Display name is required</mat-error>
+                </mat-form-field>
+              </div>
+              <div class="w-full py-2">
+                <mat-checkbox
+                  name="people-counting"
+                  formControlName="people_counting"
+                  >
+                  Should people counting be enabled?
+                </mat-checkbox>
+              </div>
+              @if (form.value.people_counting) {
+                <div class="w-full">
+                  <label for="counting-method"
+                    >People Counting Method</label
+                    >
+                    <mat-form-field appearance="outline" class="w-full">
+                      <input
+                        matInput
+                        name="counting-method"
+                        formControlName="counting_method"
+                        placeholder="People counting method"
+                        />
+                      <mat-hint>
+                        Method that PlaceOS should use for performing
+                        people counting operations
+                      </mat-hint>
+                      <mat-error
+                        >People counting method is required</mat-error
                         >
-                            Should people counting be enabled?
-                        </mat-checkbox>
+                      </mat-form-field>
                     </div>
-                    <div class="w-full" *ngIf="form.value.people_counting">
-                        <label for="counting-method"
-                            >People Counting Method</label
+                  }
+                  <div class="w-full py-2">
+                    <mat-checkbox
+                      name="people-finding"
+                      formControlName="people_finding"
+                      >
+                      Should people finding be enabled?
+                    </mat-checkbox>
+                  </div>
+                  @if (form.value.people_finding) {
+                    <div class="w-full">
+                      <label for="finding-method"
+                        >People Finding Method</label
                         >
                         <mat-form-field appearance="outline" class="w-full">
-                            <input
-                                matInput
-                                name="counting-method"
-                                formControlName="counting_method"
-                                placeholder="People counting method"
+                          <input
+                            matInput
+                            name="finding-method"
+                            formControlName="finding_method"
+                            placeholder="People finding method"
                             />
-                            <mat-hint>
-                                Method that PlaceOS should use for performing
-                                people counting operations
-                            </mat-hint>
-                            <mat-error
-                                >People counting method is required</mat-error
+                          <mat-hint>
+                            Method that PlaceOS should use for performing
+                            people finding operations
+                          </mat-hint>
+                          <mat-error
+                            >People finding method is required</mat-error
                             >
-                        </mat-form-field>
-                    </div>
-                    <div class="w-full py-2">
+                          </mat-form-field>
+                        </div>
+                      }
+                      <div class="w-full py-2">
                         <mat-checkbox
-                            name="people-finding"
-                            formControlName="people_finding"
-                        >
-                            Should people finding be enabled?
+                          name="locatable-firewarden"
+                          formControlName="locatable_firewarden"
+                          >
+                          Should firewardens be locatable?
                         </mat-checkbox>
-                    </div>
-                    <div class="w-full" *ngIf="form.value.people_finding">
-                        <label for="finding-method"
-                            >People Finding Method</label
-                        >
-                        <mat-form-field appearance="outline" class="w-full">
-                            <input
-                                matInput
-                                name="finding-method"
-                                formControlName="finding_method"
-                                placeholder="People finding method"
-                            />
-                            <mat-hint>
-                                Method that PlaceOS should use for performing
-                                people finding operations
-                            </mat-hint>
-                            <mat-error
-                                >People finding method is required</mat-error
-                            >
-                        </mat-form-field>
-                    </div>
-                    <div class="w-full py-2">
+                      </div>
+                      <div class="w-full py-2">
                         <mat-checkbox
-                            name="locatable-firewarden"
-                            formControlName="locatable_firewarden"
-                        >
-                            Should firewardens be locatable?
+                          name="auto-release"
+                          formControlName="locatable_firstaiders"
+                          >
+                          Should First Aiders be locatable?
                         </mat-checkbox>
-                    </div>
-                    <div class="w-full py-2">
+                      </div>
+                      <div class="w-full py-2">
                         <mat-checkbox
-                            name="auto-release"
-                            formControlName="locatable_firstaiders"
-                        >
-                            Should First Aiders be locatable?
+                          name="locatable-marshall"
+                          formControlName="locatable_marshall"
+                          >
+                          Should COVID marshalls be locatable?
                         </mat-checkbox>
-                    </div>
-                    <div class="w-full py-2">
-                        <mat-checkbox
-                            name="locatable-marshall"
-                            formControlName="locatable_marshall"
-                        >
-                            Should COVID marshalls be locatable?
-                        </mat-checkbox>
-                    </div>
-                </main>
-                <footer
-                    class="w-full bg-blue-300 dark:bg-neutral-700 border-t border-gray-200 dark:border-neutral-500"
-                >
-                    <div class="mx-auto w-[640px] relative p-4">
+                      </div>
+                    </main>
+                    <footer
+                      class="w-full bg-blue-300 dark:bg-neutral-700 border-t border-gray-200 dark:border-neutral-500"
+                      >
+                      <div class="mx-auto w-[640px] relative p-4">
                         <button mat-button (click)="save()" class="w-32">
-                            Save
+                          Save
                         </button>
+                      </div>
+                    </footer>
+                  } @else {
+                    <div class="mx-auto w-[640px] p-4 flex-1 h-1/2">
+                      <mat-spinner></mat-spinner>
+                      <p>Saving zone data...</p>
                     </div>
-                </footer>
-            </ng-container>
-        </div>
-        <ng-template #load_state>
-            <div class="mx-auto w-[640px] p-4 flex-1 h-1/2">
-                <mat-spinner></mat-spinner>
-                <p>Saving zone data...</p>
-            </div>
-        </ng-template>
-    `,
+                  }
+                </div>
+        `,
     styles: [``],
+
 })
 export class ZoneModalComponent {
     @Output() public readonly onSave = new EventEmitter<Partial<Zone>>();

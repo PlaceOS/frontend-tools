@@ -75,7 +75,8 @@
                     "buildTarget": "app-settings:build:development"
                 }
             },
-            "defaultConfiguration": "development"
+            "defaultConfiguration": "development",
+            "continuous": true
         },
         "extract-i18n": {
             "executor": "@angular-devkit/build-angular:extract-i18n",
@@ -91,7 +92,8 @@
             "executor": "@nx/jest:jest",
             "outputs": ["{workspaceRoot}/coverage/apps/app-settings"],
             "options": {
-                "jestConfig": "apps/app-settings/jest.config.ts"
+                "jestConfig": "apps/app-settings/jest.config.ts",
+                "tsConfig": "apps/app-settings/tsconfig.spec.json"
             }
         }
     }

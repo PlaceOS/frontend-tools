@@ -3,6 +3,7 @@ import { Building, OrganisationService } from '../organisation/organisation.serv
 import { AccessControl, AccessControlService } from './access-control.service';
 
 @Component({
+    standalone: false,
     selector: `access-control-details,[access-control-details]`,
     template: `
         <div
@@ -56,6 +57,7 @@ import { AccessControl, AccessControlService } from './access-control.service';
             }
         `,
     ]
+
 })
 export class AccessControlDetailsComponent {
     @Input() public item: AccessControl;

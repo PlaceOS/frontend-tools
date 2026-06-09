@@ -10,8 +10,11 @@ module.exports = {
         'jest-preset-angular/build/serializers/ng-snapshot',
         'jest-preset-angular/build/serializers/html-comment',
     ],
+    transformIgnorePatterns: [
+        'node_modules/(?!(.*\.mjs$|@angular/common/locales/.*\.js$))',
+    ],
     transform: {
-        '^.+\\.(ts|js|html)$': [
+        '^.+\\.(ts|js|mjs|html|svg)$': [
             'jest-preset-angular',
             {
                 tsconfig: '<rootDir>/tsconfig.spec.json',

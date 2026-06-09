@@ -8,6 +8,7 @@ export interface MapPointData {
 }
 
 @Component({
+    standalone: false,
     selector: '[map-point]',
     template: `
         <div (click)="onClick($event)">
@@ -44,6 +45,7 @@ export interface MapPointData {
         </ng-template>
     `,
     styles: [``],
+
 })
 export class MapPointComponent {
     /** Whether point should be displayed as active */

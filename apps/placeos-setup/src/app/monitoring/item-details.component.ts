@@ -6,6 +6,7 @@ import {
 import { BuildingMonitoring, MonitoringService } from './monitoring.service';
 
 @Component({
+    standalone: false,
     selector: `monitoring-item-details,[monitoring-item-details]`,
     template: `
         <div
@@ -66,6 +67,7 @@ import { BuildingMonitoring, MonitoringService } from './monitoring.service';
             }
         `,
     ],
+
 })
 export class MonitoringItemDetailsComponent {
     @Input() public item: BuildingMonitoring;

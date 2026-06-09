@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 
 @Component({
+    standalone: false,
     selector: 'wayfindiing-bootstrap',
     template: `
         <div class="absolute inset-0 bg-gray-100 flex justify-center">
@@ -31,6 +32,7 @@ import { Component } from '@angular/core';
         </div>
     `,
     styles: [``],
+
 })
 export class BootstrapComponent {
     /** URL of the map to edit */

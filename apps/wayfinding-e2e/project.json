@@ -10,8 +10,7 @@
             "executor": "@nx/cypress:cypress",
             "options": {
                 "cypressConfig": "apps/wayfinding-e2e/cypress.json",
-                "devServerTarget": "wayfinding:serve:development",
-                "tsConfig": "apps/wayfinding-e2e/tsconfig.json"
+                "devServerTarget": "wayfinding:serve:development"
             },
             "configurations": {
                 "production": {

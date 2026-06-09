@@ -6,6 +6,7 @@ import {
 import { Zone, ZonesService } from './zoning.service';
 
 @Component({
+    standalone: false,
     selector: `zone-details,[zone-details]`,
     template: `
         <div
@@ -71,6 +72,7 @@ import { Zone, ZonesService } from './zoning.service';
             }
         `,
     ],
+
 })
 export class ZoneDetailsComponent {
     @Input() public item: Zone;

@@ -5,29 +5,31 @@ import { map } from 'rxjs/operators';
 import { CateringStateService } from './catering-state.service';
 
 @Component({
+    standalone: false,
     selector: 'catering-menu',
     template: `
         <mat-tab-group class="h-full">
-            <mat-tab label="All Items">
-                <ng-container *ngIf="(menu | async)?.length; else empty_state">
-                    <ng-container *ngFor="let item of menu | async">
-                        <div catering-menu-item [item]="item"></div>
-                    </ng-container>
-                </ng-container>
-            </mat-tab>
-            <mat-tab *ngFor="let group of categories | async" [label]="group">
-                <ng-container *ngFor="let item of (tab_menu | async)[group]">
-                    <div catering-menu-item [item]="item"></div>
-                </ng-container>
-            </mat-tab>
-        </mat-tab-group>
-        <ng-template #empty_state>
-            <div class="flex flex-col items-center p-8 space-y-2">
+          <mat-tab label="All Items">
+            @if ((menu | async)?.length) {
+              @for (item of menu | async; track item) {
+                <div catering-menu-item [item]="item"></div>
+              }
+            } @else {
+              <div class="flex flex-col items-center p-8 space-y-2">
                 <app-icon>close</app-icon>
                 <p>No items in menu</p>
-            </div>
-        </ng-template>
-    `,
+              </div>
+            }
+          </mat-tab>
+          @for (group of categories | async; track group) {
+            <mat-tab [label]="group">
+              @for (item of (tab_menu | async)[group]; track item) {
+                <div catering-menu-item [item]="item"></div>
+              }
+            </mat-tab>
+          }
+        </mat-tab-group>
+        `,
     styles: [
         `
             :host {
@@ -38,6 +40,7 @@ import { CateringStateService } from './catering-state.service';
             }
         `,
     ],
+
 })
 export class CateringMenuComponent {
     /** Observable for the currently active menu */

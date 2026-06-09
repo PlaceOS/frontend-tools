@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { EditorStateService } from './editor-state.service';
 
 @Component({
+    standalone: false,
     selector: 'editor-controls',
     template: `
         <div
@@ -52,6 +53,7 @@ import { EditorStateService } from './editor-state.service';
             }
         `,
     ],
+
 })
 export class EditorControlsComponent {
     public get action() {

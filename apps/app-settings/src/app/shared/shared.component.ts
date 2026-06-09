@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { SettingsStateService } from '../settings-state.service';
 
 @Component({
+    standalone: false,
     selector: 'app-shared',
     template: `
         <form [formGroup]="form" class="w-full">
@@ -83,6 +84,7 @@ import { SettingsStateService } from '../settings-state.service';
         }
         `,
     ],
+
 })
 export class AppSharedComponent {
     public readonly form = this._state.form;

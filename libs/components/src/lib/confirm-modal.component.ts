@@ -32,45 +32,48 @@ export const CONFIRM_METADATA = {
 };
 
 @Component({
+    standalone: false,
     selector: 'confirm-modal',
     template: `
         <header class="p-4 border-b border-gray-200 dark:border-neutral-500">
-            <h3 class="font-medium">{{ title }}</h3>
+          <h3 class="font-medium">{{ title }}</h3>
         </header>
-        <main
-            *ngIf="!loading; else load_state"
+        @if (!loading) {
+          <main
             class="flex flex-col items-center space-y-2 p-4"
-        >
+            >
             <app-icon [icon]="icon" class="text-5xl"></app-icon>
             <p
-                content
-                class="text-center text-sm w-[22rem]"
-                [innerHTML]="content"
+              content
+              class="text-center text-sm w-[22rem]"
+              [innerHTML]="content"
             ></p>
-        </main>
-        <footer
+          </main>
+        } @else {
+          <main loading>
+            <div
+              class="w-full h-48 flex flex-col items-center justify-center space-y-2"
+              >
+              <mat-spinner diameter="32"></mat-spinner>
+              <p>{{ loading }}</p>
+            </div>
+          </main>
+        }
+        @if (!loading) {
+          <footer
             class="flex items-center justify-center p-2 space-x-2"
-            *ngIf="!loading"
-        >
+            >
             <button mat-button class="inverse w-32" mat-dialog-close>
-                {{ cancel_text }}
+              {{ cancel_text }}
             </button>
             <button mat-button name="accept" class="w-32" (click)="onConfirm()">
-                {{ confirm_text }}
+              {{ confirm_text }}
             </button>
-        </footer>
-        <ng-template #load_state>
-            <main loading>
-                <div
-                    class="w-full h-48 flex flex-col items-center justify-center space-y-2"
-                >
-                    <mat-spinner diameter="32"></mat-spinner>
-                    <p>{{ loading }}</p>
-                </div>
-            </main>
-        </ng-template>
-    `,
+          </footer>
+        }
+        `,
     styles: [``],
+
 })
 export class ConfirmModalComponent {
     /** Loading state */

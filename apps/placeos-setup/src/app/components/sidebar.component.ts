@@ -1,37 +1,39 @@
 import { Component } from '@angular/core';
 
 @Component({
+    standalone: false,
     selector: 'sidebar',
     template: `
         <div
-            class="flex flex-col bg-neutral-800 w-48 text-white h-full relative"
-        >
-            <div class="flex flex-col items-center space-y-2">
-                <a
-                    [routerLink]="['/']"
-                    class="font-heading text-4xl mt-4 w-[calc(100%-2rem)] dark:text-white ml-16 sm:ml-0 pb-5"
-                >
-                    Place<span class="text-primary font-heading">OS</span>
-                </a>
-                <div
-                    class="absolute top-11 inset-x-0 text-xs text-center italic font-cursive pr-2 pb-1 border-b border-neutral-600"
-                >
-                    Build Sheet
-                </div>
-                <a
-                    menu
-                    matRipple
-                    class="flex items-center p-2 rounded space-x-2 w-[calc(100%-2rem)]"
-                    *ngFor="let item of items"
-                    [routerLink]="[item.route]"
-                    routerLinkActive="active"
-                >
-                    <app-icon [icon]="item.icon"></app-icon>
-                    <p>{{ item?.name }}</p>
-                </a>
+          class="flex flex-col bg-neutral-800 w-48 text-white h-full relative"
+          >
+          <div class="flex flex-col items-center space-y-2">
+            <a
+              [routerLink]="['/']"
+              class="font-heading text-4xl mt-4 w-[calc(100%-2rem)] dark:text-white ml-16 sm:ml-0 pb-5"
+              >
+              Place<span class="text-primary font-heading">OS</span>
+            </a>
+            <div
+              class="absolute top-11 inset-x-0 text-xs text-center italic font-cursive pr-2 pb-1 border-b border-neutral-600"
+              >
+              Build Sheet
             </div>
+            @for (item of items; track item) {
+              <a
+                menu
+                matRipple
+                class="flex items-center p-2 rounded space-x-2 w-[calc(100%-2rem)]"
+                [routerLink]="[item.route]"
+                routerLinkActive="active"
+                >
+                <app-icon [icon]="item.icon"></app-icon>
+                <p>{{ item?.name }}</p>
+              </a>
+            }
+          </div>
         </div>
-    `,
+        `,
     styles: [
         `
             a.active {
@@ -40,6 +42,7 @@ import { Component } from '@angular/core';
             }
         `,
     ],
+
 })
 export class SidebarComponent {
     public readonly items = [

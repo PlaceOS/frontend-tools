@@ -1,12 +1,20 @@
 /* eslint-disable */
-export default {
+module.exports = {
     displayName: 'wayfinding',
-    preset: '../../jest.preset.ts',
+    preset: '../../jest.preset.js',
     setupFilesAfterEnv: ['<rootDir>/src/test-setup.ts'],
     globals: {},
     coverageDirectory: '../../coverage/apps/wayfinding',
+    snapshotSerializers: [
+        'jest-preset-angular/build/serializers/no-ng-attributes',
+        'jest-preset-angular/build/serializers/ng-snapshot',
+        'jest-preset-angular/build/serializers/html-comment',
+    ],
+    transformIgnorePatterns: [
+        'node_modules/(?!(.*\.mjs$|@angular/common/locales/.*\.js$))',
+    ],
     transform: {
-        '^.+\\.(ts|mjs|js|html)$': [
+        '^.+\\.(ts|js|mjs|html|svg)$': [
             'jest-preset-angular',
             {
                 tsconfig: '<rootDir>/tsconfig.spec.json',
@@ -14,10 +22,4 @@ export default {
             },
         ],
     },
-    transformIgnorePatterns: ['node_modules/(?!.*\\.mjs$)'],
-    snapshotSerializers: [
-        'jest-preset-angular/build/serializers/no-ng-attributes',
-        'jest-preset-angular/build/serializers/ng-snapshot',
-        'jest-preset-angular/build/serializers/html-comment',
-    ],
 };

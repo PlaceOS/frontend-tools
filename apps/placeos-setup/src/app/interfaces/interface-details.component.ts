@@ -2,6 +2,7 @@ import { Component, Input } from '@angular/core';
 import { Interface, InterfacesService } from './interfaces.service';
 
 @Component({
+    standalone: false,
     selector: `interface-details,[interface-details]`,
     template: `
         <div
@@ -118,6 +119,7 @@ import { Interface, InterfacesService } from './interfaces.service';
             }
         `,
     ],
+
 })
 export class InterfaceDetailsComponent {
     @Input() public item: Interface;

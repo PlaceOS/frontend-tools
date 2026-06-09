@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 
 @Component({
+    standalone: false,
     selector: 'placeos-tools-root',
     template: `
         <div class="absolute inset-0 overflow-hidden flex dark:bg-neutral-600">
@@ -18,5 +19,6 @@ import { Component } from '@angular/core';
             }
         `,
     ],
+
 })
 export class AppComponent {}

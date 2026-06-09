@@ -4,60 +4,60 @@ import { map } from 'rxjs/operators';
 import { AccessControlService } from './access-control.service';
 
 @Component({
+    standalone: false,
     selector: 'app-organisation',
     template: `
         <div class="flex flex-col h-full w-full overflow-hidden relative">
-            <header class="bg-neutral-700 p-2 space-x-2">
-                <button mat-button class="w-48" (click)="newAccessControl()">
-                    Add Access Control
-                </button>
-                <button
-                    mat-button
-                    class="w-48"
-                    *ngIf="(all_selected | async) || (some_selected | async)"
-                    (click)="removeSelected()"
+          <header class="bg-neutral-700 p-2 space-x-2">
+            <button mat-button class="w-48" (click)="newAccessControl()">
+              Add Access Control
+            </button>
+            @if ((all_selected | async) || (some_selected | async)) {
+              <button
+                mat-button
+                class="w-48"
+                (click)="removeSelected()"
                 >
-                    Remove Selected
-                </button>
-            </header>
-            <main class="w-full h-1/2 flex-1 overflow-auto">
-                <div table>
-                    <div
-                        class="sticky top-0 flex items-center bg-neutral-800 border-b border-neutral-500 w-full"
-                    >
-                        <div thead class="min-w-0 w-10">
-                            <mat-checkbox
-                                [ngModel]="all_selected | async"
-                                [indeterminate]="some_selected | async"
-                                (ngModelChange)="setSelected($event)"
-                            ></mat-checkbox>
-                        </div>
-                        <div thead>Type</div>
-                        <div thead>Building</div>
-                        <div thead>Managed Onsite?</div>
-                        <div thead>Isolated?</div>
-                        <div thead>Linked to Staff?</div>
-                        <div thead>Staff Linked to Passes?</div>
-                    </div>
-                    <ng-container
-                        *ngIf="(access_controls | async)?.length; else empty_state"
-                    >
-                        <div
-                            access-control-details
-                            *ngFor="let item of access_controls | async"
-                            [item]="item"
-                        ></div>
-                    </ng-container>
+                Remove Selected
+              </button>
+            }
+          </header>
+          <main class="w-full h-1/2 flex-1 overflow-auto">
+            <div table>
+              <div
+                class="sticky top-0 flex items-center bg-neutral-800 border-b border-neutral-500 w-full"
+                >
+                <div thead class="min-w-0 w-10">
+                  <mat-checkbox
+                    [ngModel]="all_selected | async"
+                    [indeterminate]="some_selected | async"
+                    (ngModelChange)="setSelected($event)"
+                  ></mat-checkbox>
                 </div>
-            </main>
-             <data-warning></data-warning>
-        </div>
-        <ng-template #empty_state>
-            <div class="w-full h-full flex items-center justify-center p-8">
-                <p class="opacity-60">No access control setup for organisation</p>
+                <div thead>Type</div>
+                <div thead>Building</div>
+                <div thead>Managed Onsite?</div>
+                <div thead>Isolated?</div>
+                <div thead>Linked to Staff?</div>
+                <div thead>Staff Linked to Passes?</div>
+              </div>
+              @if ((access_controls | async)?.length) {
+                @for (item of access_controls | async; track item) {
+                  <div
+                    access-control-details
+                    [item]="item"
+                  ></div>
+                }
+              } @else {
+                <div class="w-full h-full flex items-center justify-center p-8">
+                  <p class="opacity-60">No access control setup for organisation</p>
+                </div>
+              }
             </div>
-        </ng-template>
-    `,
+          </main>
+          <data-warning></data-warning>
+        </div>
+        `,
     styles: [
         `
             [table] {
@@ -77,6 +77,7 @@ import { AccessControlService } from './access-control.service';
             }
         `,
     ],
+
 })
 export class AccessControlsComponent {
     public readonly access_controls = this._service.access_controls;

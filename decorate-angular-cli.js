@@ -27,10 +27,10 @@ const cp = require('child_process');
 const isWindows = os.platform() === 'win32';
 let output;
 try {
-    output = require('@nx/workspace').output;
+    output = require('nx/src/utils/output').output;
 } catch (e) {
     console.warn(
-        'Angular CLI could not be decorated to enable computation caching. Please ensure @nx/workspace is installed.'
+        'Angular CLI could not be decorated to enable computation caching. Please ensure nx is installed.'
     );
     process.exit(0);
 }
@@ -71,7 +71,11 @@ function symlinkNgCLItoNxCLI() {
 
 try {
     symlinkNgCLItoNxCLI();
-    require('nx/src/cli/decorate-cli').decorateCli();
+    try {
+        require('nx/src/cli/decorate-cli').decorateCli();
+    } catch (e) {
+        // Nx 22 no longer exposes the legacy CLI decoration hook.
+    }
     output.log({
         title: 'Angular CLI has been decorated to enable computation caching.',
     });

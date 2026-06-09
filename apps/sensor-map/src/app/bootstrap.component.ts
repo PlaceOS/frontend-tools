@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 
 @Component({
+    standalone: false,
     selector: 'map-region-bootstrap',
     template: `
         <div class="absolute inset-0 bg-gray-100 flex justify-center">

@@ -75,7 +75,8 @@
                     "buildTarget": "wayfinding:build:development"
                 }
             },
-            "defaultConfiguration": "development"
+            "defaultConfiguration": "development",
+            "continuous": true
         },
         "extract-i18n": {
             "executor": "@angular-devkit/build-angular:extract-i18n",
@@ -90,7 +91,8 @@
             "executor": "@nx/jest:jest",
             "outputs": ["{workspaceRoot}/coverage/apps/wayfinding"],
             "options": {
-                "jestConfig": "apps/wayfinding/jest.config.ts"
+                "jestConfig": "apps/wayfinding/jest.config.ts",
+                "tsConfig": "apps/wayfinding/tsconfig.spec.json"
             }
         }
     }

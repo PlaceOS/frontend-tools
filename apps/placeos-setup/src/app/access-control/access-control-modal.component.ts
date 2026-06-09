@@ -9,121 +9,124 @@ import { OrganisationService } from '../organisation/organisation.service';
 import { AccessControl } from './access-control.service';
 
 @Component({
+    standalone: false,
     selector: 'access-control-modal',
     template: `
         <div
-            class="absolute inset-0 bg-white dark:bg-neutral-600 dark:text-white flex flex-col"
-        >
-            <header
-                class="w-full bg-blue-300 dark:bg-neutral-700 border-b border-gray-200 dark:border-neutral-500"
+          class="absolute inset-0 bg-white dark:bg-neutral-600 dark:text-white flex flex-col"
+          >
+          <header
+            class="w-full bg-blue-300 dark:bg-neutral-700 border-b border-gray-200 dark:border-neutral-500"
             >
-                <div class="mx-auto w-[640px] relative p-4 text-center">
-                    <div class="font-medium">
-                        {{ form.value.id ? 'Edit' : 'New' }} Access Control
-                    </div>
-                    <button
-                        mat-icon-button
-                        mat-dialog-close
-                        class="absolute top-1/2 right-0 -translate-y-1/2"
-                        *ngIf="!loading"
-                    >
-                        <app-icon>close</app-icon>
-                    </button>
-                </div>
-            </header>
-            <ng-container *ngIf="!loading; else load_state">
-                <main
-                    class="mx-auto w-[640px] p-4 flex-1 h-1/2 overflow-auto"
-                    [formGroup]="form"
-                >
-                    <div class="w-full">
-                        <label for="building">Building</label>
-                        <mat-form-field appearance="outline" class="w-full">
-                            <mat-select
-                                name="building"
-                                formControlName="building_id"
-                                placeholder="Building"
-                            >
-                                <mat-option
-                                    *ngFor="let item of building_list | async"
-                                    [value]="item.id"
-                                >
-                                    {{ item.display_name || item.name }}
-                                </mat-option>
-                            </mat-select>
-                            <mat-hint>
-                                Building that the level resides in
-                            </mat-hint>
-                            <mat-error>Building is required</mat-error>
-                        </mat-form-field>
-                    </div>
-                    <div class="w-full">
-                        <label for="type">Service Integration</label>
-                        <mat-form-field appearance="outline" class="w-full">
-                            <input
-                                matInput
-                                name="type"
-                                formControlName="type"
-                                placeholder="Lenel/Gallagher"
-                            />
-                            <mat-hint>
-                                Name of the service integration for security
-                            </mat-hint>
-                            <mat-error>Service Integration is required</mat-error>
-                        </mat-form-field>
-                    </div>
-                    <div class="w-full py-2">
-                        <mat-checkbox
-                            name="managed-onsite"
-                            formControlName="managed_onsite"
-                        >
-                            Is this integration managed onsite?
-                        </mat-checkbox>
-                    </div>
-                    <div class="w-full py-2">
-                        <mat-checkbox
-                            name="isolated"
-                            formControlName="isolated"
-                        >
-                            Is the integration isolated from the internet?
-                        </mat-checkbox>
-                    </div>
-                    <div class="w-full py-2">
-                        <mat-checkbox
-                            name="staff-linked"
-                            formControlName="linked_to_staff_db"
-                        >
-                            Is access control linked to staff members?
-                        </mat-checkbox>
-                    </div>
-                    <div class="w-full py-2">
-                        <mat-checkbox
-                            name="tied-identity"
-                            formControlName="access_tied_to_identity"
-                        >
-                            Are access passes linked to staff members
-                        </mat-checkbox>
-                    </div>
-                </main>
-                <footer
-                    class="w-full bg-blue-300 dark:bg-neutral-700 border-t border-gray-200 dark:border-neutral-500"
-                >
-                    <div class="mx-auto w-[640px] relative p-4">
-                        <button mat-button (click)="save()" class="w-32">
-                            Save
-                        </button>
-                    </div>
-                </footer>
-            </ng-container>
-        </div>
-        <ng-template #load_state>
-            <div class="mx-auto w-[640px] p-4 flex-1 h-1/2">
-                <mat-spinner></mat-spinner>
-                <p>Saving access control data...</p>
+            <div class="mx-auto w-[640px] relative p-4 text-center">
+              <div class="font-medium">
+                {{ form.value.id ? 'Edit' : 'New' }} Access Control
+              </div>
+              @if (!loading) {
+                <button
+                  mat-icon-button
+                  mat-dialog-close
+                  class="absolute top-1/2 right-0 -translate-y-1/2"
+                  >
+                  <app-icon>close</app-icon>
+                </button>
+              }
             </div>
-        </ng-template>
-    `,
+          </header>
+          @if (!loading) {
+            <main
+              class="mx-auto w-[640px] p-4 flex-1 h-1/2 overflow-auto"
+              [formGroup]="form"
+              >
+              <div class="w-full">
+                <label for="building">Building</label>
+                <mat-form-field appearance="outline" class="w-full">
+                  <mat-select
+                    name="building"
+                    formControlName="building_id"
+                    placeholder="Building"
+                    >
+                    @for (item of building_list | async; track item) {
+                      <mat-option
+                        [value]="item.id"
+                        >
+                        {{ item.display_name || item.name }}
+                      </mat-option>
+                    }
+                  </mat-select>
+                  <mat-hint>
+                    Building that the level resides in
+                  </mat-hint>
+                  <mat-error>Building is required</mat-error>
+                </mat-form-field>
+              </div>
+              <div class="w-full">
+                <label for="type">Service Integration</label>
+                <mat-form-field appearance="outline" class="w-full">
+                  <input
+                    matInput
+                    name="type"
+                    formControlName="type"
+                    placeholder="Lenel/Gallagher"
+                    />
+                  <mat-hint>
+                    Name of the service integration for security
+                  </mat-hint>
+                  <mat-error>Service Integration is required</mat-error>
+                </mat-form-field>
+              </div>
+              <div class="w-full py-2">
+                <mat-checkbox
+                  name="managed-onsite"
+                  formControlName="managed_onsite"
+                  >
+                  Is this integration managed onsite?
+                </mat-checkbox>
+              </div>
+              <div class="w-full py-2">
+                <mat-checkbox
+                  name="isolated"
+                  formControlName="isolated"
+                  >
+                  Is the integration isolated from the internet?
+                </mat-checkbox>
+              </div>
+              <div class="w-full py-2">
+                <mat-checkbox
+                  name="staff-linked"
+                  formControlName="linked_to_staff_db"
+                  >
+                  Is access control linked to staff members?
+                </mat-checkbox>
+              </div>
+              <div class="w-full py-2">
+                <mat-checkbox
+                  name="tied-identity"
+                  formControlName="access_tied_to_identity"
+                  >
+                  Are access passes linked to staff members
+                </mat-checkbox>
+              </div>
+            </main>
+            <footer
+              class="w-full bg-blue-300 dark:bg-neutral-700 border-t border-gray-200 dark:border-neutral-500"
+              >
+              <div class="mx-auto w-[640px] relative p-4">
+                <button mat-button (click)="save()" class="w-32">
+                  Save
+                </button>
+              </div>
+            </footer>
+          } @else {
+            <div class="mx-auto w-[640px] p-4 flex-1 h-1/2">
+              <mat-spinner></mat-spinner>
+              <p>Saving access control data...</p>
+            </div>
+          }
+        </div>
+        `,
     styles: [``],
+
 })
 export class AccessControlModalComponent {
     @Output() public readonly onSave = new EventEmitter<Partial<AccessControl>>();

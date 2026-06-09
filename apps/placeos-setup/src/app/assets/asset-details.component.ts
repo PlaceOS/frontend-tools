@@ -6,6 +6,7 @@ import {
 import { Asset, AssetsService } from './assets.service';
 
 @Component({
+    standalone: false,
     selector: `asset-details,[asset-details]`,
     template: `
         <div
@@ -70,6 +71,7 @@ import { Asset, AssetsService } from './assets.service';
             }
         `,
     ],
+
 })
 export class AssetDetailsComponent {
     @Input() public item: Asset;

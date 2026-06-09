@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 
 @Component({
+    standalone: false,
     selector: 'example-floorplan-modal',
     template: `
         <div
@@ -13,5 +14,6 @@ import { Component } from '@angular/core';
         </div>
     `,
     styles: [``],
+
 })
 export class FloorPlanExampleModalComponent {}

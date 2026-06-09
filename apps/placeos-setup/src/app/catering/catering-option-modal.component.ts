@@ -22,101 +22,115 @@ export async function openCateringItemOptionModal(
 }
 
 @Component({
+    standalone: false,
     selector: 'catering-option-modal',
     template: `
         <header
-            class="flex items-center p-2 justify-between border-b border-gray-200 dark:border-neutral-500"
-        >
-            <h3 class="p-2 font-medium">
-                {{ option.id ? 'Edit' : 'Add' }} Item Option
-            </h3>
-            <button mat-icon-button mat-dialog-close *ngIf="!loading">
-                <app-icon>close</app-icon>
+          class="flex items-center p-2 justify-between border-b border-gray-200 dark:border-neutral-500"
+          >
+          <h3 class="p-2 font-medium">
+            {{ option.id ? 'Edit' : 'Add' }} Item Option
+          </h3>
+          @if (!loading) {
+            <button mat-icon-button mat-dialog-close>
+              <app-icon>close</app-icon>
             </button>
+          }
         </header>
-        <form
+        @if (form && !loading) {
+          <form
             class="p-4 overflow-auto"
-            *ngIf="form && !loading; else load_state"
             [formGroup]="form"
-        >
-            <div class="flex flex-col" *ngIf="form.controls.name">
+            >
+            @if (form.controls.name) {
+              <div class="flex flex-col">
                 <label
-                    for="title"
+                  for="title"
                     [class.error]="
                         form.controls.name.invalid && form.controls.name.touched
                     "
-                >
-                    Name<span required>*</span>:
+                  >
+                  Name<span required>*</span>:
                 </label>
                 <mat-form-field appearance="outline">
-                    <input
-                        matInput
-                        name="name"
-                        placeholder="Item name"
-                        formControlName="name"
+                  <input
+                    matInput
+                    name="name"
+                    placeholder="Item name"
+                    formControlName="name"
                     />
-                    <mat-error>Name is required</mat-error>
+                  <mat-error>Name is required</mat-error>
                 </mat-form-field>
-            </div>
-            <div class="flex flex-col" *ngIf="form.controls.group">
+              </div>
+            }
+            @if (form.controls.group) {
+              <div class="flex flex-col">
                 <label
-                    for="group"
+                  for="group"
                     [class.error]="
                         form.controls.group.invalid &&
                         form.controls.group.touched
                     "
-                >
-                    Type<span required>*</span>:
+                  >
+                  Type<span required>*</span>:
                 </label>
                 <mat-form-field appearance="outline">
-                    <input
-                        matInput
-                        name="group"
-                        placeholder="Type of option e.g. Number of sugars"
-                        formControlName="group"
-                        [matAutocomplete]="auto"
+                  <input
+                    matInput
+                    name="group"
+                    placeholder="Type of option e.g. Number of sugars"
+                    formControlName="group"
+                    [matAutocomplete]="auto"
                     />
-                    <mat-error>Type is required</mat-error>
+                  <mat-error>Type is required</mat-error>
                 </mat-form-field>
-            </div>
-            <div class="flex flex-col" *ngIf="form.controls.unit_price">
+              </div>
+            }
+            @if (form.controls.unit_price) {
+              <div class="flex flex-col">
                 <label for="title">Unit Price:</label>
                 <mat-form-field appearance="outline">
-                    <input
-                        matInput
-                        name="unit-price"
-                        type="number"
-                        placeholder="Unit Price"
-                        formControlName="unit_price"
+                  <input
+                    matInput
+                    name="unit-price"
+                    type="number"
+                    placeholder="Unit Price"
+                    formControlName="unit_price"
                     />
                 </mat-form-field>
-            </div>
-            <div class="flex flex-col" *ngIf="form.controls.multiple">
+              </div>
+            }
+            @if (form.controls.multiple) {
+              <div class="flex flex-col">
                 <mat-checkbox name="multiple" formControlName="multiple">
-                    Can select multiple of type
+                  Can select multiple of type
                 </mat-checkbox>
-            </div>
-        </form>
-        <footer
-            *ngIf="!loading"
+              </div>
+            }
+          </form>
+        } @else {
+          <div loading class="flex flex-col items-center p-8 space-y-2 w-64">
+            <mat-spinner diameter="32"></mat-spinner>
+            <p>Saving catering item option...</p>
+          </div>
+        }
+        @if (!loading) {
+          <footer
             class="flex p-2 items-center justify-center border-t border-solid border-gray-300 dark:border-neutral-500"
-        >
+            >
             <button mat-button class="w-32" [disabled]="!form.dirty" (click)="saveChanges()">
-                Save
+              Save
             </button>
-        </footer>
-        <ng-template #load_state>
-            <div loading class="flex flex-col items-center p-8 space-y-2 w-64">
-                <mat-spinner diameter="32"></mat-spinner>
-                <p>Saving catering item option...</p>
-            </div>
-        </ng-template>
+          </footer>
+        }
         <mat-autocomplete #auto="matAutocomplete">
-            <mat-option *ngFor="let option of types" [value]="option">
-                {{ option }}
+          @for (option of types; track option) {
+            <mat-option [value]="option">
+              {{ option }}
             </mat-option>
+          }
         </mat-autocomplete>
-    `,
+        `,
     styles: [
         `
             mat-form-field {
@@ -124,6 +138,7 @@ export async function openCateringItemOptionModal(
             }
         `,
     ],
+
 })
 export class CateringItemOptionModalComponent {
     /** Emitter for events on the modal */

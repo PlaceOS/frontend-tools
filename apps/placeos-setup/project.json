@@ -72,7 +72,8 @@
                     "buildTarget": "placeos-setup:build:development"
                 }
             },
-            "defaultConfiguration": "development"
+            "defaultConfiguration": "development",
+            "continuous": true
         },
         "extract-i18n": {
             "executor": "@angular-devkit/build-angular:extract-i18n",
@@ -87,7 +88,8 @@
             "executor": "@nx/jest:jest",
             "outputs": ["{workspaceRoot}/coverage/apps/placeos-setup"],
             "options": {
-                "jestConfig": "apps/placeos-setup/jest.config.ts"
+                "jestConfig": "apps/placeos-setup/jest.config.ts",
+                "tsConfig": "apps/placeos-setup/tsconfig.spec.json"
             }
         }
     }

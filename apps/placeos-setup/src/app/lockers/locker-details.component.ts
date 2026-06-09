@@ -3,6 +3,7 @@ import { Building, OrganisationService } from '../organisation/organisation.serv
 import { Locker, LockersService } from './lockers.service';
 
 @Component({
+    standalone: false,
     selector: `locker-details,[locker-details]`,
     template: `
         <div
@@ -65,6 +66,7 @@ import { Locker, LockersService } from './lockers.service';
             }
         `,
     ]
+
 })
 export class LockerDetailsComponent {
     @Input() public item: Locker;

@@ -3,6 +3,7 @@ import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Interface } from './interfaces.service';
 
 @Component({
+    standalone: false,
     selector: 'interface-details-modal',
     template: `
         <header
@@ -345,6 +346,7 @@ import { Interface } from './interfaces.service';
         </main>
     `,
     styles: [``],
+
 })
 export class InterfaceDetailsModalComponent {
     public readonly item = this._data;

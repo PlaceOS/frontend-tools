@@ -97,7 +97,8 @@
                 "production": {
                     "buildTarget": "map-builder:build:production"
                 }
-            }
+            },
+            "continuous": true
         },
         "extract-i18n": {
             "executor": "@angular-devkit/build-angular:extract-i18n",
@@ -113,7 +114,8 @@
             "executor": "@nx/jest:jest",
             "outputs": ["{workspaceRoot}/coverage/apps/map-builder"],
             "options": {
-                "jestConfig": "apps/map-builder/jest.config.ts"
+                "jestConfig": "apps/map-builder/jest.config.ts",
+                "tsConfig": "apps/map-builder/tsconfig.spec.json"
             }
         }
     }

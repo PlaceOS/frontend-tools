@@ -81,7 +81,8 @@
                 "production": {
                     "buildTarget": "map-regions:build:production"
                 }
-            }
+            },
+            "continuous": true
         },
         "extract-i18n": {
             "executor": "@angular-devkit/build-angular:extract-i18n",
@@ -97,7 +98,8 @@
             "executor": "@nx/jest:jest",
             "outputs": ["{workspaceRoot}/coverage/apps/map-regions"],
             "options": {
-                "jestConfig": "apps/map-regions/jest.config.ts"
+                "jestConfig": "apps/map-regions/jest.config.ts",
+                "tsConfig": "apps/map-regions/tsconfig.spec.json"
             }
         }
     }

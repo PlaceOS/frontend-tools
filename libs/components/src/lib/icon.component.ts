@@ -2,16 +2,21 @@ import { Component, Input } from '@angular/core';
 import { ApplicationIcon } from '@placeos-tools/common';
 
 @Component({
+    standalone: false,
     selector: 'app-icon',
     template: `
         <div class="app-icon">
-            <i *ngIf="!icon || icon.type !== 'img'" [class]="icon?.class || className">
-                {{ icon?.content }}
-                <ng-content></ng-content>
+          @if (!icon || icon.type !== 'img') {
+            <i [class]="icon?.class || className">
+              {{ icon?.content }}
+              <ng-content></ng-content>
             </i>
-            <img *ngIf="icon && icon.type === 'img'" [src]="icon.src | safe: 'resource'" />
+          }
+          @if (icon && icon.type === 'img') {
+            <img [src]="icon.src | safe: 'resource'" />
+          }
         </div>
-    `,
+        `,
     styles: [
         `
             .app-icon {
@@ -32,6 +37,7 @@ import { ApplicationIcon } from '@placeos-tools/common';
             }
         `,
     ],
+
 })
 export class IconComponent {
     @Input() public className: string = 'material-icons';
