@@ -1,3 +1,5 @@
+@reference './application.css';
+
 .spinner {
     svg {
         width: 100%;
@@ -31,7 +33,7 @@ code {
             background-color: #fff;
             border: 2px solid #000;
             box-shadow: 0 0 0 2px #fff;
-            color: rgba(#000, 0.8);
+            color: rgba(0, 0, 0, 0.8);
             height: 2em;
             width: 2em;
         }
@@ -49,7 +51,7 @@ code {
 }
 
 .overlay-backdrop {
-    background-color: rgba(#000, 0.6);
+    background-color: rgba(0, 0, 0, 0.6);
 }
 
 [bg='white'] .mdc-form-field-outline {
@@ -359,7 +361,7 @@ div.mdc-menu-panel {
 
 .mdc-tooltip {
     font-size: 0.8em;
-    background-color: rgba(#212121, 0.85);
+    background-color: rgba(33, 33, 33, 0.85);
     & > * {
         white-space: pre;
         text-align: left;
@@ -648,12 +650,6 @@ a[icon] {
 
     .cdk-overlay-pane {
         max-width: none !important;
-    }
-
-    .svg-viewer__label {
-        top: -200%;
-        left: -200%;
-        line-height: 1.1;
     }
 
     .mdc-datepicker-toggle {
@@ -1080,7 +1076,7 @@ a[icon] {
 }
 
 mat-list-option.mdc-list-item--selected {
-    border-right: 3px solid rgba(#212121, 0.85);
+    border-right: 3px solid rgba(33, 33, 33, 0.85);
 }
 
 #placeos .sv-question {

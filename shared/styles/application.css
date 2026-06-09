@@ -1,13 +1,11 @@
 /* Application Styles */
 
-@import 'tailwindcss/base';
-@import 'tailwindcss/components';
-@import 'tailwindcss/utilities';
+@import 'tailwindcss';
+@config '../../tailwind.config.js';
 
 @import '@angular/material/prebuilt-themes/indigo-pink.css';
 
 @import 'material-symbols';
-@import '@material-design-icons/font';
 
 :root {
     /* Primary */
@@ -218,4 +216,57 @@ span.highlight {
 
 .text-mono {
     font-family: monospace;
+}
+
+#placeos .mdc-icon-button,
+button[icon],
+a[icon] {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 2.5em;
+    width: 2.5em;
+    min-width: 2.5em;
+    font-size: 1em;
+    padding: 0;
+    border-radius: 9999px;
+
+    .mdc-button-wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+    }
+
+    icon {
+        font-size: 1.5em;
+    }
+
+    &[default] {
+        background: var(--base-100);
+        border: 1px solid var(--base-300);
+        border-radius: 0.5rem;
+        color: var(--base-content);
+
+        &:hover {
+            background: var(--base-200);
+            border-color: var(--base-400);
+            --tw-shadow: 0 4px 6px -1px var(--tw-shadow-color, rgb(0 0 0 / 0.1)),
+                0 2px 4px -2px var(--tw-shadow-color, rgb(0 0 0 / 0.1));
+            box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow),
+                var(--tw-ring-offset-shadow), var(--tw-ring-shadow),
+                var(--tw-shadow);
+        }
+
+        &[error] {
+            --base-200: var(--error-light);
+            --base-300: var(--error);
+            --base-400: var(--error);
+            --base-content: var(--error);
+        }
+    }
+
+    &[disabled] {
+        opacity: 0.35;
+    }
 }

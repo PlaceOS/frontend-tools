@@ -1,3 +1,4 @@
+@reference './application.css';
 
 label {
     @apply font-semibold text-sm;

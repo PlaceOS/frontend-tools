@@ -1,14 +1,9 @@
-const { guessProductionMode } = require('@ngneat/tailwind');
-
-process.env.TAILWIND_MODE = guessProductionMode() ? 'build' : 'watch';
-
 module.exports = {
     prefix: '',
     important: '#placeos',
-    mode: 'jit',
     content: [
-        './apps/**/*.{html,ts,css,scss,sass,less,styl}',
-        './libs/**/*.{html,ts,css,scss,sass,less,styl}',
+        './apps/**/*.{html,ts,css,less,styl}',
+        './libs/**/*.{html,ts,css,less,styl}',
     ],
     darkMode: 'class', // or 'media' or 'class'
     theme: {

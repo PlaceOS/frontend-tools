@@ -1,6 +1,5 @@
-@import 'tailwindcss/base';
-@import 'tailwindcss/components';
-@import 'tailwindcss/utilities';
+@import 'tailwindcss';
+@config '../../../tailwind.config.js';
 /* You can add global styles to this file, and also import other style files */
 
 html, body { height: 100%; }
