@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { BehaviorSubject, combineLatest } from 'rxjs';
 import { debounceTime, map } from 'rxjs/operators';
 import { EditorStateService } from './editor-state.service';
@@ -60,6 +60,8 @@ import { AsyncPipe } from '@angular/common';
     imports: [FormsModule, MatRipple, IconComponent, AsyncPipe],
 })
 export class EditorSensorListComponent {
+    private _state = inject(EditorStateService);
+
     public readonly search$ = new BehaviorSubject('');
     public readonly sensor_list = combineLatest([
         this._state.sensor_details,
@@ -75,6 +77,4 @@ export class EditorSensorListComponent {
     public readonly active_sensor = this._state.active_sensor;
 
     public readonly setActive = (s) => this._state.setActive(s);
-
-    constructor(private _state: EditorStateService) {}
 }

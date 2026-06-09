@@ -3,7 +3,7 @@ import { RouterOutlet } from '@angular/router';
 
 @Component({
     selector: 'placeos-tools-root',
-    template: ` <router-outlet></router-outlet> `,
+    template: ` <router-outlet /> `,
     styles: [],
     imports: [RouterOutlet],
 })

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { BaseClass, sendMessage } from '@placeos-tools/common';
 
@@ -13,20 +13,18 @@ import { AsyncPipe } from '@angular/common';
     selector: '[map-regions-editor]',
     template: `
         <div controls class="relative h-full">
-            <editor-options></editor-options>
+            <editor-options />
         </div>
         <div class="relative h-full flex-1 bg-base-200">
-            <i-map
-                class="w-screen h-screen"
+            <i-map class="w-screen h-screen"
                 [src]="url | async"
-                [features]="features"
-                [actions]="actions"
+                [features]="features()"
+                [actions]="actions()"
                 [options]="{ disable_pan: true, disable_zoom: true }"
                 (aspect_ratio)="setRatio($event)"
-            ></i-map>
-            <editor-controls
-                class="absolute top-1/2 left-2 transform -translate-y-1/2"
-            ></editor-controls>
+             />
+            <editor-controls class="absolute top-1/2 left-2 transform -translate-y-1/2"
+             />
         </div>
     `,
     styles: [
@@ -54,45 +52,40 @@ import { AsyncPipe } from '@angular/common';
     ],
 })
 export class EditorComponent extends BaseClass implements OnInit {
+    private _editor = inject(EditorStateService);
+    private _route = inject(ActivatedRoute);
+
     /** URL of the map to display */
     public readonly url = this._editor.url;
-    public actions = [];
+    public readonly actions = signal([]);
     /** Map regions for active map URL */
-    public features = [
+    public readonly features = signal([
         {
             location: 'map-viewer-root',
             content: MapCanvasComponent,
             full_size: true,
             data: { polygons$: this._editor.regions },
         },
-    ];
-    public region_string = '';
-    public ratio = 1;
+    ]);
+    public readonly ratio = signal(1);
 
     /** Handler for click events on the map */
     public readonly clicked = (n) => (_, p) =>
         this._editor.handleMapClick(n, p);
     public readonly setRatio = (r) => {
-        this.ratio = r;
+        this.ratio.set(r);
         this._editor.setRatio(r);
     };
 
-    constructor(
-        private _editor: EditorStateService,
-        private _route: ActivatedRoute
-    ) {
-        super();
-    }
-
     public ngOnInit(): void {
-        this.actions = [
+        this.actions.set([
             { id: '*', action: 'mousedown', callback: this.clicked('start') },
             { id: '*', action: 'mousemove', callback: this.clicked('move') },
             { id: '*', action: 'mouseup', callback: this.clicked('end') },
             { id: '*', action: 'touchstart', callback: this.clicked('start') },
             { id: '*', action: 'touchmove', callback: this.clicked('move') },
             { id: '*', action: 'touchend', callback: this.clicked('end') },
-        ];
+        ]);
         const handle_params = async (params) => {
             if (params.has('src')) {
                 const src = await sendMessage({

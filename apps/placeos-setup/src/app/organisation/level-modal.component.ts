@@ -1,4 +1,4 @@
-import { Component, Inject, Output, EventEmitter } from '@angular/core';
+import { Component, inject, output, signal } from '@angular/core';
 import {
     FormControl,
     FormGroup,
@@ -30,7 +30,7 @@ import { MatCheckbox } from '@angular/material/checkbox';
                     <div class="font-medium">
                         {{ form.value.id ? 'Edit' : 'New' }} Building Level
                     </div>
-                    @if (!loading) {
+                    @if (!loading()) {
                     <button
                         mat-icon-button
                         mat-dialog-close
@@ -41,7 +41,7 @@ import { MatCheckbox } from '@angular/material/checkbox';
                     }
                 </div>
             </header>
-            @if (!loading) {
+            @if (!loading()) {
             <main
                 class="mx-auto w-[640px] p-4 flex-1 h-1/2 overflow-auto"
                 [formGroup]="form"
@@ -124,7 +124,7 @@ import { MatCheckbox } from '@angular/material/checkbox';
             </footer>
             } @else {
             <div class="mx-auto w-[640px] p-4 flex-1 h-1/2">
-                <mat-spinner></mat-spinner>
+                <mat-spinner />
                 <p>Saving building data...</p>
             </div>
             }
@@ -148,10 +148,13 @@ import { MatCheckbox } from '@angular/material/checkbox';
     ],
 })
 export class OrganisationLevelModalComponent {
-    @Output() public readonly onSave = new EventEmitter<
-        Partial<BuildingLevel>
-    >();
-    public loading = false;
+    private _data = inject<{
+        lvl?: BuildingLevel;
+        bld_list: Building[];
+    }>(MAT_DIALOG_DATA);
+
+    public readonly onSave = output<Partial<BuildingLevel>>();
+    public readonly loading = signal(false);
 
     public readonly building_list = this._data.bld_list;
     public readonly form = new FormGroup({
@@ -172,15 +175,10 @@ export class OrganisationLevelModalComponent {
         ),
     });
 
-    constructor(
-        @Inject(MAT_DIALOG_DATA)
-        private _data: { lvl?: BuildingLevel; bld_list: Building[] }
-    ) {}
-
     public save() {
         this.form.markAllAsTouched();
         if (!this.form.valid) return;
-        this.loading = true;
+        this.loading.set(true);
         this.onSave.emit(this.form.getRawValue());
     }
 }

@@ -1,4 +1,4 @@
-import { Component, forwardRef, Input } from '@angular/core';
+import { Component, forwardRef, input, signal } from '@angular/core';
 import {
     ControlValueAccessor,
     NG_VALUE_ACCESSOR,
@@ -14,7 +14,7 @@ type FieldFn<T> = (_: T) => void;
 @Component({
     selector: 'pair-list-field',
     template: `
-        @for (item of pair_list; track item; let i = $index) {
+        @for (item of pair_list(); track item; let i = $index) {
         <div class="flex mb-2 space-x-2">
             <div class="flex flex-col flex-1">
                 @if (i === 0) {
@@ -27,9 +27,11 @@ type FieldFn<T> = (_: T) => void;
                 >
                     <input
                         matInput
-                        [disabled]="!edit_keys"
-                        [(ngModel)]="item[0]"
-                        (ngModelChange)="setValue(pair_list)"
+                        [disabled]="!edit_keys()"
+                        [ngModel]="item[0]"
+                        (ngModelChange)="
+                            item[0] = $event; setValue(pair_list())
+                        "
                         placeholder="Variable Key"
                     />
                 </mat-form-field>
@@ -45,14 +47,16 @@ type FieldFn<T> = (_: T) => void;
                 >
                     <input
                         matInput
-                        [(ngModel)]="item[1]"
-                        (ngModelChange)="setValue(pair_list)"
+                        [ngModel]="item[1]"
+                        (ngModelChange)="
+                            item[1] = $event; setValue(pair_list())
+                        "
                         placeholder="Variable Value"
                     />
                 </mat-form-field>
             </div>
         </div>
-        } @if (add_new) {
+        } @if (add_new()) {
         <button mat-button class="w-full" (click)="addNewPair()">
             Add Key Value Pair
         </button>
@@ -69,10 +73,10 @@ type FieldFn<T> = (_: T) => void;
     imports: [MatFormField, MatInput, FormsModule, MatButton],
 })
 export class PairListFieldComponent implements ControlValueAccessor {
-    @Input() public edit_keys = false;
-    @Input() public add_new = false;
+    public readonly edit_keys = input(false);
+    public readonly add_new = input(false);
     /** List of set values */
-    public pair_list: [string, string][] = [];
+    public readonly pair_list = signal<[string, string][]>([]);
 
     /** Form control on change handler */
     private _onChange?: FieldFn<Record<string, string>>;
@@ -80,7 +84,7 @@ export class PairListFieldComponent implements ControlValueAccessor {
     private _onTouch?: FieldFn<Record<string, string>>;
 
     public addNewPair() {
-        this.pair_list.push(['', '']);
+        this.pair_list.update((list) => [...list, ['', '']]);
     }
 
     /**
@@ -107,7 +111,7 @@ export class PairListFieldComponent implements ControlValueAccessor {
         for (const key in value) {
             list.push([key, value[key]]);
         }
-        this.pair_list = list;
+        this.pair_list.set(list);
     }
     public readonly registerOnChange = (fn: any) => (this._onChange = fn);
     public readonly registerOnTouched = (fn: any) => (this._onTouch = fn);

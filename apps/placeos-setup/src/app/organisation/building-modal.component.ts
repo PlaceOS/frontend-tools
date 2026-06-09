@@ -1,4 +1,4 @@
-import { Component, Inject, Output, EventEmitter } from '@angular/core';
+import { Component, inject, output, signal } from '@angular/core';
 import {
     FormControl,
     FormGroup,
@@ -34,7 +34,7 @@ import { MatCheckbox } from '@angular/material/checkbox';
                     <div class="font-medium">
                         {{ form.value.id ? 'Edit' : 'New' }} Building
                     </div>
-                    @if (!loading) {
+                    @if (!loading()) {
                     <button
                         mat-icon-button
                         mat-dialog-close
@@ -45,7 +45,7 @@ import { MatCheckbox } from '@angular/material/checkbox';
                     }
                 </div>
             </header>
-            @if (!loading) {
+            @if (!loading()) {
             <main
                 class="mx-auto w-[640px] max-w-full p-4 flex-1 h-1/2 overflow-auto"
                 [formGroup]="form"
@@ -179,7 +179,7 @@ import { MatCheckbox } from '@angular/material/checkbox';
             </footer>
             } @else {
             <div class="mx-auto w-[640px] p-4 flex-1 h-1/2">
-                <mat-spinner></mat-spinner>
+                <mat-spinner />
                 <p>Saving building data...</p>
             </div>
             }
@@ -203,8 +203,10 @@ import { MatCheckbox } from '@angular/material/checkbox';
     ],
 })
 export class OrganisationBuildingModalComponent {
-    @Output() public readonly onSave = new EventEmitter<Partial<Building>>();
-    public loading = false;
+    private _bld = inject<Building>(MAT_DIALOG_DATA);
+
+    public readonly onSave = output<Partial<Building>>();
+    public readonly loading = signal(false);
 
     public readonly form = new FormGroup({
         id: new FormControl(this._bld?.id ?? ''),
@@ -222,12 +224,10 @@ export class OrganisationBuildingModalComponent {
     public readonly country_list = COUNTRIES;
     public readonly currency_list = CURRENCIES;
 
-    constructor(@Inject(MAT_DIALOG_DATA) private _bld?: Building) {}
-
     public save() {
         this.form.markAllAsTouched();
         if (!this.form.valid) return;
-        this.loading = true;
+        this.loading.set(true);
         this.onSave.emit(this.form.getRawValue());
     }
 }

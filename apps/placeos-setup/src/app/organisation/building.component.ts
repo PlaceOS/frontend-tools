@@ -1,4 +1,4 @@
-import { Component, Input, SimpleChanges } from '@angular/core';
+import { Component, SimpleChanges, inject, input, signal } from '@angular/core';
 import { ANIMATION_SHOW_CONTRACT_EXPAND } from '@placeos-tools/common';
 import { BehaviorSubject, combineLatest } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -19,30 +19,29 @@ import { AsyncPipe } from '@angular/common';
             class="flex items-center border-b border-neutral-500 text-sm hover:bg-black/10 relative"
         >
             <div thead class="min-w-0">
-                <mat-checkbox
-                    [ngModel]="selected"
+                <mat-checkbox [ngModel]="selected"
                     (ngModelChange)="setSelected($event)"
-                ></mat-checkbox>
+                 />
             </div>
             <div class="min-w-0 flex items-center w-10 p-0 justify-end">
                 <button
                     mat-icon-button
-                    (click)="show = !show"
+                    (click)="show.update((value) => !value)"
                     [disabled]="!(levels | async)?.length"
                 >
                     <app-icon>{{
-                        show ? 'expand_less' : 'expand_more'
+                        show() ? 'expand_less' : 'expand_more'
                     }}</app-icon>
                 </button>
             </div>
-            <div class="w-56">{{ building.display_name }}</div>
-            <div>{{ building.country }}</div>
-            <div class="w-32">{{ building.city }}</div>
-            <div class="w-56">{{ building.address }}</div>
+            <div class="w-56">{{ building().display_name }}</div>
+            <div>{{ building().country }}</div>
+            <div class="w-32">{{ building().city }}</div>
+            <div class="w-56">{{ building().address }}</div>
             <div>{{ (levels | async)?.length || 0 }}</div>
-            <div>{{ building.currency }}</div>
-            <div>{{ building.allow_visitors ? 'YES' : 'NO' }}</div>
-            <div>{{ building.catering_available ? 'YES' : 'NO' }}</div>
+            <div>{{ building().currency }}</div>
+            <div>{{ building().allow_visitors ? 'YES' : 'NO' }}</div>
+            <div>{{ building().catering_available ? 'YES' : 'NO' }}</div>
             <div
                 actions
                 class="absolute top-1/2 -translate-y-1/2 left-24 rounded-3xl flex items-center bg-white dark:bg-neutral-700 shadow !p-0 min-w-0"
@@ -66,8 +65,8 @@ import { AsyncPipe } from '@angular/common';
         @if ((levels | async)?.length) {
         <ul
             class="list-none p-0 m-0 w-full relative z-0"
-            [class.shown]="show"
-            [@show]="show ? 'show' : 'hide'"
+            [class.shown]="show()"
+            [@show]="show() ? 'show' : 'hide'"
         >
             @for (item of levels | async; track item; let i = $index) {
             <li org-level class="flex items-center w-full" [level]="item"></li>
@@ -111,31 +110,31 @@ import { AsyncPipe } from '@angular/common';
     ],
 })
 export class BuildingComponent {
-    @Input() public building: Building;
+    private _org = inject(OrganisationService);
+
+    public readonly building = input<Building>(undefined);
 
     private _bld_id = new BehaviorSubject('');
 
-    public show = false;
+    public readonly show = signal(false);
 
     public readonly levels = combineLatest([
         this._bld_id,
         this._org.levels,
     ]).pipe(map(([id, l]) => l.filter((lvl) => lvl.parent_id === id)));
 
-    public readonly edit = () => this._org.openBuildingModal(this.building);
-    public readonly remove = () => this._org.removeBuilding(this.building);
+    public readonly edit = () => this._org.openBuildingModal(this.building());
+    public readonly remove = () => this._org.removeBuilding(this.building());
     public readonly setSelected = (s) =>
-        this._org.setSelected(this.building.id, s);
+        this._org.setSelected(this.building().id, s);
 
     public get selected() {
-        return this._org.isSelected(this.building.id);
+        return this._org.isSelected(this.building().id);
     }
-
-    constructor(private _org: OrganisationService) {}
 
     public ngOnChanges(changes: SimpleChanges) {
         if (changes.building) {
-            this._bld_id.next(this.building?.id || '');
+            this._bld_id.next(this.building()?.id || '');
         }
     }
 }

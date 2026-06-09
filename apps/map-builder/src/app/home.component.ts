@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { randomInt, randomString } from '@placeos-tools/common';
 
 import { MapDataService } from './data/map-data.service';
@@ -21,7 +21,7 @@ import { AsyncPipe, SlicePipe } from '@angular/common';
                 mat-button
                 class="inverse w-full"
                 (click)="newMap()"
-                [routerLink]="['/editor', new_id]"
+                [routerLink]="['/editor', new_id()]"
             >
                 <div class="flex items-center justify-center">
                     <app-icon>add</app-icon>
@@ -83,16 +83,16 @@ import { AsyncPipe, SlicePipe } from '@angular/common';
     imports: [MatButton, RouterLink, IconComponent, AsyncPipe, SlicePipe],
 })
 export class HomeComponent implements OnInit {
+    private _data = inject(MapDataService);
+
     /** Observable for list of maps */
     public readonly map_list = this._data.maps$;
     /** Store for new map ID */
-    public new_id: string;
+    public readonly new_id = signal('');
 
-    public readonly newMap = () => this._data.newMap(this.new_id);
-
-    constructor(private _data: MapDataService) {}
+    public readonly newMap = () => this._data.newMap(this.new_id());
 
     public ngOnInit(): void {
-        this.new_id = `${randomString(16)}`;
+        this.new_id.set(`${randomString(16)}`);
     }
 }

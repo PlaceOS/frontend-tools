@@ -17,13 +17,29 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatMenuModule } from '@angular/material/menu';
 import { ClipboardModule } from '@angular/cdk/clipboard';
 import { AppComponent } from './app/app.component';
-import { BootstrapComponent } from './app/bootstrap.component';
-import { EditorComponent } from './app/editor/editor.component';
 
 const routes: Route[] = [
-    { path: '', component: BootstrapComponent },
-    { path: 'editor', component: EditorComponent },
-    { path: 'editor/:src', component: EditorComponent },
+    {
+        path: '',
+        loadComponent: () =>
+            import('./app/bootstrap.component').then(
+                (m) => m.BootstrapComponent
+            ),
+    },
+    {
+        path: 'editor',
+        loadComponent: () =>
+            import('./app/editor/editor.component').then(
+                (m) => m.EditorComponent
+            ),
+    },
+    {
+        path: 'editor/:src',
+        loadComponent: () =>
+            import('./app/editor/editor.component').then(
+                (m) => m.EditorComponent
+            ),
+    },
     { path: '**', redirectTo: '' },
 ];
 

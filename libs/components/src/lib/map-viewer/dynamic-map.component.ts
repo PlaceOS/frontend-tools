@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+import { NgTemplateOutlet, NgComponentOutlet } from '@angular/common';
 import {
     Component,
     effect,
@@ -13,6 +13,7 @@ import {
     signal,
     TemplateRef,
     Type,
+    untracked,
     viewChild,
     viewChildren,
 } from '@angular/core';
@@ -90,7 +91,7 @@ export interface MapMetadata {
                 </button>
             </div>
         }
-        @if (injectors?.length) {
+        @if (injectors().length) {
             <div hidden>
                 @for (
                     element of features();
@@ -107,12 +108,11 @@ export interface MapMetadata {
                             >
                                 @switch (contentType(element.content)) {
                                     @case ('component') {
-                                        <ng-container
-                                            *ngComponentOutlet="
+                                        <ng-container *ngComponentOutlet="
                                                 $any(element.content);
-                                                injector: injectors[i]
+                                                injector: injectors()[i]
                                             "
-                                        ></ng-container>
+                                         />
                                     }
                                     @case ('html') {
                                         <div
@@ -122,12 +122,11 @@ export interface MapMetadata {
                                         ></div>
                                     }
                                     @default {
-                                        <ng-container
-                                            *ngTemplateOutlet="
+                                        <ng-container *ngTemplateOutlet="
                                                 $any(element.content);
                                                 context: $any(element).data
                                             "
-                                        ></ng-container>
+                                         />
                                     }
                                 }
                             </div>
@@ -185,7 +184,12 @@ export interface MapMetadata {
             }
         `,
     ],
-    imports: [CommonModule, MatRippleModule, MatTooltipModule],
+    imports: [
+        MatRippleModule,
+        MatTooltipModule,
+        NgComponentOutlet,
+        NgTemplateOutlet,
+    ],
 })
 export class DynamicMapComponent implements OnInit, OnDestroy {
     private _injector = inject(Injector);
@@ -211,7 +215,7 @@ export class DynamicMapComponent implements OnInit, OnDestroy {
     public mapInfo = output<MapDetails>();
     public aspect_ratio = output<number>();
 
-    public injectors: Injector[] = [];
+    public readonly injectors = signal<Injector[]>([]);
     public loading = signal(false);
 
     private _view_changes = new BehaviorSubject<{
@@ -583,27 +587,29 @@ export class DynamicMapComponent implements OnInit, OnDestroy {
     }
 
     private _updateInjectors() {
-        const old_injectors = this.injectors || [];
-        this.injectors = (this.features() || []).map(
-            (f: any) =>
-                old_injectors.find(
-                    (_) =>
-                        _.get(MAP_FEATURE_DATA)?.track_id &&
-                        _.get(MAP_FEATURE_DATA)?.track_id === f.track_id
-                ) ||
-                Injector.create({
-                    providers: [
-                        {
-                            provide: MAP_FEATURE_DATA,
-                            useValue: {
-                                track_id: f.track_id,
-                                ...f.data,
-                                ...this._extra_data,
+        const old_injectors = untracked(this.injectors);
+        this.injectors.set(
+            (this.features() || []).map(
+                (f: any) =>
+                    old_injectors.find(
+                        (_) =>
+                            _.get(MAP_FEATURE_DATA)?.track_id &&
+                            _.get(MAP_FEATURE_DATA)?.track_id === f.track_id
+                    ) ||
+                    Injector.create({
+                        providers: [
+                            {
+                                provide: MAP_FEATURE_DATA,
+                                useValue: {
+                                    track_id: f.track_id,
+                                    ...f.data,
+                                    ...this._extra_data,
+                                },
                             },
-                        },
-                    ],
-                    parent: this._injector,
-                })
+                        ],
+                        parent: this._injector,
+                    })
+            )
         );
     }
 }

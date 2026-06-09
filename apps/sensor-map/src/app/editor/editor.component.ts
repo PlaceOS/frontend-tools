@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { ActivatedRoute, ParamMap } from '@angular/router';
 import { BaseClass, sendMessage } from '@placeos-tools/common';
 
@@ -13,12 +13,11 @@ import { AsyncPipe } from '@angular/common';
     selector: '[sensor-map-editor]',
     template: `
         <div class="relative h-full flex-1">
-            <i-map
-                class="w-screen h-screen"
+            <i-map class="w-screen h-screen"
                 [src]="url | async"
                 [features]="features | async"
-                [actions]="actions"
-            ></i-map>
+                [actions]="actions()"
+             />
             <div
                 class="absolute bottom-2 right-2 flex flex-wrap items-center justify-end"
             >
@@ -37,7 +36,7 @@ import { AsyncPipe } from '@angular/common';
             </div>
         </div>
         <div class="w-64 h-full">
-            <editor-sensor-list></editor-sensor-list>
+            <editor-sensor-list />
         </div>
     `,
     styles: [
@@ -67,27 +66,23 @@ import { AsyncPipe } from '@angular/common';
     ],
 })
 export class EditorComponent extends BaseClass implements OnInit {
+    private _editor = inject(EditorStateService);
+    private _route = inject(ActivatedRoute);
+
     /** URL of the map to display */
     public readonly url = this._editor.url;
     /** Whether UI is embeded */
     public readonly embeded = this._editor.embeded;
     public readonly features = this._editor.features;
-    public actions = [
+    public readonly actions = signal([
         { id: '*', action: 'click', callback: (_, p) => this.clicked(p) },
         { id: '*', action: 'touchend', callback: (_, p) => this.clicked(p) },
-    ];
+    ]);
 
     public readonly clicked = (p) => this._editor.setSensorPosition(p);
 
     public readonly saveMetadata = () => this._editor.saveMetadata();
     public readonly copyMetadata = () => this._editor.copyMetadata();
-
-    constructor(
-        private _editor: EditorStateService,
-        private _route: ActivatedRoute
-    ) {
-        super();
-    }
 
     public ngOnInit() {
         const handle_params = async (params: ParamMap) => {

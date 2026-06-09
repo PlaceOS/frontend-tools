@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { randomInt } from '@placeos-tools/common';
 import { openConfirmModal } from 'libs/components/src/lib/confirm-modal.component';
@@ -31,6 +31,8 @@ export interface BuildingLevel {
     providedIn: 'root',
 })
 export class OrganisationService {
+    private _dialog = inject(MatDialog);
+
     private _building_list = new BehaviorSubject<Building[]>([
         {
             id: 'bld-01',
@@ -52,14 +54,15 @@ export class OrganisationService {
             name: 'LVL 01',
             allow_visitors: true,
             catering_available: true,
-        },]);
+        },
+    ]);
     private _selected = new BehaviorSubject<string[]>([]);
 
     public readonly buildings = this._building_list.asObservable();
     public readonly levels = this._floor_list.asObservable();
     public readonly selected = this._selected.asObservable();
 
-    constructor(private _dialog: MatDialog) {
+    constructor() {
         this._load();
     }
 

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { combineLatest } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -34,11 +34,10 @@ import { AsyncPipe } from '@angular/common';
                         class="sticky top-0 flex items-center bg-neutral-800 border-b border-neutral-500 w-full"
                     >
                         <div thead class="min-w-0 w-10">
-                            <mat-checkbox
-                                [ngModel]="all_selected | async"
+                            <mat-checkbox [ngModel]="all_selected | async"
                                 [indeterminate]="some_selected | async"
                                 (ngModelChange)="setSelected($event)"
-                            ></mat-checkbox>
+                             />
                         </div>
                         <div thead>Building</div>
                         <div thead>Level</div>
@@ -61,7 +60,7 @@ import { AsyncPipe } from '@angular/common';
                     }
                 </div>
             </main>
-            <data-warning [levels]="true"></data-warning>
+            <data-warning [levels]="true" />
         </div>
     `,
     styles: [
@@ -93,6 +92,9 @@ import { AsyncPipe } from '@angular/common';
     ],
 })
 export class FloorPlansComponent {
+    private _service = inject(FloorPlansService);
+    private _dialog = inject(MatDialog);
+
     public readonly floorplans = this._service.floorplans;
 
     public readonly newFloorPlan = () => this._service.openFloorPlanModal();
@@ -106,11 +108,6 @@ export class FloorPlansComponent {
         this._service.floorplans,
         this._service.selected,
     ]).pipe(map(([l, s]) => l.length !== s.length && s.length > 0));
-
-    constructor(
-        private _service: FloorPlansService,
-        private _dialog: MatDialog
-    ) {}
 
     public viewExample() {
         this._dialog.open(FloorPlanExampleModalComponent);

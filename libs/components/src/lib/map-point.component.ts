@@ -1,4 +1,4 @@
-import { Component, Inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { MAP_FEATURE_DATA } from './map-viewer/map-types';
 import { CustomTooltipComponent } from './custom-tooltip.component';
 
@@ -48,6 +48,8 @@ export interface MapPointData {
     imports: [CustomTooltipComponent],
 })
 export class MapPointComponent {
+    private _details = inject<MapPointData>(MAP_FEATURE_DATA);
+
     /** Whether point should be displayed as active */
     public readonly active = this._details.active;
     /** Whether point should be displayed as active */
@@ -58,6 +60,4 @@ export class MapPointComponent {
         e.stopPropagation();
         this._details.clicked && !this.active ? this._details.clicked() : null;
     };
-
-    constructor(@Inject(MAP_FEATURE_DATA) private _details: MapPointData) {}
 }

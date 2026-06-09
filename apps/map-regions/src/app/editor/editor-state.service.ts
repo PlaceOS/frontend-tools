@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Clipboard } from '@angular/cdk/clipboard';
 import {
     downloadFile,
@@ -52,6 +52,8 @@ const formatRegion = (r) => {
     providedIn: 'root',
 })
 export class EditorStateService {
+    private _clipboard = inject(Clipboard);
+
     private _use_url = new BehaviorSubject<string>('');
     private _map_url = new BehaviorSubject<string>('');
     private _map_width = new BehaviorSubject<number>(100);
@@ -82,7 +84,7 @@ export class EditorStateService {
         return this._action;
     }
 
-    constructor(private _clipboard: Clipboard) {
+    constructor() {
         document.addEventListener('keydown', (ev) =>
             ev.key === 'Shift' ? (this._shift = true) : ''
         );

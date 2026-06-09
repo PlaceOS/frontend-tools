@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import {
     Building,
     OrganisationService,
@@ -18,24 +18,23 @@ import { IconComponent } from '../../../../../libs/components/src/lib/icon.compo
             class="flex items-center border-b border-neutral-500 text-sm hover:bg-black/10 relative"
         >
             <div thead class="min-w-0 w-10">
-                <mat-checkbox
-                    [ngModel]="selected"
+                <mat-checkbox [ngModel]="selected"
                     (ngModelChange)="setSelected($event)"
-                ></mat-checkbox>
+                 />
             </div>
-            <div thead>{{ item.name }}</div>
-            <div thead>{{ item.building_id }}</div>
-            <div thead>{{ item.brand }}</div>
-            <div thead>{{ item.category }}</div>
-            <div thead>{{ item.barcode }}</div>
-            <div thead>{{ item.purchase_date }}</div>
-            <div thead>{{ item.good_until }}</div>
-            <div thead>{{ item.consumable ? 'YES' : 'NO' }}</div>
-            <div thead>{{ item.quantity }}</div>
-            <div thead>{{ item.remind_returns ? 'YES' : 'NO' }}</div>
-            <div thead>{{ item.reminder_delay }}</div>
-            <div thead>{{ item.available_for_desks ? 'YES' : 'NO' }}</div>
-            <div thead>{{ item.available_for_spaces ? 'YES' : 'NO' }}</div>
+            <div thead>{{ item().name }}</div>
+            <div thead>{{ item().building_id }}</div>
+            <div thead>{{ item().brand }}</div>
+            <div thead>{{ item().category }}</div>
+            <div thead>{{ item().barcode }}</div>
+            <div thead>{{ item().purchase_date }}</div>
+            <div thead>{{ item().good_until }}</div>
+            <div thead>{{ item().consumable ? 'YES' : 'NO' }}</div>
+            <div thead>{{ item().quantity }}</div>
+            <div thead>{{ item().remind_returns ? 'YES' : 'NO' }}</div>
+            <div thead>{{ item().reminder_delay }}</div>
+            <div thead>{{ item().available_for_desks ? 'YES' : 'NO' }}</div>
+            <div thead>{{ item().available_for_spaces ? 'YES' : 'NO' }}</div>
             <div
                 actions
                 class="absolute top-1/2 -translate-y-1/2 left-12 rounded-3xl flex items-center bg-white dark:bg-neutral-700 shadow !p-0 min-w-0 w-auto"
@@ -91,16 +90,16 @@ import { IconComponent } from '../../../../../libs/components/src/lib/icon.compo
     ],
 })
 export class AssetDetailsComponent {
-    @Input() public item: Asset;
+    private _service = inject(AssetsService);
 
-    public readonly edit = () => this._service.openAssetModal(this.item);
-    public readonly remove = () => this._service.removeAsset(this.item);
+    public readonly item = input<Asset>(undefined);
+
+    public readonly edit = () => this._service.openAssetModal(this.item());
+    public readonly remove = () => this._service.removeAsset(this.item());
     public readonly setSelected = (s) =>
-        this._service.setSelected(this.item.id, s);
+        this._service.setSelected(this.item().id, s);
 
     public get selected() {
-        return this._service.isSelected(this.item.id);
+        return this._service.isSelected(this.item().id);
     }
-
-    constructor(private _service: AssetsService) {}
 }

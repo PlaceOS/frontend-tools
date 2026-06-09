@@ -1,4 +1,4 @@
-import { Component, Renderer2 } from '@angular/core';
+import { Component, Renderer2, inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { BaseClass, sendMessage } from '@placeos-tools/common';
 import { EditorStateService } from './editor-state.service';
@@ -19,12 +19,11 @@ import { AsyncPipe } from '@angular/common';
     selector: 'wayfinding-editor',
     template: `
         <div class="relative h-full flex-1">
-            <i-map
-                class="w-screen h-screen"
+            <i-map class="w-screen h-screen"
                 [src]="url | async"
                 [features]="features | async"
                 [actions]="actions"
-            ></i-map>
+             />
         </div>
         @if ((method | async) !== 'testing') {
         <div
@@ -170,6 +169,10 @@ import { AsyncPipe } from '@angular/common';
     ],
 })
 export class WayfindingEditorComponent extends BaseClass {
+    private _editor = inject(EditorStateService);
+    private _route = inject(ActivatedRoute);
+    private _renderer = inject(Renderer2);
+
     public readonly url = this._editor.url;
     public readonly size = this._editor.size;
     public readonly features = this._editor.features;
@@ -183,14 +186,6 @@ export class WayfindingEditorComponent extends BaseClass {
     public readonly setMethod = (s) => this._editor.setMethod(s);
     public readonly saveMetadata = () => this._editor.saveMetadata();
     public readonly copyMetadata = () => this._editor.copyMetadata();
-
-    constructor(
-        private _editor: EditorStateService,
-        private _route: ActivatedRoute,
-        private _renderer: Renderer2
-    ) {
-        super();
-    }
 
     public ngOnInit() {
         this.subscription(

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { EditorStateService } from './editor-state.service';
 import { MatRipple } from '@angular/material/core';
 import { MatTooltip } from '@angular/material/tooltip';
@@ -58,11 +58,11 @@ import { IconComponent } from '../../../../../libs/components/src/lib/icon.compo
     imports: [MatRipple, MatTooltip, IconComponent],
 })
 export class EditorControlsComponent {
+    private _state = inject(EditorStateService);
+
     public get action() {
         return this._state.action;
     }
 
     public readonly setAction = (a) => this._state.setAction(a);
-
-    constructor(private _state: EditorStateService) {}
 }

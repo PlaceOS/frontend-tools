@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Inject, OnInit, Output } from '@angular/core';
+import { Component, OnInit, inject, output, signal } from '@angular/core';
 import {
     FormGroup,
     FormControl,
@@ -50,13 +50,13 @@ export async function openCateringItemOptionModal(
             <h3 class="p-2 font-medium">
                 {{ option.id ? 'Edit' : 'Add' }} Item Option
             </h3>
-            @if (!loading) {
+            @if (!loading()) {
             <button mat-icon-button mat-dialog-close>
                 <app-icon>close</app-icon>
             </button>
             }
         </header>
-        @if (form && !loading) {
+        @if (form && !loading()) {
         <form class="p-4 overflow-auto" [formGroup]="form">
             @if (form.controls.name) {
             <div class="flex flex-col">
@@ -123,10 +123,10 @@ export async function openCateringItemOptionModal(
         </form>
         } @else {
         <div loading class="flex flex-col items-center p-8 space-y-2 w-64">
-            <mat-spinner diameter="32"></mat-spinner>
+            <mat-spinner diameter="32" />
             <p>Saving catering item option...</p>
         </div>
-        } @if (!loading) {
+        } @if (!loading()) {
         <footer
             class="flex p-2 items-center justify-center border-t border-solid border-gray-300 dark:border-neutral-500"
         >
@@ -172,8 +172,10 @@ export async function openCateringItemOptionModal(
     ],
 })
 export class CateringItemOptionModalComponent {
+    private _data = inject<CateringItemOptionModalData>(MAT_DIALOG_DATA);
+
     /** Emitter for events on the modal */
-    @Output() public event = new EventEmitter<DialogEvent>();
+    public readonly event = output<DialogEvent>();
     /** Form fields for item */
     public form = new FormGroup({
         name: new FormControl(this.option.name || '', [Validators.required]),
@@ -182,7 +184,7 @@ export class CateringItemOptionModalComponent {
         multiple: new FormControl(!!this.option.multiple, []),
     });
     /** Whether changes are being saved */
-    public loading = false;
+    public readonly loading = signal(false);
 
     /** Current item details */
     public get option(): CateringOption {
@@ -194,12 +196,8 @@ export class CateringItemOptionModalComponent {
         return this._data.types || [];
     }
 
-    constructor(
-        @Inject(MAT_DIALOG_DATA) private _data: CateringItemOptionModalData
-    ) {}
-
     public saveChanges() {
-        this.loading = true;
+        this.loading.set(true);
         const new_option = {
             ...this.option,
             id: this.option.id || `option-${randomInt(9999_9999)}`,

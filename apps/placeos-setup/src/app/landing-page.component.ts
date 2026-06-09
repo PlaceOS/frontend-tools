@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { ExportService } from './data/export.service';
 import { IconComponent } from '../../../../libs/components/src/lib/icon.component';
 import { RouterLink } from '@angular/router';
@@ -47,7 +47,7 @@ import { AsyncPipe } from '@angular/common';
                     class="flex items-center px-2 rounded m-2 w-[30%] border border-gray-200 dark:border-neutral-500 space-x-2"
                     [routerLink]="[item.route]"
                 >
-                    <app-icon [icon]="item.icon"></app-icon>
+                    <app-icon [icon]="item.icon" />
                     <p class="flex-1 py-2">{{ item?.name }}</p>
                     @if (item.count && (item.count | async) > 0) {
                     <app-icon class="text-green-600 text-2xl -mr-2">
@@ -87,6 +87,8 @@ import { AsyncPipe } from '@angular/common';
     imports: [IconComponent, RouterLink, MatButton, AsyncPipe],
 })
 export class LandingPageComponent {
+    private _export = inject(ExportService);
+
     public readonly resources = [
         {
             name: 'Organisation',
@@ -163,6 +165,4 @@ export class LandingPageComponent {
     ];
 
     public readonly export = () => this._export.exportData();
-
-    constructor(private _export: ExportService) {}
 }

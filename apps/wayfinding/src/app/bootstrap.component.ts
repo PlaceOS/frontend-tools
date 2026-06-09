@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatFormField } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
@@ -19,7 +19,8 @@ import { RouterLink } from '@angular/router';
                     <input
                         matInput
                         name="map-url"
-                        [(ngModel)]="url"
+                        [ngModel]="url()"
+                        (ngModelChange)="url.set($event)"
                         placeholder="SVG URL e.g. https://my.domain/path/to/file.svg"
                     />
                 </mat-form-field>
@@ -27,8 +28,8 @@ import { RouterLink } from '@angular/router';
                     button
                     mat-button
                     class="w-32"
-                    [disabled]="!url"
-                    [routerLink]="['/editor', url]"
+                    [disabled]="!url()"
+                    [routerLink]="['/editor', url()]"
                 >
                     View Map
                 </a>
@@ -40,5 +41,5 @@ import { RouterLink } from '@angular/router';
 })
 export class BootstrapComponent {
     /** URL of the map to edit */
-    public url = '';
+    public readonly url = signal('');
 }

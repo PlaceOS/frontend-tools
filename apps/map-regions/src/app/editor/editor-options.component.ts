@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { EditorStateService } from './editor-state.service';
 import { MatFormField } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
@@ -145,6 +145,8 @@ import { AsyncPipe } from '@angular/common';
     ],
 })
 export class EditorOptionsComponent {
+    private _state = inject(EditorStateService);
+
     /** Map regions for active map URL */
     public readonly regions = this._state.regions;
     /** Map regions for active map URL */
@@ -163,6 +165,4 @@ export class EditorOptionsComponent {
     public readonly setWidth = (w) => this._state.setWidth(w);
     public readonly saveMetadata = () => this._state.saveMetadata();
     public readonly copyMetadata = () => this._state.copyMetadata();
-
-    constructor(private _state: EditorStateService) {}
 }

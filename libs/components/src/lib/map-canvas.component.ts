@@ -1,9 +1,9 @@
 import {
     Component,
     ElementRef,
-    Inject,
     OnInit,
-    ViewChild,
+    inject,
+    viewChild,
 } from '@angular/core';
 import { BaseClass } from '@placeos-tools/common';
 import { Observable, combineLatest, of } from 'rxjs';
@@ -40,20 +40,18 @@ export interface MapPolygonData {
     styles: [],
 })
 export class MapCanvasComponent extends BaseClass implements OnInit {
+    private _data = inject<MapPolygonData>(MAP_FEATURE_DATA);
+
     public zoom = 1;
     public ratio = 1;
     public svg_ratio = 1;
     public width = 10000;
 
-    @ViewChild('canvas', { static: true })
-    private canvas_element: ElementRef<HTMLCanvasElement>;
+    private readonly canvas_element =
+        viewChild<ElementRef<HTMLCanvasElement>>('canvas');
 
     public get ratioed_height(): number {
         return +(this.width * this.ratio).toFixed(2);
-    }
-
-    constructor(@Inject(MAP_FEATURE_DATA) private _data: MapPolygonData) {
-        super();
     }
 
     public ngOnInit(): void {
@@ -86,7 +84,7 @@ export class MapCanvasComponent extends BaseClass implements OnInit {
         this.svg_ratio = svg_ratio;
         const width = this.width / 10;
         const height = (this.width * this.ratio) / 10;
-        const canvas = this.canvas_element.nativeElement;
+        const canvas = this.canvas_element().nativeElement;
 
         if (
             old_ratio === ratio &&
@@ -103,7 +101,7 @@ export class MapCanvasComponent extends BaseClass implements OnInit {
     }
 
     private _handleStateChange(polygon_list: Polygon[]): void {
-        const canvas = this.canvas_element.nativeElement;
+        const canvas = this.canvas_element().nativeElement;
         const ctx = canvas.getContext('2d');
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         polygon_list.forEach((poly) => this._drawPolygon(poly));
@@ -112,7 +110,7 @@ export class MapCanvasComponent extends BaseClass implements OnInit {
     private _drawPolygon(polygon: Polygon) {
         const points = polygon.points;
         if (!points?.length) return;
-        const canvas = this.canvas_element.nativeElement;
+        const canvas = this.canvas_element().nativeElement;
         const ctx = canvas.getContext('2d');
         const width = canvas.width;
         const height = canvas.height;

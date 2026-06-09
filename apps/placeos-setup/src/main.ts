@@ -12,19 +12,7 @@ import {
     provideRouter,
     Route,
 } from '@angular/router';
-import { LandingPageComponent } from './app/landing-page.component';
-import { OrganisationComponent } from './app/organisation/organisation.component';
-import { InterfacesComponent } from './app/interfaces/interfaces.component';
-import { SpacesComponent } from './app/spaces/spaces.component';
-import { FloorPlansComponent } from './app/floorplans/floorplans.component';
-import { CateringComponent } from './app/catering/catering.component';
-import { DesksComponent } from './app/desks/desks.component';
-import { LockersComponent } from './app/lockers/lockers.component';
-import { ZonesComponent } from './app/zoning/zoning.component';
-import { CarSpacesComponent } from './app/car-spaces/car-spaces.component';
-import { AssetsComponent } from './app/assets/assets.component';
-import { MonitoringComponent } from './app/monitoring/monitoring.component';
-import { AccessControlsComponent } from './app/access-control/access-control.component';
+
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -41,20 +29,96 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AppComponent } from './app/app.component';
 
 const ROUTES: Route[] = [
-    { path: 'home', component: LandingPageComponent },
-    { path: 'organisation', component: OrganisationComponent },
-    { path: 'interfaces/:id', component: InterfacesComponent },
+    {
+        path: 'home',
+        loadComponent: () =>
+            import('./app/landing-page.component').then(
+                (m) => m.LandingPageComponent
+            ),
+    },
+    {
+        path: 'organisation',
+        loadComponent: () =>
+            import('./app/organisation/organisation.component').then(
+                (m) => m.OrganisationComponent
+            ),
+    },
+    {
+        path: 'interfaces/:id',
+        loadComponent: () =>
+            import('./app/interfaces/interfaces.component').then(
+                (m) => m.InterfacesComponent
+            ),
+    },
     { path: 'interfaces', redirectTo: `/interfaces/root` },
-    { path: 'spaces', component: SpacesComponent },
-    { path: 'floorplans', component: FloorPlansComponent },
-    { path: 'catering', component: CateringComponent },
-    { path: 'desks', component: DesksComponent },
-    { path: 'lockers', component: LockersComponent },
-    { path: 'zoning', component: ZonesComponent },
-    { path: 'parking', component: CarSpacesComponent },
-    { path: 'assets', component: AssetsComponent },
-    { path: 'monitoring', component: MonitoringComponent },
-    { path: 'access-control', component: AccessControlsComponent },
+    {
+        path: 'spaces',
+        loadComponent: () =>
+            import('./app/spaces/spaces.component').then(
+                (m) => m.SpacesComponent
+            ),
+    },
+    {
+        path: 'floorplans',
+        loadComponent: () =>
+            import('./app/floorplans/floorplans.component').then(
+                (m) => m.FloorPlansComponent
+            ),
+    },
+    {
+        path: 'catering',
+        loadComponent: () =>
+            import('./app/catering/catering.component').then(
+                (m) => m.CateringComponent
+            ),
+    },
+    {
+        path: 'desks',
+        loadComponent: () =>
+            import('./app/desks/desks.component').then((m) => m.DesksComponent),
+    },
+    {
+        path: 'lockers',
+        loadComponent: () =>
+            import('./app/lockers/lockers.component').then(
+                (m) => m.LockersComponent
+            ),
+    },
+    {
+        path: 'zoning',
+        loadComponent: () =>
+            import('./app/zoning/zoning.component').then(
+                (m) => m.ZonesComponent
+            ),
+    },
+    {
+        path: 'parking',
+        loadComponent: () =>
+            import('./app/car-spaces/car-spaces.component').then(
+                (m) => m.CarSpacesComponent
+            ),
+    },
+    {
+        path: 'assets',
+        loadComponent: () =>
+            import('./app/assets/assets.component').then(
+                (m) => m.AssetsComponent
+            ),
+    },
+    {
+        path: 'monitoring',
+        loadComponent: () =>
+            import('./app/monitoring/monitoring.component').then(
+                (m) => m.MonitoringComponent
+            ),
+    },
+    {
+        path: 'access-control',
+        loadComponent: () =>
+            import('./app/access-control/access-control.component').then(
+                (m) => m.AccessControlsComponent
+            ),
+    },
     { path: '**', redirectTo: '/home' },
 ];
 

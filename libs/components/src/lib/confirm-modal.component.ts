@@ -1,4 +1,4 @@
-import { Component, Output, EventEmitter, Inject } from '@angular/core';
+import { Component, inject, output } from '@angular/core';
 import {
     MatDialog,
     MatDialogRef,
@@ -52,7 +52,7 @@ export const CONFIRM_METADATA = {
         </header>
         @if (!loading) {
         <main class="flex flex-col items-center space-y-2 p-4">
-            <app-icon [icon]="icon" class="text-5xl"></app-icon>
+            <app-icon [icon]="icon" class="text-5xl" />
             <p
                 content
                 class="text-center text-sm w-[22rem]"
@@ -64,7 +64,7 @@ export const CONFIRM_METADATA = {
             <div
                 class="w-full h-48 flex flex-col items-center justify-center space-y-2"
             >
-                <mat-spinner diameter="32"></mat-spinner>
+                <mat-spinner diameter="32" />
                 <p>{{ loading }}</p>
             </div>
         </main>
@@ -83,10 +83,14 @@ export const CONFIRM_METADATA = {
     imports: [IconComponent, MatProgressSpinner, MatButton, MatDialogClose],
 })
 export class ConfirmModalComponent {
+    private _dialog_ref =
+        inject<MatDialogRef<ConfirmModalComponent>>(MatDialogRef);
+    private _data = inject<ConfirmModalData>(MAT_DIALOG_DATA);
+
     /** Loading state */
     public loading: string;
     /** Emitter for user action on the modal */
-    @Output() public event = new EventEmitter<DialogEvent>();
+    public readonly event = output<DialogEvent>();
     /** Title of the confirm modal */
     public readonly title: string = this._data.title || 'Confirm';
     /** Body of the confirm modal */
@@ -104,11 +108,6 @@ export class ConfirmModalComponent {
     public readonly disableClose = () => (this._dialog_ref.disableClose = true);
     /** Allow the user to close the modal */
     public readonly enableClose = () => (this._dialog_ref.disableClose = false);
-
-    constructor(
-        private _dialog_ref: MatDialogRef<ConfirmModalComponent>,
-        @Inject(MAT_DIALOG_DATA) private _data: ConfirmModalData
-    ) {}
 
     /** User confirmation of the content of the modal */
     public onConfirm() {

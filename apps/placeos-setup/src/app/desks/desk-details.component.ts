@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import {
     Building,
     OrganisationService,
@@ -18,28 +18,29 @@ import { IconComponent } from '../../../../../libs/components/src/lib/icon.compo
             class="flex items-center border-b border-neutral-500 text-sm hover:bg-black/10 relative"
         >
             <div thead class="min-w-0 w-10">
-                <mat-checkbox
-                    [ngModel]="selected"
+                <mat-checkbox [ngModel]="selected"
                     (ngModelChange)="setSelected($event)"
-                ></mat-checkbox>
+                 />
             </div>
-            <div thead class="font-mono text-xs">{{ item.map_id }}</div>
-            <div thead class="w-56">{{ item.display_name }}</div>
-            <div thead>{{ item.name }}</div>
-            <div thead>{{ item.building_id }}</div>
-            <div thead>{{ item.level_id }}</div>
-            <div thead>{{ item.zone }}</div>
-            <div thead class="w-64">{{ item.features?.join() || 'NONE' }}</div>
+            <div thead class="font-mono text-xs">{{ item().map_id }}</div>
+            <div thead class="w-56">{{ item().display_name }}</div>
+            <div thead>{{ item().name }}</div>
+            <div thead>{{ item().building_id }}</div>
+            <div thead>{{ item().level_id }}</div>
+            <div thead>{{ item().zone }}</div>
             <div thead class="w-64">
-                {{ item.whitelist_groups?.join() || 'NONE' }}
+                {{ item().features?.join() || 'NONE' }}
             </div>
-            <div thead>{{ item.bookable ? 'YES' : 'NO' }}</div>
-            <div thead>{{ item.requires_approval ? 'YES' : 'NO' }}</div>
-            <div thead>{{ item.auto_release ? 'YES' : 'NO' }}</div>
-            <div thead>{{ item.auto_release_delay || '10' }} minutes</div>
-            <div thead class="w-32">{{ item.sensor_brand }}</div>
-            <div thead>{{ item.recurrence ? 'YES' : 'NO' }}</div>
-            <div thead>{{ item.max_recurrence }}</div>
+            <div thead class="w-64">
+                {{ item().whitelist_groups?.join() || 'NONE' }}
+            </div>
+            <div thead>{{ item().bookable ? 'YES' : 'NO' }}</div>
+            <div thead>{{ item().requires_approval ? 'YES' : 'NO' }}</div>
+            <div thead>{{ item().auto_release ? 'YES' : 'NO' }}</div>
+            <div thead>{{ item().auto_release_delay || '10' }} minutes</div>
+            <div thead class="w-32">{{ item().sensor_brand }}</div>
+            <div thead>{{ item().recurrence ? 'YES' : 'NO' }}</div>
+            <div thead>{{ item().max_recurrence }}</div>
             <div
                 actions
                 class="absolute top-1/2 -translate-y-1/2 left-12 rounded-3xl flex items-center bg-white dark:bg-neutral-700 shadow !p-0 min-w-0 w-auto"
@@ -91,16 +92,16 @@ import { IconComponent } from '../../../../../libs/components/src/lib/icon.compo
     ],
 })
 export class DeskDetailsComponent {
-    @Input() public item: Desk;
+    private _service = inject(DesksService);
 
-    public readonly edit = () => this._service.openDeskModal(this.item);
-    public readonly remove = () => this._service.removeDesk(this.item);
+    public readonly item = input<Desk>(undefined);
+
+    public readonly edit = () => this._service.openDeskModal(this.item());
+    public readonly remove = () => this._service.removeDesk(this.item());
     public readonly setSelected = (s) =>
-        this._service.setSelected(this.item.id, s);
+        this._service.setSelected(this.item().id, s);
 
     public get selected() {
-        return this._service.isSelected(this.item.id);
+        return this._service.isSelected(this.item().id);
     }
-
-    constructor(private _service: DesksService) {}
 }

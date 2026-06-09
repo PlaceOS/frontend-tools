@@ -16,14 +16,29 @@ import { ClipboardModule } from '@angular/cdk/clipboard';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { AppComponent } from './app/app.component';
-import { BootstrapComponent } from './app/bootstrap.component';
-import { WayfindingEditorComponent } from './app/editor/editor.component';
-import { WayfindingPlaygroundComponent } from './app/playground/playground.component';
 
 const routes: Route[] = [
-    { path: '', component: BootstrapComponent },
-    { path: 'editor/:src', component: WayfindingEditorComponent },
-    { path: 'playground/:src', component: WayfindingPlaygroundComponent },
+    {
+        path: '',
+        loadComponent: () =>
+            import('./app/bootstrap.component').then(
+                (m) => m.BootstrapComponent
+            ),
+    },
+    {
+        path: 'editor/:src',
+        loadComponent: () =>
+            import('./app/editor/editor.component').then(
+                (m) => m.WayfindingEditorComponent
+            ),
+    },
+    {
+        path: 'playground/:src',
+        loadComponent: () =>
+            import('./app/playground/playground.component').then(
+                (m) => m.WayfindingPlaygroundComponent
+            ),
+    },
     { path: '**', redirectTo: '' },
 ];
 

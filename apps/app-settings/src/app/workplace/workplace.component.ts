@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { SettingsStateService } from '../settings-state.service';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatFormField } from '@angular/material/form-field';
@@ -183,9 +183,8 @@ import { MatButton } from '@angular/material/button';
                     </div>
                 </div>
                 <h3 class="text-lg font-medium">Theme</h3>
-                <color-list-field
-                    formControlName="css_variables"
-                ></color-list-field>
+                <color-list-field formControlName="css_variables"
+                 />
             </div>
         </form>
         <button mat-button class="w-32 my-2 mx-auto" (click)="save()">
@@ -214,6 +213,8 @@ import { MatButton } from '@angular/material/button';
     ],
 })
 export class AppWorkplaceComponent {
+    private _state = inject(SettingsStateService);
+
     public readonly form = this._state.form;
     public readonly save = () => this._state.saveSettings('workplace_app');
 
@@ -243,6 +244,4 @@ export class AppWorkplaceComponent {
             form.patchValue({ features: [...feature_list, feature] });
         }
     }
-
-    constructor(private _state: SettingsStateService) {}
 }

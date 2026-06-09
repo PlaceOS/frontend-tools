@@ -1,5 +1,5 @@
 import { Clipboard } from '@angular/cdk/clipboard';
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import {
     downloadFile,
     isChildFrame,
@@ -29,6 +29,8 @@ const RES = 0.01;
     providedIn: 'root',
 })
 export class EditorStateService {
+    private _clipboard = inject(Clipboard);
+
     private _use_url = new BehaviorSubject<string>('');
     private _map_url = new BehaviorSubject<string>('');
     private _embeded = new BehaviorSubject<boolean>(false);
@@ -122,7 +124,7 @@ export class EditorStateService {
     /** Action method for wayfinding grid */
     public readonly method = this._method.asObservable();
 
-    constructor(private _clipboard: Clipboard) {
+    constructor() {
         const is_child = isChildFrame();
         this._embeded.next(is_child);
         if (is_child) {

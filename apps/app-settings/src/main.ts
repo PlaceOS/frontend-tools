@@ -11,9 +11,7 @@ import {
     provideRouter,
     Route,
 } from '@angular/router';
-import { AppSharedComponent } from './app/shared/shared.component';
-import { AppWorkplaceComponent } from './app/workplace/workplace.component';
-import { AppConciergeComponent } from './app/concierge/concierge.component';
+
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { MatButtonModule } from '@angular/material/button';
@@ -27,9 +25,27 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AppComponent } from './app/app.component';
 
 const routes: Route[] = [
-    { path: 'shared', component: AppSharedComponent },
-    { path: 'workplace', component: AppWorkplaceComponent },
-    { path: 'concierge', component: AppConciergeComponent },
+    {
+        path: 'shared',
+        loadComponent: () =>
+            import('./app/shared/shared.component').then(
+                (m) => m.AppSharedComponent
+            ),
+    },
+    {
+        path: 'workplace',
+        loadComponent: () =>
+            import('./app/workplace/workplace.component').then(
+                (m) => m.AppWorkplaceComponent
+            ),
+    },
+    {
+        path: 'concierge',
+        loadComponent: () =>
+            import('./app/concierge/concierge.component').then(
+                (m) => m.AppConciergeComponent
+            ),
+    },
     { path: '**', redirectTo: 'shared' },
 ];
 

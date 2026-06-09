@@ -28,7 +28,7 @@ import { IconComponent } from '../../../../../libs/components/src/lib/icon.compo
                     [routerLink]="[item.route]"
                     routerLinkActive="active"
                 >
-                    <app-icon [icon]="item.icon"></app-icon>
+                    <app-icon [icon]="item.icon" />
                     <p>{{ item?.name }}</p>
                 </a>
                 }

@@ -6,13 +6,15 @@ import {
     HostListener,
     Injectable,
     Injector,
-    Input,
     OnChanges,
     OnDestroy,
     SimpleChanges,
     TemplateRef,
     Type,
-    ViewChild,
+    inject,
+    input,
+    signal,
+    viewChild,
 } from '@angular/core';
 import { BaseClass } from '@placeos-tools/common';
 import { NgComponentOutlet, NgTemplateOutlet } from '@angular/common';
@@ -21,29 +23,23 @@ import { NgComponentOutlet, NgTemplateOutlet } from '@angular/common';
 export class CustomTooltipData<T = any> {
     data: T;
     close: () => void;
-    constructor(d) {
-        this.data = d.data;
-        this.close = d.close || (() => null);
-    }
 }
 
 @Component({
     selector: '[customTooltip]',
     template: `
-        <ng-content></ng-content>
+        <ng-content />
 
         <ng-template cdk-portal>
             <div custom-tooltip class="pointer-events-none">
-                @switch (type) { @case ('component') {
-                <ng-container
-                    *ngComponentOutlet="content; injector: injector"
-                ></ng-container>
+                @switch (type()) { @case ('component') {
+                <ng-container *ngComponentOutlet="content(); injector: injector()"
+                 />
                 } @case ('html') {
-                <div [innerHTML]="content | sanitize"></div>
+                <div [innerHTML]="content() | sanitize"></div>
                 } @default {
-                <ng-container
-                    *ngTemplateOutlet="content; context: data"
-                ></ng-container>
+                <ng-container *ngTemplateOutlet="content(); context: data()"
+                 />
                 } }
             </div>
         </ng-template>
@@ -54,41 +50,45 @@ export class CustomTooltipComponent<T = any>
     extends BaseClass
     implements OnChanges, OnDestroy
 {
-    /** Horizontal position of the rendered overlay */
-    @Input('xPosition') public x_pos: 'start' | 'center' | 'end';
-    /** Vertical position of the rendered overlay */
-    @Input('yPosition') public y_pos: 'top' | 'center' | 'bottom';
-    /** Content to render in the tooltip */
-    @Input() public content: TemplateRef<any> | Type<any> | string;
-    /** Data associated with the tooltip content */
-    @Input() public data: T;
-    /** Whether tooltip shows on hover */
-    @Input() public hover = false;
-    /** Whether tooltip has a backdrop */
-    @Input() public backdrop = true;
-    /** Type of content to render */
-    public type: 'template' | 'component' | 'html' = 'template';
+    private _element = inject<ElementRef<HTMLElement>>(ElementRef);
+    private _overlay = inject(Overlay);
+    private _injector = inject(Injector);
 
-    public injector: Injector;
+    /** Horizontal position of the rendered overlay */
+    public readonly x_pos = input<'start' | 'center' | 'end'>(undefined, {
+        alias: 'xPosition',
+    });
+    /** Vertical position of the rendered overlay */
+    public readonly y_pos = input<'top' | 'center' | 'bottom'>(undefined, {
+        alias: 'yPosition',
+    });
+    /** Content to render in the tooltip */
+    public readonly content = input<TemplateRef<any> | Type<any> | string>(
+        undefined
+    );
+    /** Data associated with the tooltip content */
+    public readonly data = input<T>(undefined);
+    /** Whether tooltip shows on hover */
+    public readonly hover = input(false);
+    /** Whether tooltip has a backdrop */
+    public readonly backdrop = input(true);
+    /** Type of content to render */
+    public readonly type = signal<'template' | 'component' | 'html'>(
+        'template'
+    );
+
+    public readonly injector = signal<Injector>(this._injector);
 
     private _overlay_ref: OverlayRef = null;
 
-    @ViewChild(CdkPortal) private _portal: CdkPortal;
+    private readonly _portal = viewChild(CdkPortal);
 
     @HostListener('click') public readonly onClick = () =>
-        this.hover ? '' : this.open();
+        this.hover() ? '' : this.open();
     @HostListener('mouseenter') public readonly onEnter = () =>
-        this.hover ? this.open() : '';
+        this.hover() ? this.open() : '';
     @HostListener('mouseleave') public readonly onLeave = () =>
-        this.hover ? this.close() : '';
-
-    constructor(
-        private _element: ElementRef<HTMLElement>,
-        private _overlay: Overlay,
-        private _injector: Injector
-    ) {
-        super();
-    }
+        this.hover() ? this.close() : '';
 
     public ngOnChanges(changes: SimpleChanges): void {
         this._updateInjector();
@@ -109,28 +109,30 @@ export class CustomTooltipComponent<T = any>
         console.log('Open Tooltip');
         this._updateType();
         if (this._overlay_ref) this.close();
-        if (!this._portal) return;
+        const _portal = this._portal();
+        if (!_portal) return;
+        const y_pos = this.y_pos();
         this._overlay_ref = this._overlay.create({
-            hasBackdrop: !!this.backdrop,
+            hasBackdrop: !!this.backdrop(),
             positionStrategy: this._overlay
                 .position()
                 .flexibleConnectedTo(this._element)
                 .withPositions([
                     {
-                        originX: this.x_pos || 'end',
+                        originX: this.x_pos() || 'end',
                         originY:
-                            (this.y_pos === 'top'
+                            (y_pos === 'top'
                                 ? 'bottom'
-                                : this.y_pos == 'bottom'
+                                : y_pos == 'bottom'
                                 ? 'top'
-                                : this.y_pos) || 'bottom',
-                        overlayX: this.x_pos || 'end',
-                        overlayY: this.y_pos || 'top',
+                                : y_pos) || 'bottom',
+                        overlayX: this.x_pos() || 'end',
+                        overlayY: this.y_pos() || 'top',
                     },
                 ]),
         });
-        this._overlay_ref.attach(this._portal);
-        if (this.backdrop) {
+        this._overlay_ref.attach(_portal);
+        if (this.backdrop()) {
             this.subscription(
                 'backdrop',
                 this._overlay_ref.backdropClick().subscribe(() => this.close())
@@ -146,23 +148,30 @@ export class CustomTooltipComponent<T = any>
     }
 
     private _updateType() {
-        this.type =
-            typeof this.content === 'string'
+        const content = this.content();
+        this.type.set(
+            typeof content === 'string'
                 ? 'html'
-                : this.content instanceof TemplateRef
+                : content instanceof TemplateRef
                 ? 'template'
-                : 'component';
+                : 'component'
+        );
     }
 
     private _updateInjector() {
-        this.injector = Injector.create({
-            providers: [
-                {
-                    provide: CustomTooltipData,
-                    useValue: { data: this.data, close: () => this.close() },
-                },
-            ],
-            parent: this._injector,
-        });
+        this.injector.set(
+            Injector.create({
+                providers: [
+                    {
+                        provide: CustomTooltipData,
+                        useValue: {
+                            data: this.data(),
+                            close: () => this.close(),
+                        },
+                    },
+                ],
+                parent: this._injector,
+            })
+        );
     }
 }

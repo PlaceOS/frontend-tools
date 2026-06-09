@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { downloadFile } from '@placeos-tools/common';
 import { combineLatest } from 'rxjs';
 import { map, take } from 'rxjs/operators';
@@ -19,6 +19,19 @@ import { ZonesService } from '../zoning/zoning.service';
     providedIn: 'root',
 })
 export class ExportService {
+    private _org = inject(OrganisationService);
+    private _interfaces = inject(InterfacesService);
+    private _floorplan = inject(FloorPlansService);
+    private _spaces = inject(SpacesService);
+    private _desks = inject(DesksService);
+    private _lockers = inject(LockersService);
+    private _zones = inject(ZonesService);
+    private _catering = inject(CateringStateService);
+    private _parking = inject(CarSpacesService);
+    private _assets = inject(AssetsService);
+    private _monitoring = inject(MonitoringService);
+    private _access_control = inject(AccessControlService);
+
     public readonly building_count = this._org.buildings.pipe(
         map((_) => _.length)
     );
@@ -56,21 +69,6 @@ export class ExportService {
     public readonly access_control_count =
         this._access_control.access_controls.pipe(map((_) => _.length));
 
-    constructor(
-        private _org: OrganisationService,
-        private _interfaces: InterfacesService,
-        private _floorplan: FloorPlansService,
-        private _spaces: SpacesService,
-        private _desks: DesksService,
-        private _lockers: LockersService,
-        private _zones: ZonesService,
-        private _catering: CateringStateService,
-        private _parking: CarSpacesService,
-        private _assets: AssetsService,
-        private _monitoring: MonitoringService,
-        private _access_control: AccessControlService
-    ) {}
-
     public async exportData() {
         console.log('Export');
         const data = await combineLatest([
@@ -86,7 +84,7 @@ export class ExportService {
             this._parking.spaces,
             this._assets.assets,
             this._monitoring.item_list,
-            this._access_control.access_controls
+            this._access_control.access_controls,
         ])
             .pipe(
                 take(1),
@@ -104,7 +102,7 @@ export class ExportService {
                         parking_spaces,
                         assets,
                         regions,
-                        access_controls
+                        access_controls,
                     ]) => ({
                         buildings,
                         levels,
@@ -118,7 +116,7 @@ export class ExportService {
                         parking_spaces,
                         assets,
                         regions,
-                        access_controls
+                        access_controls,
                     })
                 )
             )

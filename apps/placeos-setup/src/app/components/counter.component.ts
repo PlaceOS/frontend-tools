@@ -1,4 +1,4 @@
-import { Component, forwardRef, Input } from '@angular/core';
+import { Component, forwardRef, input, signal } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { MatIconButton } from '@angular/material/button';
 import { IconComponent } from '../../../../../libs/components/src/lib/icon.component';
@@ -9,30 +9,30 @@ import { IconComponent } from '../../../../../libs/components/src/lib/icon.compo
         <div
             counter
             class="flex items-center text-base"
-            (window:keydown.shift)="shift_key = true"
-            (window:keydown.control)="ctrl_key = true"
-            (window:keydown.meta)="ctrl_key = true"
-            (window:keyup.shift)="shift_key = false"
-            (window:keyup.control)="ctrl_key = false"
-            (window:keyup.meta)="ctrl_key = false"
+            (window:keydown.shift)="shift_key.set(true)"
+            (window:keydown.control)="ctrl_key.set(true)"
+            (window:keydown.meta)="ctrl_key.set(true)"
+            (window:keyup.shift)="shift_key.set(false)"
+            (window:keyup.control)="ctrl_key.set(false)"
+            (window:keyup.meta)="ctrl_key.set(false)"
         >
             <button
                 mat-icon-button
                 name="remove"
                 type="button"
-                [disabled]="!value || value === min"
+                [disabled]="!value() || value() === min()"
                 (click)="remove()"
             >
                 <app-icon>remove</app-icon>
             </button>
             <div value class="p-1 text-center">
-                {{ (render_fn ? render_fn(value) : value) || '0' }}
+                {{ (render_fn() ? render_fn()!(value()) : value()) || '0' }}
             </div>
             <button
                 mat-icon-button
                 name="add"
                 type="button"
-                [disabled]="value === max"
+                [disabled]="value() === max()"
                 (click)="add()"
             >
                 <app-icon>add</app-icon>
@@ -58,19 +58,19 @@ import { IconComponent } from '../../../../../libs/components/src/lib/icon.compo
 })
 export class CounterComponent implements ControlValueAccessor {
     /** Size of a single step */
-    @Input() public step = 1;
+    public readonly step = input(1);
     /** Maximum amount for the counter */
-    @Input() public max = 10;
+    public readonly max = input(10);
     /** Minimum amount for the counter */
-    @Input() public min = 0;
+    public readonly min = input(0);
     /** Custom function for rendering the counter value */
-    @Input() public render_fn: (v: number) => string;
+    public readonly render_fn = input<((v: number) => string) | undefined>();
     /** Current value of the counter */
-    public value: number;
+    public readonly value = signal(0);
     /** Whether shift key is being held by the user */
-    public shift_key: boolean;
+    public readonly shift_key = signal(false);
     /** Whether control key is being held by the user */
-    public ctrl_key: boolean;
+    public readonly ctrl_key = signal(false);
 
     /** Form control on change handler */
     private _onChange: (_: number) => void;
@@ -81,36 +81,38 @@ export class CounterComponent implements ControlValueAccessor {
      * Add the `step` to the current value
      */
     public add() {
-        if (!this.value) {
-            this.value = this.min || 0;
+        let value = this.value();
+        if (!value) {
+            value = this.min() || 0;
         }
-        const step = this.ctrl_key
-            ? 100 * this.step
-            : this.shift_key
-            ? 10 * this.step
-            : this.step || 1;
-        this.value += step;
-        if (this.value > this.max) {
-            this.value = this.max || 10;
+        const step = this.ctrl_key()
+            ? 100 * this.step()
+            : this.shift_key()
+            ? 10 * this.step()
+            : this.step() || 1;
+        value += step;
+        if (value > this.max()) {
+            value = this.max() || 10;
         }
-        this.setValue(this.value);
+        this.setValue(value);
     }
 
     /** Remove the `step` from the current value */
     public remove() {
-        if (!this.value) {
-            this.value = this.min || 0;
+        let value = this.value();
+        if (!value) {
+            value = this.min() || 0;
         }
-        const step = this.ctrl_key
-            ? 100 * this.step
-            : this.shift_key
-            ? 10 * this.step
-            : this.step || 1;
-        this.value -= step;
-        if (this.value < this.min) {
-            this.value = this.min || 0;
+        const step = this.ctrl_key()
+            ? 100 * this.step()
+            : this.shift_key()
+            ? 10 * this.step()
+            : this.step() || 1;
+        value -= step;
+        if (value < this.min()) {
+            value = this.min() || 0;
         }
-        this.setValue(this.value);
+        this.setValue(value);
     }
 
     /**
@@ -118,7 +120,7 @@ export class CounterComponent implements ControlValueAccessor {
      * @param new_value New value to set on the form field
      */
     public setValue(new_value: number): void {
-        this.value = new_value;
+        this.value.set(new_value);
         /* istanbul ignore else */
         if (this._onChange) {
             this._onChange(new_value);
@@ -130,7 +132,7 @@ export class CounterComponent implements ControlValueAccessor {
      * @param value The new value for the component
      */
     public writeValue(value: number) {
-        this.value = value;
+        this.value.set(value);
     }
 
     /* istanbul ignore next */

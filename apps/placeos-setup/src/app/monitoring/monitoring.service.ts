@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { randomInt } from '@placeos-tools/common';
 import { openConfirmModal } from 'libs/components/src/lib/confirm-modal.component';
@@ -19,6 +19,8 @@ export interface BuildingMonitoring {
     providedIn: 'root',
 })
 export class MonitoringService {
+    private _dialog = inject(MatDialog);
+
     private _list = new BehaviorSubject<BuildingMonitoring[]>([
         {
             id: 'bld-01',
@@ -35,19 +37,21 @@ export class MonitoringService {
     public readonly item_list = this._list.asObservable();
     public readonly selected = this._selected.asObservable();
 
-    constructor(private _dialog: MatDialog) {
+    constructor() {
         this._load();
     }
 
     public isSelected(id: string) {
         const list = this._selected.getValue();
-        return !!list.find(_ => id === _);
+        return !!list.find((_) => id === _);
     }
 
     public setSelected(id: string, state: boolean) {
-        const list = this._selected.getValue().filter(_ => _ !== id);
+        const list = this._selected.getValue().filter((_) => _ !== id);
         if (id === '*') {
-            this._selected.next(!state ? [] : this._list.getValue().map(_ => _.id));
+            this._selected.next(
+                !state ? [] : this._list.getValue().map((_) => _.id)
+            );
             return;
         }
         if (!state) this._selected.next(list);
@@ -82,15 +86,22 @@ export class MonitoringService {
         const list = this._selected.getValue();
         if (!list.length) return;
         if (list.length === 1) {
-            return this.removeItem(this._list.getValue().find(_ => _.id === list[0]));
+            return this.removeItem(
+                this._list.getValue().find((_) => _.id === list[0])
+            );
         }
-        const { close, reason } = await openConfirmModal({
-            title: 'Remove regions',
-            content: `Are you sure you want to remove ${list.length} regions?`,
-            icon: { content: 'delete' }
-        }, this._dialog);
+        const { close, reason } = await openConfirmModal(
+            {
+                title: 'Remove regions',
+                content: `Are you sure you want to remove ${list.length} regions?`,
+                icon: { content: 'delete' },
+            },
+            this._dialog
+        );
         if (reason !== 'done') return;
-        this._list.next(this._list.getValue().filter(_ => !list.find(id => _.id === id)));
+        this._list.next(
+            this._list.getValue().filter((_) => !list.find((id) => _.id === id))
+        );
         this._selected.next([]);
         this._store();
         close();

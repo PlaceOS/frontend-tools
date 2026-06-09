@@ -1,4 +1,4 @@
-import { Component, ElementRef, Inject, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, inject, signal } from '@angular/core';
 import { MAP_FEATURE_DATA } from './map-viewer/map-types';
 
 export interface MapRadiusData {
@@ -11,7 +11,7 @@ export interface MapRadiusData {
 @Component({
     selector: '[map-radius]',
     template: `
-        @if (show) {
+        @if (show()) {
         <div
             class="center border-4 rounded-full border-dashed"
             [style.border-color]="stroke"
@@ -19,7 +19,7 @@ export interface MapRadiusData {
             [style.width]="radius * 100 + '%'"
             [style.height]="radius * 100 + '%'"
         ></div>
-        @if (message && show_message) {
+        @if (message && show_message()) {
         <div
             name="message"
             [style.top]="'-' + radius * 100 + '%'"
@@ -59,6 +59,8 @@ export interface MapRadiusData {
     ],
 })
 export class MapRadiusComponent implements OnInit {
+    private _details = inject<MapRadiusData>(MAP_FEATURE_DATA);
+
     /** Message to display above the pin */
     public readonly message = this._details.message;
     /** Fill colour for the pin SVG */
@@ -68,13 +70,11 @@ export class MapRadiusComponent implements OnInit {
     /** Stroke colour for the pin SVG */
     public readonly stroke = this._details.stroke || '#e53935';
 
-    public show = false;
-    public show_message = false;
-
-    constructor(@Inject(MAP_FEATURE_DATA) private _details: MapRadiusData) {}
+    public readonly show = signal(false);
+    public readonly show_message = signal(false);
 
     public ngOnInit() {
-        setTimeout(() => (this.show = true), 300);
-        setTimeout(() => (this.show_message = true), 1000);
+        setTimeout(() => this.show.set(true), 300);
+        setTimeout(() => this.show_message.set(true), 1000);
     }
 }

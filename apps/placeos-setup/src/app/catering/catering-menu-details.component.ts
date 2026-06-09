@@ -1,4 +1,4 @@
-import { Component, Input, SimpleChanges } from '@angular/core';
+import { Component, SimpleChanges, inject, input } from '@angular/core';
 import { BehaviorSubject, combineLatest } from 'rxjs';
 import { map } from 'rxjs/operators';
 import {
@@ -19,9 +19,9 @@ import { AsyncPipe } from '@angular/common';
             class="flex items-center border-b border-neutral-500 text-sm hover:bg-black/10 relative"
         >
             <div thead class="min-w-0 w-10">
-                <mat-checkbox></mat-checkbox>
+                <mat-checkbox />
             </div>
-            <div thead>{{ item.name }}</div>
+            <div thead>{{ item().name }}</div>
             <div thead>{{ item_count | async }}</div>
             <div
                 actions
@@ -68,7 +68,9 @@ import { AsyncPipe } from '@angular/common';
     imports: [MatCheckbox, MatIconButton, MatTooltip, IconComponent, AsyncPipe],
 })
 export class CateringMenuDetailsComponent {
-    @Input() public item: CateringMenuConfig;
+    private _service = inject(CateringStateService);
+
+    public readonly item = input<CateringMenuConfig>(undefined);
 
     private _id = new BehaviorSubject('');
 
@@ -77,14 +79,12 @@ export class CateringMenuDetailsComponent {
         this._service.menu_list,
     ]).pipe(map(([id, _]) => this._service.menuForID(id)?.length || 0));
 
-    public readonly edit = () => this._service.openMenuModal(this.item);
-    public readonly remove = () => this._service.removeMenu(this.item);
-
-    constructor(private _service: CateringStateService) {}
+    public readonly edit = () => this._service.openMenuModal(this.item());
+    public readonly remove = () => this._service.removeMenu(this.item());
 
     public ngOnChange(changes: SimpleChanges) {
         if (changes.item) {
-            this._id.next(this.item?.id || '');
+            this._id.next(this.item()?.id || '');
         }
     }
 }

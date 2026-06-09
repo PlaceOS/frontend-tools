@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { combineLatest } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { InterfacesService } from './interfaces.service';
@@ -29,11 +29,10 @@ import { AsyncPipe } from '@angular/common';
                         class="sticky top-0 flex items-center bg-neutral-800 border-b border-neutral-500 w-full"
                     >
                         <div thead class="min-w-0 w-10">
-                            <mat-checkbox
-                                [ngModel]="all_selected | async"
+                            <mat-checkbox [ngModel]="all_selected | async"
                                 [indeterminate]="some_selected | async"
                                 (ngModelChange)="setSelected($event)"
-                            ></mat-checkbox>
+                             />
                         </div>
                         <div thead>Interface ID</div>
                         <div thead class="w-48">Building</div>
@@ -58,7 +57,7 @@ import { AsyncPipe } from '@angular/common';
                     }
                 </div>
             </main>
-            <data-warning></data-warning>
+            <data-warning />
         </div>
     `,
     styles: [
@@ -90,6 +89,8 @@ import { AsyncPipe } from '@angular/common';
     ],
 })
 export class InterfacesComponent {
+    private _service = inject(InterfacesService);
+
     public readonly interfaces = this._service.interfaces;
 
     public readonly newInterface = () => this._service.openInterfaceModal();
@@ -103,6 +104,4 @@ export class InterfacesComponent {
         this._service.interfaces,
         this._service.selected,
     ]).pipe(map(([l, s]) => l.length !== s.length && s.length > 0));
-
-    constructor(private _service: InterfacesService) {}
 }

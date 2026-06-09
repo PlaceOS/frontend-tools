@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { randomInt } from '@placeos-tools/common';
 import { openConfirmModal } from 'libs/components/src/lib/confirm-modal.component';
@@ -53,6 +53,8 @@ export interface Interface {
     providedIn: 'root',
 })
 export class InterfacesService {
+    private _dialog = inject(MatDialog);
+
     private _interface_list = new BehaviorSubject<Interface[]>([
         {
             id: 'default',
@@ -102,19 +104,21 @@ export class InterfacesService {
     public readonly interfaces = this._interface_list.asObservable();
     public readonly selected = this._selected.asObservable();
 
-    constructor(private _dialog: MatDialog) {
+    constructor() {
         this._load();
     }
 
     public isSelected(id: string) {
         const list = this._selected.getValue();
-        return !!list.find(_ => id === _);
+        return !!list.find((_) => id === _);
     }
 
     public setSelected(id: string, state: boolean) {
-        const list = this._selected.getValue().filter(_ => _ !== id);
+        const list = this._selected.getValue().filter((_) => _ !== id);
         if (id === '*') {
-            this._selected.next(!state ? [] : this._interface_list.getValue().map(_ => _.id));
+            this._selected.next(
+                !state ? [] : this._interface_list.getValue().map((_) => _.id)
+            );
             return;
         }
         if (!state) this._selected.next(list);
@@ -151,15 +155,24 @@ export class InterfacesService {
         const list = this._selected.getValue();
         if (!list.length) return;
         if (list.length === 1) {
-            return this.removeInterface(this._interface_list.getValue().find(_ => _.id === list[0]));
+            return this.removeInterface(
+                this._interface_list.getValue().find((_) => _.id === list[0])
+            );
         }
-        const { close, reason } = await openConfirmModal({
-            title: 'Remove regions',
-            content: `Are you sure you want to remove ${list.length} regions?`,
-            icon: { content: 'delete' }
-        }, this._dialog);
+        const { close, reason } = await openConfirmModal(
+            {
+                title: 'Remove regions',
+                content: `Are you sure you want to remove ${list.length} regions?`,
+                icon: { content: 'delete' },
+            },
+            this._dialog
+        );
         if (reason !== 'done') return;
-        this._interface_list.next(this._interface_list.getValue().filter(_ => !list.find(id => _.id === id)));
+        this._interface_list.next(
+            this._interface_list
+                .getValue()
+                .filter((_) => !list.find((id) => _.id === id))
+        );
         this._selected.next([]);
         this._store();
         close();

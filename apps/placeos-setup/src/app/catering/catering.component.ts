@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { OrganisationService } from '../organisation/organisation.service';
 import { CateringStateService } from './catering-state.service';
 import { MatButton } from '@angular/material/button';
@@ -28,7 +28,7 @@ import { AsyncPipe } from '@angular/common';
                         class="sticky top-0 flex items-center bg-neutral-800 border-b border-neutral-500 w-full"
                     >
                         <div thead class="min-w-0 w-10">
-                            <mat-checkbox></mat-checkbox>
+                            <mat-checkbox />
                         </div>
                         <div thead>Building</div>
                         <div thead>Item Count</div>
@@ -47,7 +47,7 @@ import { AsyncPipe } from '@angular/common';
                     }
                 </div>
             </main>
-            <data-warning></data-warning>
+            <data-warning />
         </div>
     `,
     styles: [
@@ -79,10 +79,8 @@ import { AsyncPipe } from '@angular/common';
     ],
 })
 export class CateringComponent {
-    public readonly menu_list = this._service.menu_list;
+    private _service = inject(CateringStateService);
+    private _org = inject(OrganisationService);
 
-    constructor(
-        private _service: CateringStateService,
-        private _org: OrganisationService
-    ) {}
+    public readonly menu_list = this._service.menu_list;
 }

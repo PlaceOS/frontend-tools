@@ -1,5 +1,5 @@
 import { Clipboard } from '@angular/cdk/clipboard';
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import {
     downloadFile,
     isChildFrame,
@@ -35,6 +35,8 @@ export interface PlaceSensorLocation {
     providedIn: 'root',
 })
 export class EditorStateService {
+    private _clipboard = inject(Clipboard);
+
     private _use_url = new BehaviorSubject<string>('');
     private _map_url = new BehaviorSubject<string>('');
     private _active_sensor = new BehaviorSubject<PlaceSensor>(null);
@@ -96,7 +98,7 @@ export class EditorStateService {
     /** Whether application is embeded within another */
     public readonly embeded = this._embeded.asObservable();
 
-    constructor(private _clipboard: Clipboard) {
+    constructor() {
         const is_child = isChildFrame();
         this._embeded.next(is_child);
     }

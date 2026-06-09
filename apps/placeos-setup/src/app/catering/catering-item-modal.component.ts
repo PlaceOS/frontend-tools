@@ -1,5 +1,5 @@
 import { COMMA, ENTER, SPACE } from '@angular/cdk/keycodes';
-import { Component, EventEmitter, Inject, Output } from '@angular/core';
+import { Component, inject, output, signal } from '@angular/core';
 import {
     FormControl,
     FormGroup,
@@ -56,13 +56,13 @@ export interface CateringItemModalData {
             class="flex items-center p-2 justify-between border-b border-gray-200 dark:border-neutral-500"
         >
             <h3 class="p-2 font-medium">{{ item.id ? 'Edit' : 'Add' }} Item</h3>
-            @if (!loading) {
+            @if (!loading()) {
             <button mat-icon-button mat-dialog-close>
                 <app-icon>close</app-icon>
             </button>
             }
         </header>
-        @if (form && !loading) {
+        @if (form && !loading()) {
         <form class="p-4 overflow-auto max-h-[65vh]" [formGroup]="form">
             @if (form.controls.name) {
             <div class="flex flex-col">
@@ -126,13 +126,12 @@ export interface CateringItemModalData {
                             (removed)="removeTag(tag)"
                         >
                             {{ tag }}
-                            <app-icon
-                                matChipRemove
+                            <app-icon matChipRemove
                                 [icon]="{
                                     class: 'material-icons',
                                     content: 'close'
                                 }"
-                            ></app-icon>
+                             />
                         </mat-chip>
                         }
                         <input
@@ -190,22 +189,21 @@ export interface CateringItemModalData {
             </div>
             <div class="flex items-center">
                 <label class="flex-1 w-24 min-w-0">Discount Cap</label>
-                <a-counter
-                    class="border border-gray-200 rounded"
+                <a-counter class="border border-gray-200 rounded"
                     formControlName="discount_cap"
                     [min]="0"
                     [max]="100"
                     [step]="5"
                     [render_fn]="renderPercent"
-                ></a-counter>
+                 />
             </div>
         </form>
         } @else {
         <div class="flex flex-col items-center p-8 space-y-2 w-64">
-            <mat-spinner diameter="32"></mat-spinner>
+            <mat-spinner diameter="32" />
             <p>Saving catering item...</p>
         </div>
-        } @if (!loading) {
+        } @if (!loading()) {
         <footer
             class="flex p-2 items-center justify-center border-t border-solid border-gray-300 dark:border-neutral-500"
         >
@@ -255,8 +253,10 @@ export interface CateringItemModalData {
     ],
 })
 export class CateringItemModalComponent {
+    private _data = inject<CateringItemModalData>(MAT_DIALOG_DATA);
+
     /** Emitter for events on the modal */
-    @Output() public event = new EventEmitter<DialogEvent>();
+    public readonly event = output<DialogEvent>();
     /** Form fields for item */
     public form = new FormGroup({
         name: new FormControl(this.item.name || '', [Validators.required]),
@@ -272,7 +272,7 @@ export class CateringItemModalComponent {
         discount_cap: new FormControl(this.item.discount_cap || 0),
     });
     /** Whether changes are being saved */
-    public loading = false;
+    public readonly loading = signal(false);
     /** List of separator characters for tags */
     public readonly separators: number[] = [ENTER, COMMA, SPACE];
 
@@ -293,10 +293,6 @@ export class CateringItemModalComponent {
     public renderPercent(value: number = 0) {
         return `${value}%`;
     }
-
-    constructor(
-        @Inject(MAT_DIALOG_DATA) private _data: CateringItemModalData
-    ) {}
 
     /**
      * Add a tag to the list of tags for the item
@@ -336,7 +332,7 @@ export class CateringItemModalComponent {
     }
 
     public saveChanges() {
-        this.loading = true;
+        this.loading.set(true);
         this.event.emit({
             reason: 'done',
             metadata: {

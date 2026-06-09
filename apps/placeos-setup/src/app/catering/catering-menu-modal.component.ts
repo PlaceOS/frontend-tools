@@ -1,4 +1,4 @@
-import { Component, Inject, Output, EventEmitter } from '@angular/core';
+import { Component, inject, output, signal } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatChipInputEvent } from '@angular/material/chips';
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
@@ -24,7 +24,7 @@ import { MatTooltip } from '@angular/material/tooltip';
                     <div class="font-medium">
                         Edit Catering Menu for {{ building }}
                     </div>
-                    @if (!loading) {
+                    @if (!loading()) {
                     <button
                         mat-icon-button
                         mat-dialog-close
@@ -35,9 +35,9 @@ import { MatTooltip } from '@angular/material/tooltip';
                     }
                 </div>
             </header>
-            @if (!loading) {
+            @if (!loading()) {
             <main class="mx-auto w-[768px] max-w-full flex-1 h-1/2 relative">
-                <catering-menu></catering-menu>
+                <catering-menu />
                 <button
                     mat-icon-button
                     class="absolute bottom-2 right-2 bg-primary shadow"
@@ -58,7 +58,7 @@ import { MatTooltip } from '@angular/material/tooltip';
             </footer>
             } @else {
             <div class="mx-auto w-[640px] p-4 flex-1 h-1/2">
-                <mat-spinner></mat-spinner>
+                <mat-spinner />
                 <p>Saving catering menu data...</p>
             </div>
             }
@@ -75,13 +75,10 @@ import { MatTooltip } from '@angular/material/tooltip';
     ],
 })
 export class CateringMenuModalComponent {
-    @Output() public add = new EventEmitter();
-    public loading = false;
+    private _data = inject<CateringMenuConfig>(MAT_DIALOG_DATA);
+
+    public readonly add = output();
+    public readonly loading = signal(false);
 
     public readonly building = this._data.name;
-
-    constructor(
-        @Inject(MAT_DIALOG_DATA)
-        private _data: CateringMenuConfig
-    ) {}
 }

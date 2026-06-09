@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { BehaviorSubject, combineLatest } from 'rxjs';
 import { map } from 'rxjs/operators';
 
@@ -51,6 +51,8 @@ import { AsyncPipe } from '@angular/common';
     ],
 })
 export class CateringMenuComponent {
+    private _catering = inject(CateringStateService);
+
     /** Observable for the currently active menu */
     public readonly menu = this._catering.menu;
 
@@ -73,6 +75,4 @@ export class CateringMenuComponent {
             return menu_map;
         })
     );
-
-    constructor(private _catering: CateringStateService) {}
 }

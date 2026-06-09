@@ -6,9 +6,9 @@ import { RouterOutlet } from '@angular/router';
     selector: 'placeos-tools-root',
     template: `
         <div class="absolute inset-0 overflow-hidden flex dark:bg-neutral-600">
-            <sidebar class="h-full"></sidebar>
+            <sidebar class="h-full" />
             <div class="flex-1 w-1/2 h-full border-l border-neutral-500">
-                <router-outlet></router-outlet>
+                <router-outlet />
             </div>
         </div>
     `,

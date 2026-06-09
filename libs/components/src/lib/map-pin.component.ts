@@ -1,4 +1,4 @@
-import { Component, Inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { MAP_FEATURE_DATA } from './map-viewer/map-types';
 
 export interface MapPinData {
@@ -11,7 +11,7 @@ export interface MapPinData {
 @Component({
     selector: '[map-pin]',
     template: `
-        @if (show) { @if (message && show_message) {
+        @if (show()) { @if (message && show_message()) {
         <div class="p-2 m-2 rounded bg-white text-gray-700 shadow">
             {{ message }}
         </div>
@@ -83,6 +83,8 @@ export interface MapPinData {
     ],
 })
 export class MapPinComponent {
+    private _details = inject<MapPinData>(MAP_FEATURE_DATA);
+
     /** Message to display above the pin */
     public readonly message = this._details.message;
     /** Fill colour for the pin SVG */
@@ -92,13 +94,11 @@ export class MapPinComponent {
     /** Action to perform when clicking pin */
     public readonly action = this._details.action || null;
 
-    public show = false;
-    public show_message = false;
-
-    constructor(@Inject(MAP_FEATURE_DATA) private _details: MapPinData) {}
+    public readonly show = signal(false);
+    public readonly show_message = signal(false);
 
     public ngOnInit() {
-        setTimeout(() => (this.show = true), 300);
-        setTimeout(() => (this.show_message = true), 1000);
+        setTimeout(() => this.show.set(true), 300);
+        setTimeout(() => this.show_message.set(true), 1000);
     }
 }

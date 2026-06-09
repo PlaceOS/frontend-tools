@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { BaseClass, unique } from '@placeos-tools/common';
 import { randomInt } from '@placeos-tools/common';
@@ -23,6 +23,9 @@ export interface CateringMenuConfig {
     providedIn: 'root',
 })
 export class CateringStateService extends BaseClass {
+    private _dialog = inject(MatDialog);
+    private _org = inject(OrganisationService);
+
     private _menu_map = new BehaviorSubject<Record<string, CateringItem[]>>({});
     private _loading = new BehaviorSubject<boolean>(false);
     private _currency = new BehaviorSubject<string>('USD');
@@ -60,7 +63,7 @@ export class CateringStateService extends BaseClass {
         return menus[id] || [];
     }
 
-    constructor(private _dialog: MatDialog, private _org: OrganisationService) {
+    constructor() {
         super();
         this._load();
     }
@@ -68,9 +71,12 @@ export class CateringStateService extends BaseClass {
     public openMenuModal(item: CateringMenuConfig) {
         this._active_id.next(item.id);
         const ref = this._dialog.open(CateringMenuModalComponent, {
-            data: item
+            data: item,
         });
-        this.subscription('add-item', ref.componentInstance.add.subscribe(() => this.addItem()));
+        const add_subscription = ref.componentInstance.add.subscribe(() =>
+            this.addItem()
+        );
+        this.subscription('add-item', () => add_subscription.unsubscribe());
         ref.afterClosed().subscribe(() => this._active_id.next(''));
     }
 

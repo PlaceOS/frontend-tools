@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { BuildingLevel, OrganisationService } from './organisation.service';
 import { MatCheckbox } from '@angular/material/checkbox';
 import { FormsModule } from '@angular/forms';
@@ -17,20 +17,19 @@ import { IconComponent } from '../../../../../libs/components/src/lib/icon.compo
             class="flex items-center border-b border-neutral-500 text-sm hover:bg-black/10"
         >
             <div thead class="min-w-0 relative">
-                <mat-checkbox
-                    [ngModel]="selected"
+                <mat-checkbox [ngModel]="selected"
                     (ngModelChange)="setSelected($event)"
-                ></mat-checkbox>
+                 />
             </div>
             <div class="min-w-0 w-10 p-0"></div>
-            <div class="w-56">{{ level.display_name }}</div>
+            <div class="w-56">{{ level().display_name }}</div>
             <div></div>
             <div class="w-32"></div>
             <div class="w-56"></div>
             <div></div>
             <div></div>
-            <div>{{ level.allow_visitors ? 'YES' : 'NO' }}</div>
-            <div>{{ level.catering_available ? 'YES' : 'NO' }}</div>
+            <div>{{ level().allow_visitors ? 'YES' : 'NO' }}</div>
+            <div>{{ level().catering_available ? 'YES' : 'NO' }}</div>
             <div
                 actions
                 class="absolute top-1/2 -translate-y-1/2 left-24 rounded-3xl flex items-center bg-white dark:bg-neutral-700 shadow !p-0 min-w-0"
@@ -86,16 +85,16 @@ import { IconComponent } from '../../../../../libs/components/src/lib/icon.compo
     ],
 })
 export class OrganisationLevelComponent {
-    @Input() public level: BuildingLevel;
+    private _org = inject(OrganisationService);
 
-    public readonly edit = () => this._org.openLevelModal(this.level);
-    public readonly remove = () => this._org.removeLevel(this.level);
+    public readonly level = input<BuildingLevel>(undefined);
+
+    public readonly edit = () => this._org.openLevelModal(this.level());
+    public readonly remove = () => this._org.removeLevel(this.level());
     public readonly setSelected = (s) =>
-        this._org.setSelected(this.level.id, s);
+        this._org.setSelected(this.level().id, s);
 
     public get selected() {
-        return this._org.isSelected(this.level.id);
+        return this._org.isSelected(this.level().id);
     }
-
-    constructor(private _org: OrganisationService) {}
 }

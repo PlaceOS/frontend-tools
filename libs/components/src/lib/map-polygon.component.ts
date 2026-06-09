@@ -1,9 +1,10 @@
 import {
     Component,
     ElementRef,
-    Inject,
     OnInit,
-    ViewChild,
+    inject,
+    signal,
+    viewChild,
 } from '@angular/core';
 import { BaseClass } from '@placeos-tools/common';
 import { Observable, combineLatest } from 'rxjs';
@@ -32,29 +33,27 @@ export interface MapPolygonData {
         <canvas
             #canvas
             class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
-            [style.width]="width * svg_ratio * zoom + '%'"
-            [style.height]="height * ratio * svg_ratio * zoom + '%'"
+            [style.width]="width() * svg_ratio() * zoom() + '%'"
+            [style.height]="height() * ratio() * svg_ratio() * zoom() + '%'"
         ></canvas>
     `,
     styles: [],
 })
 export class MapPolygonComponent extends BaseClass implements OnInit {
-    public polygon: Polygon = this._data.polygon;
-    public zoom = 1;
-    public ratio = 1;
-    public svg_ratio = 1;
-    public width = 10000;
-    public height = 10000;
+    private _data = inject<MapPolygonData>(MAP_FEATURE_DATA);
 
-    @ViewChild('canvas', { static: true })
-    private canvas_element: ElementRef<HTMLCanvasElement>;
+    public readonly polygon = signal<Polygon>(this._data.polygon);
+    public readonly zoom = signal(1);
+    public readonly ratio = signal(1);
+    public readonly svg_ratio = signal(1);
+    public readonly width = signal(10000);
+    public readonly height = signal(10000);
+
+    private readonly canvas_element =
+        viewChild<ElementRef<HTMLCanvasElement>>('canvas');
 
     public get ratioed_height(): number {
-        return +(this.height * this.ratio).toFixed(2);
-    }
-
-    constructor(@Inject(MAP_FEATURE_DATA) private _data: MapPolygonData) {
-        super();
+        return +(this.height() * this.ratio()).toFixed(2);
     }
 
     public ngOnInit(): void {
@@ -72,28 +71,29 @@ export class MapPolygonComponent extends BaseClass implements OnInit {
     }
 
     private _handleStateChange(ratio: number, zoom: number, svg_ratio): void {
-        const points = this.polygon.points;
-        this.zoom = zoom;
-        this.ratio = ratio;
-        this.svg_ratio = svg_ratio;
+        const polygon = this.polygon();
+        const points = polygon.points;
+        this.zoom.set(zoom);
+        this.ratio.set(ratio);
+        this.svg_ratio.set(svg_ratio);
         if (!points?.length) return;
-        const width = this.width / 10;
-        const height = (this.height * this.ratio) / 10;
+        const width = this.width() / 10;
+        const height = (this.height() * this.ratio()) / 10;
         //
-        const canvas = this.canvas_element.nativeElement;
+        const canvas = this.canvas_element().nativeElement;
         canvas.width = width;
         canvas.height = height;
         const ctx = canvas.getContext('2d');
         ctx.clearRect(0, 0, width, height);
         // Draw polygon
-        ctx.fillStyle = this.polygon.color + '80';
+        ctx.fillStyle = polygon.color + '80';
         ctx.beginPath();
         ctx.moveTo(points[0][0] * width, points[0][1] * height);
         points.forEach(([x, y]) => ctx.lineTo(x * width, y * height));
         ctx.closePath();
         ctx.fill();
         // Draw Outline
-        ctx.strokeStyle = this.polygon.color;
+        ctx.strokeStyle = polygon.color;
         ctx.lineWidth = 3;
         ctx.beginPath();
         ctx.moveTo(points[0][0] * width, points[0][1] * height);
@@ -102,7 +102,7 @@ export class MapPolygonComponent extends BaseClass implements OnInit {
         ctx.stroke();
         // Draw Points
         ctx.fillStyle = '#fff';
-        ctx.strokeStyle = this.polygon.color;
+        ctx.strokeStyle = polygon.color;
         ctx.lineWidth = 4;
         points.forEach(([x, y]) => {
             ctx.beginPath();
@@ -122,11 +122,11 @@ export class MapPolygonComponent extends BaseClass implements OnInit {
         ctx.fillStyle = '#FFF';
         ctx.font = '32px sans-serif';
         ctx.fillText(
-            this.polygon.name,
+            polygon.name,
             center[0] * width + 1,
             center[1] * height + 2
         );
         ctx.fillStyle = '#000';
-        ctx.fillText(this.polygon.name, center[0] * width, center[1] * height);
+        ctx.fillText(polygon.name, center[0] * width, center[1] * height);
     }
 }

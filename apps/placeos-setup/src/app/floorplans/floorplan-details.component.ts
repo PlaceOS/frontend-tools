@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import {
     Building,
     OrganisationService,
@@ -18,17 +18,16 @@ import { IconComponent } from '../../../../../libs/components/src/lib/icon.compo
             class="flex items-center border-b border-neutral-500 text-sm hover:bg-black/10 relative"
         >
             <div thead class="min-w-0 w-10">
-                <mat-checkbox
-                    [ngModel]="selected"
+                <mat-checkbox [ngModel]="selected"
                     (ngModelChange)="setSelected($event)"
-                ></mat-checkbox>
+                 />
             </div>
-            <div thead>{{ item.building_id }}</div>
-            <div thead>{{ item.level_id }}</div>
-            <div thead>{{ item.map_available ? 'YES' : 'NO' }}</div>
-            <div thead>{{ item.features_setup ? 'YES' : 'NO' }}</div>
-            <div thead>{{ item.zones_setup ? 'YES' : 'NO' }}</div>
-            <div thead>{{ item.sensors_setup ? 'YES' : 'NO' }}</div>
+            <div thead>{{ item().building_id }}</div>
+            <div thead>{{ item().level_id }}</div>
+            <div thead>{{ item().map_available ? 'YES' : 'NO' }}</div>
+            <div thead>{{ item().features_setup ? 'YES' : 'NO' }}</div>
+            <div thead>{{ item().zones_setup ? 'YES' : 'NO' }}</div>
+            <div thead>{{ item().sensors_setup ? 'YES' : 'NO' }}</div>
             <div
                 actions
                 class="absolute top-1/2 -translate-y-1/2 left-12 rounded-3xl flex items-center bg-white dark:bg-neutral-700 shadow !p-0 min-w-0 w-auto"
@@ -84,16 +83,16 @@ import { IconComponent } from '../../../../../libs/components/src/lib/icon.compo
     ],
 })
 export class FloorPlanDetailsComponent {
-    @Input() public item: FloorPlan;
+    private _service = inject(FloorPlansService);
 
-    public readonly edit = () => this._service.openFloorPlanModal(this.item);
-    public readonly remove = () => this._service.removeFloorPlan(this.item);
+    public readonly item = input<FloorPlan>(undefined);
+
+    public readonly edit = () => this._service.openFloorPlanModal(this.item());
+    public readonly remove = () => this._service.removeFloorPlan(this.item());
     public readonly setSelected = (s) =>
-        this._service.setSelected(this.item.id, s);
+        this._service.setSelected(this.item().id, s);
 
     public get selected() {
-        return this._service.isSelected(this.item.id);
+        return this._service.isSelected(this.item().id);
     }
-
-    constructor(private _service: FloorPlansService) {}
 }

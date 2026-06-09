@@ -10,12 +10,20 @@ import { ServiceWorkerModule } from '@angular/service-worker';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatButtonModule } from '@angular/material/button';
 import { AppComponent } from './app/app.component';
-import { EditorComponent } from './app/editor/editor.component';
-import { HomeComponent } from './app/home.component';
 
 const routes: Route[] = [
-    { path: '', component: HomeComponent },
-    { path: 'editor/:id', component: EditorComponent },
+    {
+        path: '',
+        loadComponent: () =>
+            import('./app/home.component').then((m) => m.HomeComponent),
+    },
+    {
+        path: 'editor/:id',
+        loadComponent: () =>
+            import('./app/editor/editor.component').then(
+                (m) => m.EditorComponent
+            ),
+    },
     { path: '**', redirectTo: '' },
 ];
 

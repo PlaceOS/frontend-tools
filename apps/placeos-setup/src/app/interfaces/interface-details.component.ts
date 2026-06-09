@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { Interface, InterfacesService } from './interfaces.service';
 import { MatCheckbox } from '@angular/material/checkbox';
 import { FormsModule } from '@angular/forms';
@@ -14,13 +14,12 @@ import { MatTooltip } from '@angular/material/tooltip';
             class="flex items-center border-b border-neutral-500 text-sm hover:bg-black/10 relative"
         >
             <div thead class="min-w-0 w-10">
-                <mat-checkbox
-                    [ngModel]="selected"
+                <mat-checkbox [ngModel]="selected"
                     (ngModelChange)="setSelected($event)"
-                ></mat-checkbox>
+                 />
             </div>
-            <div thead class="font-mono text-xs">{{ item.id }}</div>
-            <div thead class="w-48">{{ item.building_name }}</div>
+            <div thead class="font-mono text-xs">{{ item().id }}</div>
+            <div thead class="w-48">{{ item().building_name }}</div>
             <div thead>
                 <app-icon
                     [class.text-green-600]="has('workplace')"
@@ -135,22 +134,22 @@ import { MatTooltip } from '@angular/material/tooltip';
     ],
 })
 export class InterfaceDetailsComponent {
-    @Input() public item: Interface;
+    private _service = inject(InterfacesService);
+
+    public readonly item = input<Interface>(undefined);
 
     public readonly view = () =>
-        this._service.openInterfaceDetailsModal(this.item);
-    public readonly edit = () => this._service.openInterfaceModal(this.item);
-    public readonly remove = () => this._service.removeInterface(this.item);
+        this._service.openInterfaceDetailsModal(this.item());
+    public readonly edit = () => this._service.openInterfaceModal(this.item());
+    public readonly remove = () => this._service.removeInterface(this.item());
     public readonly setSelected = (s) =>
-        this._service.setSelected(this.item.id, s);
+        this._service.setSelected(this.item().id, s);
 
     public get selected() {
-        return this._service.isSelected(this.item.id);
+        return this._service.isSelected(this.item().id);
     }
 
     public has(id: string) {
-        return this.item?.required.includes(id);
+        return this.item()?.required.includes(id);
     }
-
-    constructor(private _service: InterfacesService) {}
 }

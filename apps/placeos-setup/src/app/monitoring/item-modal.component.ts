@@ -1,4 +1,4 @@
-import { Component, Inject, Output, EventEmitter } from '@angular/core';
+import { Component, inject, output, signal } from '@angular/core';
 import {
     FormControl,
     FormGroup,
@@ -32,7 +32,7 @@ import { AsyncPipe } from '@angular/common';
                     <div class="font-medium">
                         {{ form.value.id ? 'Edit' : 'New' }} Monitoring Region
                     </div>
-                    @if (!loading) {
+                    @if (!loading()) {
                     <button
                         mat-icon-button
                         mat-dialog-close
@@ -43,7 +43,7 @@ import { AsyncPipe } from '@angular/common';
                     }
                 </div>
             </header>
-            @if (!loading) {
+            @if (!loading()) {
             <main
                 class="mx-auto w-[640px] p-4 flex-1 h-1/2 overflow-auto"
                 [formGroup]="form"
@@ -139,7 +139,7 @@ import { AsyncPipe } from '@angular/common';
             </footer>
             } @else {
             <div class="mx-auto w-[640px] p-4 flex-1 h-1/2">
-                <mat-spinner></mat-spinner>
+                <mat-spinner />
                 <p>Saving monitoring data...</p>
             </div>
             }
@@ -164,10 +164,11 @@ import { AsyncPipe } from '@angular/common';
     ],
 })
 export class MonitoringItemModalComponent {
-    @Output() public readonly onSave = new EventEmitter<
-        Partial<BuildingMonitoring>
-    >();
-    public loading = false;
+    private _data = inject<BuildingMonitoring>(MAT_DIALOG_DATA);
+    private _org = inject(OrganisationService);
+
+    public readonly onSave = output<Partial<BuildingMonitoring>>();
+    public readonly loading = signal(false);
 
     public readonly building_list = this._org.buildings;
     public readonly level_list = this._org.levels;
@@ -181,18 +182,14 @@ export class MonitoringItemModalComponent {
         show_in_analytics: new FormControl(false),
     });
 
-    constructor(
-        @Inject(MAT_DIALOG_DATA)
-        private _data: BuildingMonitoring,
-        private _org: OrganisationService
-    ) {
+    constructor() {
         this.form.patchValue(this._data as any);
     }
 
     public save() {
         this.form.markAllAsTouched();
         if (!this.form.valid) return;
-        this.loading = true;
+        this.loading.set(true);
         this.onSave.emit(this.form.getRawValue() as any);
     }
 }

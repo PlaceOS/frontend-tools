@@ -1,4 +1,4 @@
-import { Component, Inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogClose } from '@angular/material/dialog';
 import { Interface } from './interfaces.service';
 import { MatIconButton } from '@angular/material/button';
@@ -328,6 +328,7 @@ import { IconComponent } from '../../../../../libs/components/src/lib/icon.compo
     imports: [MatIconButton, MatDialogClose, IconComponent],
 })
 export class InterfaceDetailsModalComponent {
+    private _data = inject<Interface>(MAT_DIALOG_DATA);
+
     public readonly item = this._data;
-    constructor(@Inject(MAT_DIALOG_DATA) private _data: Interface) {}
 }

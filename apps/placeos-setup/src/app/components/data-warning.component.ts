@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { combineLatest } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
 import { OrganisationService } from '../organisation/organisation.service';
@@ -9,14 +9,14 @@ import { AsyncPipe } from '@angular/common';
 @Component({
     selector: 'data-warning',
     template: `
-        @if ( (levels && !(has_both | async)) || (!levels && !(has_building |
-        async)) ) {
+        @if ( (levels() && !(has_both | async)) || (!levels() && !(has_building
+        | async)) ) {
         <div
             class="absolute inset-0 bg-black/60 flex flex-col items-center justify-center space-y-2"
         >
-            @if (levels && !(has_both | async)) {
+            @if (levels() && !(has_both | async)) {
             <div>A building and level is required for this features</div>
-            } @if (!levels && !(has_building | async)) {
+            } @if (!levels() && !(has_building | async)) {
             <div>A building is required for this feature</div>
             }
             <a
@@ -28,7 +28,7 @@ import { AsyncPipe } from '@angular/common';
             >
                 Add Building
             </a>
-            @if (levels && (has_building | async)) {
+            @if (levels() && (has_building | async)) {
             <a
                 button
                 mat-button
@@ -46,7 +46,9 @@ import { AsyncPipe } from '@angular/common';
     imports: [MatButton, RouterLink, AsyncPipe],
 })
 export class DataWarningComponent {
-    @Input() public levels: boolean = false;
+    private _org = inject(OrganisationService);
+
+    public readonly levels = input(false);
 
     public readonly has_building = this._org.buildings.pipe(
         map((_) => _.length > 0),
@@ -63,6 +65,4 @@ export class DataWarningComponent {
         map(([b, l]) => b && l),
         tap((_) => console.log('Has Both:', _))
     );
-
-    constructor(private _org: OrganisationService) {}
 }
