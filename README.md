@@ -1,98 +1,154 @@
-# PlaceosTools
+# PlaceOS Frontend Tools
 
-This project was generated using [Nx](https://nx.dev).
+Angular/Nx workspace for small PlaceOS frontend utilities. The repo contains standalone tools for map editing, wayfinding, sensor overlays, application metadata, and initial PlaceOS setup data.
 
-<p align="center"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-logo.png" width="450"></p>
+## Projects
 
-🔎 **Nx is a set of Extensible Dev Tools for Monorepos.**
+### Applications
 
-## Quick Start & Documentation
+| Project | Purpose |
+| --- | --- |
+| `map-builder` | Create and edit PlaceOS map metadata. This is the default Nx project. |
+| `map-regions` | Load an SVG floorplan and draw/edit map regions against it. |
+| `sensor-map` | Load an SVG floorplan and place/edit environmental sensor overlays. |
+| `wayfinding` | Load an SVG floorplan and configure waypoints, navigation paths, and route previews. |
+| `app-settings` | Edit shared, workplace, and concierge application settings metadata. |
+| `placeos-setup` | Build and export PlaceOS setup data for organisations, interfaces, floorplans, rooms, desks, lockers, zoning, parking, assets, monitoring, catering, and access control. |
 
-[Nx Documentation](https://nx.dev/angular)
+Each application has a matching Playwright e2e project where available, for example `map-builder-e2e` and `placeos-setup-e2e`.
 
-[10-minute video showing all Nx features](https://nx.dev/angular/getting-started/what-is-nx)
+### Libraries
 
-[Interactive Tutorial](https://nx.dev/angular/tutorial/01-create-application)
+| Library | Purpose |
+| --- | --- |
+| `common` | Shared helpers, types, base classes, animations, and PlaceOS backoffice request helpers. |
+| `components` | Shared UI/map components including interactive map primitives, pins, polygons, radii, counters, icons, tooltips, and map viewer support. |
 
-## Adding capabilities to your workspace
+## Prerequisites
 
-Nx supports many plugins which add capabilities for developing different types of applications and different tools.
+- Node.js compatible with Angular 22 and Nx 22.
+- npm for dependency installation.
 
-These capabilities include generating applications, libraries, etc as well as the devtools to test, and build projects as well.
+Install dependencies:
 
-Below are our core plugins:
+```sh
+npm install
+```
 
--   [Angular](https://angular.io)
-    -   `ng add @nx/angular`
--   [React](https://reactjs.org)
-    -   `ng add @nrwl/react`
--   Web (no framework frontends)
-    -   `ng add @nrwl/web`
--   [Nest](https://nestjs.com)
-    -   `ng add @nrwl/nest`
--   [Express](https://expressjs.com)
-    -   `ng add @nrwl/express`
--   [Node](https://nodejs.org)
-    -   `ng add @nrwl/node`
+The `postinstall` script decorates the Angular CLI for Nx and generates the local version file with `config/version.js`.
 
-There are also many [community plugins](https://nx.dev/nx-community) you could add.
+## Development
 
-## Generate an application
+Run the default app, `map-builder`:
 
-Run `ng g @nx/angular:app my-app` to generate an application.
+```sh
+npm start
+```
 
-> You can use any of the plugins above to generate applications as well.
+Run a specific app:
 
-When using Nx, you can create multiple applications and libraries in the same workspace.
+```sh
+npm run nx -- serve map-builder
+npm run nx -- serve map-regions
+npm run nx -- serve sensor-map
+npm run nx -- serve wayfinding
+npm run nx -- serve app-settings
+npm run nx -- serve placeos-setup
+```
 
-## Generate a library
-
-Run `ng g @nx/angular:lib my-lib` to generate a library.
-
-> You can also use any of the plugins above to generate libraries as well.
-
-Libraries are shareable across libraries and applications. They can be imported from `@placeos-tools/mylib`.
-
-## Development server
-
-Run `ng serve my-app` for a dev server. Navigate to http://localhost:4200/. The app will automatically reload if you change any of the source files.
-
-## Code scaffolding
-
-Run `ng g component my-component --project=my-app` to generate a new component.
+Most apps use hash routing. The SVG-based tools start with a bootstrap screen where you enter an SVG URL before opening the editor.
 
 ## Build
 
-Run `ng build my-app` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `--prod` flag for a production build.
+Build one project:
 
-## Running unit tests
+```sh
+npm run nx -- build map-builder
+```
 
-Run `ng test my-app` to execute the unit tests via [Vitest](https://vitest.dev).
+Build every buildable app:
 
-Run `nx affected:test` to execute the unit tests affected by a change.
+```sh
+npm run build-all
+```
 
-## Running end-to-end tests
+Build output is written under `dist/apps/<project>`.
 
-Run `ng e2e my-app` to execute the end-to-end tests via [Playwright](https://playwright.dev).
+## Tests
 
-Run `nx affected:e2e` to execute the end-to-end tests affected by a change.
+Run unit tests for one project:
 
-## Understand your workspace
+```sh
+npm run nx -- test map-builder
+```
 
-Run `nx dep-graph` to see a diagram of the dependencies of your projects.
+Run all configured unit tests:
 
-## Further help
+```sh
+npm run test-all
+```
 
-Visit the [Nx Documentation](https://nx.dev/angular) to learn more.
+Run e2e tests for one project:
 
-## ☁ Nx Cloud
+```sh
+npm run nx -- e2e map-builder-e2e
+```
 
-### Computation Memoization in the Cloud
+Run affected checks:
 
-<p align="center"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-cloud-card.png"></p>
+```sh
+npm run affected:test
+npm run affected:e2e
+npm run affected:lint
+npm run affected:build
+```
 
-Nx Cloud pairs with Nx in order to enable you to build and test code more rapidly, by up to 10 times. Even teams that are new to Nx can connect to Nx Cloud and start saving time instantly.
+## Formatting and Linting
 
-Teams using Nx gain the advantage of building full-stack applications with their preferred framework alongside Nx’s advanced code generation and project dependency graph, plus a unified experience for both frontend and backend developers.
+Format the workspace:
 
-Visit [Nx Cloud](https://nx.app/) to learn more.
+```sh
+npm run format
+```
+
+Check formatting:
+
+```sh
+npm run format:check
+```
+
+Run lint for all projects with a lint target:
+
+```sh
+npm run lint
+```
+
+## Workspace Tools
+
+Show the project graph:
+
+```sh
+npm run dep-graph
+```
+
+List affected apps or libraries:
+
+```sh
+npm run affected:apps
+npm run affected:libs
+```
+
+Generate Angular code with Nx:
+
+```sh
+npm run nx -- generate @nx/angular:component my-component --project=map-builder
+```
+
+## Data Storage
+
+Several tools use browser `localStorage` while editing:
+
+- `map-builder` stores maps under `MAP.data.*`.
+- `placeos-setup` stores setup sections under `PLACEOS_BUILD.*`.
+
+Treat the browser profile as part of the local editing state when developing or debugging these tools.
