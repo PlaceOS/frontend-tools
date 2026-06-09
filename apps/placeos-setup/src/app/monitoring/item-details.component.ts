@@ -4,9 +4,13 @@ import {
     OrganisationService,
 } from '../organisation/organisation.service';
 import { BuildingMonitoring, MonitoringService } from './monitoring.service';
+import { MatCheckbox } from '@angular/material/checkbox';
+import { FormsModule } from '@angular/forms';
+import { MatIconButton } from '@angular/material/button';
+import { MatTooltip } from '@angular/material/tooltip';
+import { IconComponent } from '../../../../../libs/components/src/lib/icon.component';
 
 @Component({
-    standalone: false,
     selector: `monitoring-item-details,[monitoring-item-details]`,
     template: `
         <div
@@ -14,7 +18,10 @@ import { BuildingMonitoring, MonitoringService } from './monitoring.service';
             class="flex items-center border-b border-neutral-500 text-sm hover:bg-black/10 relative"
         >
             <div thead class="min-w-0 w-10">
-                <mat-checkbox [ngModel]="selected" (ngModelChange)="setSelected($event)"></mat-checkbox>
+                <mat-checkbox
+                    [ngModel]="selected"
+                    (ngModelChange)="setSelected($event)"
+                ></mat-checkbox>
             </div>
             <div thead class="w-48">{{ item.id }}</div>
             <div thead class="w-48">{{ item.level_id }}</div>
@@ -29,7 +36,11 @@ import { BuildingMonitoring, MonitoringService } from './monitoring.service';
                 actions
                 class="absolute top-1/2 -translate-y-1/2 left-12 rounded-3xl flex items-center bg-white dark:bg-neutral-700 shadow !p-0 min-w-0 w-auto"
             >
-                <button mat-icon-button matTooltip="Edit Region" (click)="edit()">
+                <button
+                    mat-icon-button
+                    matTooltip="Edit Region"
+                    (click)="edit()"
+                >
                     <app-icon>edit</app-icon>
                 </button>
                 <button
@@ -67,14 +78,21 @@ import { BuildingMonitoring, MonitoringService } from './monitoring.service';
             }
         `,
     ],
-
+    imports: [
+        MatCheckbox,
+        FormsModule,
+        MatIconButton,
+        MatTooltip,
+        IconComponent,
+    ],
 })
 export class MonitoringItemDetailsComponent {
     @Input() public item: BuildingMonitoring;
 
     public readonly edit = () => this._service.openItemModal(this.item);
     public readonly remove = () => this._service.removeItem(this.item);
-    public readonly setSelected = (s) => this._service.setSelected(this.item.id, s);
+    public readonly setSelected = (s) =>
+        this._service.setSelected(this.item.id, s);
 
     public get selected() {
         return this._service.isSelected(this.item.id);

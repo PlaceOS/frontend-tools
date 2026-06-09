@@ -1,5 +1,6 @@
 import { Component, Inject } from '@angular/core';
 import { MAP_FEATURE_DATA } from './map-viewer/map-types';
+import { CustomTooltipComponent } from './custom-tooltip.component';
 
 export interface MapPointData {
     name: string;
@@ -8,7 +9,6 @@ export interface MapPointData {
 }
 
 @Component({
-    standalone: false,
     selector: '[map-point]',
     template: `
         <div (click)="onClick($event)">
@@ -45,7 +45,7 @@ export interface MapPointData {
         </ng-template>
     `,
     styles: [``],
-
+    imports: [CustomTooltipComponent],
 })
 export class MapPointComponent {
     /** Whether point should be displayed as active */

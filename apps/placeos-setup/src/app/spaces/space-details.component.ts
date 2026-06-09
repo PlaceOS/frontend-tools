@@ -1,9 +1,16 @@
 import { Component, Input } from '@angular/core';
-import { Building, OrganisationService } from '../organisation/organisation.service';
+import {
+    Building,
+    OrganisationService,
+} from '../organisation/organisation.service';
 import { Space, SpacesService } from './spaces.service';
+import { MatCheckbox } from '@angular/material/checkbox';
+import { FormsModule } from '@angular/forms';
+import { MatIconButton } from '@angular/material/button';
+import { MatTooltip } from '@angular/material/tooltip';
+import { IconComponent } from '../../../../../libs/components/src/lib/icon.component';
 
 @Component({
-    standalone: false,
     selector: `space-details,[space-details]`,
     template: `
         <div
@@ -11,7 +18,10 @@ import { Space, SpacesService } from './spaces.service';
             class="flex items-center border-b border-neutral-500 text-sm hover:bg-black/10 relative"
         >
             <div thead class="min-w-0 w-10">
-                <mat-checkbox [ngModel]="selected" (ngModelChange)="setSelected($event)"></mat-checkbox>
+                <mat-checkbox
+                    [ngModel]="selected"
+                    (ngModelChange)="setSelected($event)"
+                ></mat-checkbox>
             </div>
             <div thead class="font-mono text-xs">{{ item.room_id }}</div>
             <div thead class="w-56">{{ item.display_name }}</div>
@@ -26,7 +36,9 @@ import { Space, SpacesService } from './spaces.service';
             <div thead>{{ item.catering_available ? 'YES' : 'NO' }}</div>
             <div thead>{{ item.requires_approval ? 'YES' : 'NO' }}</div>
             <div thead>{{ item.visitors ? 'YES' : 'NO' }}</div>
-            <div thead class="w-64">{{ item.whitelist_groups?.join() || 'NONE' }}</div>
+            <div thead class="w-64">
+                {{ item.whitelist_groups?.join() || 'NONE' }}
+            </div>
             <div thead>{{ item.auto_release ? 'YES' : 'NO' }}</div>
             <div thead>{{ item.auto_release_delay || '10' }} minutes</div>
             <div thead class="w-32">{{ item.sensor_brand }}</div>
@@ -41,7 +53,11 @@ import { Space, SpacesService } from './spaces.service';
                 <button mat-icon-button matTooltip="Edit Room" (click)="edit()">
                     <app-icon>edit</app-icon>
                 </button>
-                <button mat-icon-button matTooltip="Delete Room" (click)="remove()">
+                <button
+                    mat-icon-button
+                    matTooltip="Delete Room"
+                    (click)="remove()"
+                >
                     <app-icon>delete</app-icon>
                 </button>
             </div>
@@ -71,15 +87,22 @@ import { Space, SpacesService } from './spaces.service';
                 pointer-events: auto;
             }
         `,
-    ]
-
+    ],
+    imports: [
+        MatCheckbox,
+        FormsModule,
+        MatIconButton,
+        MatTooltip,
+        IconComponent,
+    ],
 })
 export class SpaceDetailsComponent {
     @Input() public item: Space;
 
     public readonly edit = () => this._service.openSpaceModal(this.item);
     public readonly remove = () => this._service.removeSpace(this.item);
-    public readonly setSelected = (s) => this._service.setSelected(this.item.id, s);
+    public readonly setSelected = (s) =>
+        this._service.setSelected(this.item.id, s);
 
     public get selected() {
         return this._service.isSelected(this.item.id);

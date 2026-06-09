@@ -1,14 +1,27 @@
 import { Component, Output, EventEmitter, Inject } from '@angular/core';
-import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import {
+    MatDialog,
+    MatDialogRef,
+    MAT_DIALOG_DATA,
+    MatDialogClose,
+} from '@angular/material/dialog';
 import { openGenericModal } from '@placeos-tools/common';
 
 import { ApplicationIcon, DialogEvent } from 'libs/common/src/lib/types';
+import { IconComponent } from './icon.component';
+import { MatProgressSpinner } from '@angular/material/progress-spinner';
+import { MatButton } from '@angular/material/button';
 
 export async function openConfirmModal(
     data: ConfirmModalData,
     dialog: MatDialog
 ) {
-    return openGenericModal(ConfirmModalComponent, data, dialog, CONFIRM_METADATA as any)
+    return openGenericModal(
+        ConfirmModalComponent,
+        data,
+        dialog,
+        CONFIRM_METADATA as any
+    );
 }
 
 export interface ConfirmModalData {
@@ -32,48 +45,42 @@ export const CONFIRM_METADATA = {
 };
 
 @Component({
-    standalone: false,
     selector: 'confirm-modal',
     template: `
         <header class="p-4 border-b border-gray-200 dark:border-neutral-500">
-          <h3 class="font-medium">{{ title }}</h3>
+            <h3 class="font-medium">{{ title }}</h3>
         </header>
         @if (!loading) {
-          <main
-            class="flex flex-col items-center space-y-2 p-4"
-            >
+        <main class="flex flex-col items-center space-y-2 p-4">
             <app-icon [icon]="icon" class="text-5xl"></app-icon>
             <p
-              content
-              class="text-center text-sm w-[22rem]"
-              [innerHTML]="content"
+                content
+                class="text-center text-sm w-[22rem]"
+                [innerHTML]="content"
             ></p>
-          </main>
+        </main>
         } @else {
-          <main loading>
+        <main loading>
             <div
-              class="w-full h-48 flex flex-col items-center justify-center space-y-2"
-              >
-              <mat-spinner diameter="32"></mat-spinner>
-              <p>{{ loading }}</p>
-            </div>
-          </main>
-        }
-        @if (!loading) {
-          <footer
-            class="flex items-center justify-center p-2 space-x-2"
+                class="w-full h-48 flex flex-col items-center justify-center space-y-2"
             >
+                <mat-spinner diameter="32"></mat-spinner>
+                <p>{{ loading }}</p>
+            </div>
+        </main>
+        } @if (!loading) {
+        <footer class="flex items-center justify-center p-2 space-x-2">
             <button mat-button class="inverse w-32" mat-dialog-close>
-              {{ cancel_text }}
+                {{ cancel_text }}
             </button>
             <button mat-button name="accept" class="w-32" (click)="onConfirm()">
-              {{ confirm_text }}
+                {{ confirm_text }}
             </button>
-          </footer>
+        </footer>
         }
-        `,
+    `,
     styles: [``],
-
+    imports: [IconComponent, MatProgressSpinner, MatButton, MatDialogClose],
 })
 export class ConfirmModalComponent {
     /** Loading state */

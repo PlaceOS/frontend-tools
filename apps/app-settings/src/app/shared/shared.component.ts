@@ -1,8 +1,12 @@
 import { Component } from '@angular/core';
 import { SettingsStateService } from '../settings-state.service';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { MatFormField } from '@angular/material/form-field';
+import { MatInput } from '@angular/material/input';
+import { ColorListFieldComponent } from '../components/color-list-field.component';
+import { MatButton } from '@angular/material/button';
 
 @Component({
-    standalone: false,
     selector: 'app-shared',
     template: `
         <form [formGroup]="form" class="w-full">
@@ -67,24 +71,35 @@ import { SettingsStateService } from '../settings-state.service';
                     </mat-form-field>
                 </div>
                 <h3 class="text-lg font-medium">Theme</h3>
-                <color-list-field formControlName="css_variables"></color-list-field>
+                <color-list-field
+                    formControlName="css_variables"
+                ></color-list-field>
             </div>
         </form>
-        <button mat-button class="mx-auto w-32 my-2" (click)="save()">Save Changes</button>
+        <button mat-button class="mx-auto w-32 my-2" (click)="save()">
+            Save Changes
+        </button>
     `,
     styles: [
         `
             label {
                 margin-bottom: 0.25rem;
             }
-        :host {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
+            :host {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
         `,
     ],
-
+    imports: [
+        FormsModule,
+        ReactiveFormsModule,
+        MatFormField,
+        MatInput,
+        ColorListFieldComponent,
+        MatButton,
+    ],
 })
 export class AppSharedComponent {
     public readonly form = this._state.form;

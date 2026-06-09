@@ -3,33 +3,35 @@ import { BehaviorSubject, combineLatest } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 import { CateringStateService } from './catering-state.service';
+import { MatTabGroup, MatTab } from '@angular/material/tabs';
+import { CateringMenuItemComponent } from './catering-menu-item.component';
+import { IconComponent } from '../../../../../libs/components/src/lib/icon.component';
+import { AsyncPipe } from '@angular/common';
 
 @Component({
-    standalone: false,
     selector: 'catering-menu',
     template: `
         <mat-tab-group class="h-full">
-          <mat-tab label="All Items">
-            @if ((menu | async)?.length) {
-              @for (item of menu | async; track item) {
+            <mat-tab label="All Items">
+                @if ((menu | async)?.length) { @for (item of menu | async; track
+                item) {
                 <div catering-menu-item [item]="item"></div>
-              }
-            } @else {
-              <div class="flex flex-col items-center p-8 space-y-2">
-                <app-icon>close</app-icon>
-                <p>No items in menu</p>
-              </div>
-            }
-          </mat-tab>
-          @for (group of categories | async; track group) {
-            <mat-tab [label]="group">
-              @for (item of (tab_menu | async)[group]; track item) {
-                <div catering-menu-item [item]="item"></div>
-              }
+                } } @else {
+                <div class="flex flex-col items-center p-8 space-y-2">
+                    <app-icon>close</app-icon>
+                    <p>No items in menu</p>
+                </div>
+                }
             </mat-tab>
-          }
+            @for (group of categories | async; track group) {
+            <mat-tab [label]="group">
+                @for (item of (tab_menu | async)[group]; track item) {
+                <div catering-menu-item [item]="item"></div>
+                }
+            </mat-tab>
+            }
         </mat-tab-group>
-        `,
+    `,
     styles: [
         `
             :host {
@@ -40,7 +42,13 @@ import { CateringStateService } from './catering-state.service';
             }
         `,
     ],
-
+    imports: [
+        MatTabGroup,
+        MatTab,
+        CateringMenuItemComponent,
+        IconComponent,
+        AsyncPipe,
+    ],
 })
 export class CateringMenuComponent {
     /** Observable for the currently active menu */

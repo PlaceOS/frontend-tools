@@ -1,1 +1,11 @@
-export * from './lib/components.module';
+export * from './lib/confirm-modal.component';
+export * from './lib/custom-tooltip.component';
+export * from './lib/icon.component';
+export { MapCanvasComponent } from './lib/map-canvas.component';
+export * from './lib/map-pin.component';
+export * from './lib/map-point.component';
+export { MapPolygonComponent } from './lib/map-polygon.component';
+export * from './lib/map-radius.component';
+export * from './lib/map-viewer/dynamic-map.component';
+export { DynamicMapComponent as InteractiveMapComponent } from './lib/map-viewer/dynamic-map.component';
+export * from './lib/map-viewer/map-types';

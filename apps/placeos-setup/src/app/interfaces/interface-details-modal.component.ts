@@ -1,9 +1,10 @@
 import { Component, Inject } from '@angular/core';
-import { MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogClose } from '@angular/material/dialog';
 import { Interface } from './interfaces.service';
+import { MatIconButton } from '@angular/material/button';
+import { IconComponent } from '../../../../../libs/components/src/lib/icon.component';
 
 @Component({
-    standalone: false,
     selector: 'interface-details-modal',
     template: `
         <header
@@ -147,9 +148,7 @@ import { Interface } from './interfaces.service';
                             "
                         >
                             {{
-                                item.booking_panel.show_title
-                                    ? 'done'
-                                    : 'close'
+                                item.booking_panel.show_title ? 'done' : 'close'
                             }}
                         </app-icon>
                     </div>
@@ -160,14 +159,10 @@ import { Interface } from './interfaces.service';
                             [class.text-green-600]="
                                 item.booking_panel.show_host
                             "
-                            [class.text-red-600]="
-                                !item.booking_panel.show_host
-                            "
+                            [class.text-red-600]="!item.booking_panel.show_host"
                         >
                             {{
-                                item.booking_panel.show_host
-                                    ? 'done'
-                                    : 'close'
+                                item.booking_panel.show_host ? 'done' : 'close'
                             }}
                         </app-icon>
                     </div>
@@ -254,14 +249,10 @@ import { Interface } from './interfaces.service';
                             [class.text-green-600]="
                                 item.visitor_kiosk.induction
                             "
-                            [class.text-red-600]="
-                                !item.visitor_kiosk.induction
-                            "
+                            [class.text-red-600]="!item.visitor_kiosk.induction"
                         >
                             {{
-                                item.visitor_kiosk.induction
-                                    ? 'done'
-                                    : 'close'
+                                item.visitor_kiosk.induction ? 'done' : 'close'
                             }}
                         </app-icon>
                     </div>
@@ -269,18 +260,10 @@ import { Interface } from './interfaces.service';
                         <div class="text-xs">Pre-order Catering</div>
                         <app-icon
                             class="text-2xl"
-                            [class.text-green-600]="
-                                item.visitor_kiosk.catering
-                            "
-                            [class.text-red-600]="
-                                !item.visitor_kiosk.catering
-                            "
+                            [class.text-green-600]="item.visitor_kiosk.catering"
+                            [class.text-red-600]="!item.visitor_kiosk.catering"
                         >
-                            {{
-                                item.visitor_kiosk.catering
-                                    ? 'done'
-                                    : 'close'
-                            }}
+                            {{ item.visitor_kiosk.catering ? 'done' : 'close' }}
                         </app-icon>
                     </div>
                 </div>
@@ -301,14 +284,10 @@ import { Interface } from './interfaces.service';
                             [class.text-green-600]="
                                 item.map_kiosk.touch_enabled
                             "
-                            [class.text-red-600]="
-                                !item.map_kiosk.touch_enabled
-                            "
+                            [class.text-red-600]="!item.map_kiosk.touch_enabled"
                         >
                             {{
-                                item.map_kiosk.touch_enabled
-                                    ? 'done'
-                                    : 'close'
+                                item.map_kiosk.touch_enabled ? 'done' : 'close'
                             }}
                         </app-icon>
                     </div>
@@ -346,7 +325,7 @@ import { Interface } from './interfaces.service';
         </main>
     `,
     styles: [``],
-
+    imports: [MatIconButton, MatDialogClose, IconComponent],
 })
 export class InterfaceDetailsModalComponent {
     public readonly item = this._data;

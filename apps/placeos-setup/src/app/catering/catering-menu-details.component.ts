@@ -5,9 +5,13 @@ import {
     CateringMenuConfig,
     CateringStateService,
 } from './catering-state.service';
+import { MatCheckbox } from '@angular/material/checkbox';
+import { MatIconButton } from '@angular/material/button';
+import { MatTooltip } from '@angular/material/tooltip';
+import { IconComponent } from '../../../../../libs/components/src/lib/icon.component';
+import { AsyncPipe } from '@angular/common';
 
 @Component({
-    standalone: false,
     selector: `catering-menu-details,[catering-menu-details]`,
     template: `
         <div
@@ -23,11 +27,7 @@ import {
                 actions
                 class="absolute top-1/2 -translate-y-1/2 left-12 rounded-3xl flex items-center bg-white dark:bg-neutral-700 shadow !p-0 min-w-0 w-auto"
             >
-                <button
-                    mat-icon-button
-                    matTooltip="Edit Menu"
-                    (click)="edit()"
-                >
+                <button mat-icon-button matTooltip="Edit Menu" (click)="edit()">
                     <app-icon>edit</app-icon>
                 </button>
                 <button
@@ -65,7 +65,7 @@ import {
             }
         `,
     ],
-
+    imports: [MatCheckbox, MatIconButton, MatTooltip, IconComponent, AsyncPipe],
 })
 export class CateringMenuDetailsComponent {
     @Input() public item: CateringMenuConfig;

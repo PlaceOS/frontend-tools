@@ -1,8 +1,10 @@
 import { Component } from '@angular/core';
 import { EditorStateService } from './editor-state.service';
+import { MatRipple } from '@angular/material/core';
+import { MatTooltip } from '@angular/material/tooltip';
+import { IconComponent } from '../../../../../libs/components/src/lib/icon.component';
 
 @Component({
-    standalone: false,
     selector: 'editor-controls',
     template: `
         <div
@@ -53,7 +55,7 @@ import { EditorStateService } from './editor-state.service';
             }
         `,
     ],
-
+    imports: [MatRipple, MatTooltip, IconComponent],
 })
 export class EditorControlsComponent {
     public get action() {

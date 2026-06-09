@@ -3,9 +3,13 @@ import { ActivatedRoute, ParamMap } from '@angular/router';
 import { BaseClass, sendMessage } from '@placeos-tools/common';
 
 import { EditorStateService } from './editor-state.service';
+import { DynamicMapComponent } from '../../../../../libs/components/src/lib/map-viewer/dynamic-map.component';
+import { MatRipple } from '@angular/material/core';
+import { IconComponent } from '../../../../../libs/components/src/lib/icon.component';
+import { EditorSensorListComponent } from './editor-sensor-list.component';
+import { AsyncPipe } from '@angular/common';
 
 @Component({
-    standalone: false,
     selector: '[sensor-map-editor]',
     template: `
         <div class="relative h-full flex-1">
@@ -54,7 +58,13 @@ import { EditorStateService } from './editor-state.service';
             }
         `,
     ],
-
+    imports: [
+        DynamicMapComponent,
+        MatRipple,
+        IconComponent,
+        EditorSensorListComponent,
+        AsyncPipe,
+    ],
 })
 export class EditorComponent extends BaseClass implements OnInit {
     /** URL of the map to display */

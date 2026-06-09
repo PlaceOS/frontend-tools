@@ -27,7 +27,6 @@ export interface MapPolygonData {
 }
 
 @Component({
-    standalone: false,
     selector: '[map-polygon]',
     template: `
         <canvas
@@ -38,7 +37,6 @@ export interface MapPolygonData {
         ></canvas>
     `,
     styles: [],
-
 })
 export class MapPolygonComponent extends BaseClass implements OnInit {
     public polygon: Polygon = this._data.polygon;

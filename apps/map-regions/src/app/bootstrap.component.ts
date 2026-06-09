@@ -1,7 +1,10 @@
 import { Component } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { MatFormField } from '@angular/material/form-field';
+import { MatInput } from '@angular/material/input';
+import { RouterLink } from '@angular/router';
 
 @Component({
-    standalone: false,
     selector: 'map-region-bootstrap',
     template: `
         <div class="absolute inset-0 bg-base-200">
@@ -38,6 +41,7 @@ import { Component } from '@angular/core';
             }
         `,
     ],
+    imports: [FormsModule, MatFormField, MatInput, RouterLink],
 })
 export class BootstrapComponent {
     /** URL of the map to edit */

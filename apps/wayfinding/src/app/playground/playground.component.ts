@@ -1,12 +1,8 @@
-import { Component } from "@angular/core";
+import { Component } from '@angular/core';
 
 @Component({
-    standalone: false,
     selector: 'wayfinding-playground',
     template: ``,
-    styles: [``]
-
+    styles: [``],
 })
-export class WayfindingPlaygroundComponent {
-
-}
+export class WayfindingPlaygroundComponent {}

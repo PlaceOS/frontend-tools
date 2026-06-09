@@ -1,64 +1,63 @@
 import { Component, forwardRef, Input } from '@angular/core';
-import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import {
+    ControlValueAccessor,
+    NG_VALUE_ACCESSOR,
+    FormsModule,
+} from '@angular/forms';
+import { MatFormField } from '@angular/material/form-field';
+import { MatInput } from '@angular/material/input';
+import { MatButton } from '@angular/material/button';
 
 type FieldValue<T> = T;
 type FieldFn<T> = (_: T) => void;
 
 @Component({
-    standalone: false,
     selector: 'pair-list-field',
     template: `
         @for (item of pair_list; track item; let i = $index) {
-          <div
-            class="flex mb-2 space-x-2"
-            >
+        <div class="flex mb-2 space-x-2">
             <div class="flex flex-col flex-1">
-              @if (i === 0) {
+                @if (i === 0) {
                 <label>Key</label>
-              }
-              <mat-form-field
-                no-label
-                appearance="outline"
-                class="h-[3.25rem] w-full"
+                }
+                <mat-form-field
+                    no-label
+                    appearance="outline"
+                    class="h-[3.25rem] w-full"
                 >
-                <input
-                  matInput
-                  [disabled]="!edit_keys"
-                  [(ngModel)]="item[0]"
-                  (ngModelChange)="setValue(pair_list)"
-                  placeholder="Variable Key"
-                  />
-              </mat-form-field>
+                    <input
+                        matInput
+                        [disabled]="!edit_keys"
+                        [(ngModel)]="item[0]"
+                        (ngModelChange)="setValue(pair_list)"
+                        placeholder="Variable Key"
+                    />
+                </mat-form-field>
             </div>
             <div class="flex flex-col flex-1">
-              @if (i === 0) {
+                @if (i === 0) {
                 <label>Value</label>
-              }
-              <mat-form-field
-                no-label
-                appearance="outline"
-                class="h-[3.25rem] w-full"
+                }
+                <mat-form-field
+                    no-label
+                    appearance="outline"
+                    class="h-[3.25rem] w-full"
                 >
-                <input
-                  matInput
-                  [(ngModel)]="item[1]"
-                  (ngModelChange)="setValue(pair_list)"
-                  placeholder="Variable Value"
-                  />
-              </mat-form-field>
+                    <input
+                        matInput
+                        [(ngModel)]="item[1]"
+                        (ngModelChange)="setValue(pair_list)"
+                        placeholder="Variable Value"
+                    />
+                </mat-form-field>
             </div>
-          </div>
-        }
-        @if (add_new) {
-          <button
-            mat-button
-            class="w-full"
-            (click)="addNewPair()"
-            >
+        </div>
+        } @if (add_new) {
+        <button mat-button class="w-full" (click)="addNewPair()">
             Add Key Value Pair
-          </button>
+        </button>
         }
-        `,
+    `,
     styles: [``],
     providers: [
         {
@@ -67,7 +66,7 @@ type FieldFn<T> = (_: T) => void;
             multi: true,
         },
     ],
-
+    imports: [MatFormField, MatInput, FormsModule, MatButton],
 })
 export class PairListFieldComponent implements ControlValueAccessor {
     @Input() public edit_keys = false;

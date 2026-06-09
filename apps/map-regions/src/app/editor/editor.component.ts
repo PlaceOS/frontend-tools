@@ -4,9 +4,12 @@ import { BaseClass, sendMessage } from '@placeos-tools/common';
 
 import { EditorStateService } from './editor-state.service';
 import { MapCanvasComponent } from 'libs/components/src/lib/map-canvas.component';
+import { EditorOptionsComponent } from './editor-options.component';
+import { DynamicMapComponent } from '../../../../../libs/components/src/lib/map-viewer/dynamic-map.component';
+import { EditorControlsComponent } from './editor-controls.component';
+import { AsyncPipe } from '@angular/common';
 
 @Component({
-    standalone: false,
     selector: '[map-regions-editor]',
     template: `
         <div controls class="relative h-full">
@@ -43,7 +46,12 @@ import { MapCanvasComponent } from 'libs/components/src/lib/map-canvas.component
             }
         `,
     ],
-
+    imports: [
+        EditorOptionsComponent,
+        DynamicMapComponent,
+        EditorControlsComponent,
+        AsyncPipe,
+    ],
 })
 export class EditorComponent extends BaseClass implements OnInit {
     /** URL of the map to display */

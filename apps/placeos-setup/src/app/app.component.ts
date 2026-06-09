@@ -1,7 +1,8 @@
 import { Component } from '@angular/core';
+import { SidebarComponent } from './components/sidebar.component';
+import { RouterOutlet } from '@angular/router';
 
 @Component({
-    standalone: false,
     selector: 'placeos-tools-root',
     template: `
         <div class="absolute inset-0 overflow-hidden flex dark:bg-neutral-600">
@@ -19,6 +20,6 @@ import { Component } from '@angular/core';
             }
         `,
     ],
-
+    imports: [SidebarComponent, RouterOutlet],
 })
 export class AppComponent {}

@@ -1,8 +1,9 @@
 import { Component, forwardRef, Input } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { MatIconButton } from '@angular/material/button';
+import { IconComponent } from '../../../../../libs/components/src/lib/icon.component';
 
 @Component({
-    standalone: false,
     selector: 'a-counter',
     template: `
         <div
@@ -24,7 +25,9 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
             >
                 <app-icon>remove</app-icon>
             </button>
-            <div value class="p-1 text-center">{{ (render_fn ? render_fn(value) : value) || '0' }}</div>
+            <div value class="p-1 text-center">
+                {{ (render_fn ? render_fn(value) : value) || '0' }}
+            </div>
             <button
                 mat-icon-button
                 name="add"
@@ -51,7 +54,7 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
             multi: true,
         },
     ],
-
+    imports: [MatIconButton, IconComponent],
 })
 export class CounterComponent implements ControlValueAccessor {
     /** Size of a single step */
@@ -81,7 +84,11 @@ export class CounterComponent implements ControlValueAccessor {
         if (!this.value) {
             this.value = this.min || 0;
         }
-        const step = this.ctrl_key ? 100 * this.step : this.shift_key ? 10 * this.step : this.step || 1;
+        const step = this.ctrl_key
+            ? 100 * this.step
+            : this.shift_key
+            ? 10 * this.step
+            : this.step || 1;
         this.value += step;
         if (this.value > this.max) {
             this.value = this.max || 10;
@@ -94,7 +101,11 @@ export class CounterComponent implements ControlValueAccessor {
         if (!this.value) {
             this.value = this.min || 0;
         }
-        const step = this.ctrl_key ? 100 * this.step : this.shift_key ? 10 * this.step : this.step || 1;
+        const step = this.ctrl_key
+            ? 100 * this.step
+            : this.shift_key
+            ? 10 * this.step
+            : this.step || 1;
         this.value -= step;
         if (this.value < this.min) {
             this.value = this.min || 0;

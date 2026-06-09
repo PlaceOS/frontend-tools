@@ -1,9 +1,16 @@
 import { Component, Input } from '@angular/core';
-import { Building, OrganisationService } from '../organisation/organisation.service';
+import {
+    Building,
+    OrganisationService,
+} from '../organisation/organisation.service';
 import { Desk, DesksService } from './desks.service';
+import { MatCheckbox } from '@angular/material/checkbox';
+import { FormsModule } from '@angular/forms';
+import { MatIconButton } from '@angular/material/button';
+import { MatTooltip } from '@angular/material/tooltip';
+import { IconComponent } from '../../../../../libs/components/src/lib/icon.component';
 
 @Component({
-    standalone: false,
     selector: `desk-details,[desk-details]`,
     template: `
         <div
@@ -11,7 +18,10 @@ import { Desk, DesksService } from './desks.service';
             class="flex items-center border-b border-neutral-500 text-sm hover:bg-black/10 relative"
         >
             <div thead class="min-w-0 w-10">
-                <mat-checkbox [ngModel]="selected" (ngModelChange)="setSelected($event)"></mat-checkbox>
+                <mat-checkbox
+                    [ngModel]="selected"
+                    (ngModelChange)="setSelected($event)"
+                ></mat-checkbox>
             </div>
             <div thead class="font-mono text-xs">{{ item.map_id }}</div>
             <div thead class="w-56">{{ item.display_name }}</div>
@@ -20,7 +30,9 @@ import { Desk, DesksService } from './desks.service';
             <div thead>{{ item.level_id }}</div>
             <div thead>{{ item.zone }}</div>
             <div thead class="w-64">{{ item.features?.join() || 'NONE' }}</div>
-            <div thead class="w-64">{{ item.whitelist_groups?.join() || 'NONE' }}</div>
+            <div thead class="w-64">
+                {{ item.whitelist_groups?.join() || 'NONE' }}
+            </div>
             <div thead>{{ item.bookable ? 'YES' : 'NO' }}</div>
             <div thead>{{ item.requires_approval ? 'YES' : 'NO' }}</div>
             <div thead>{{ item.auto_release ? 'YES' : 'NO' }}</div>
@@ -35,7 +47,11 @@ import { Desk, DesksService } from './desks.service';
                 <button mat-icon-button matTooltip="Edit Desk" (click)="edit()">
                     <app-icon>edit</app-icon>
                 </button>
-                <button mat-icon-button matTooltip="Delete Desk" (click)="remove()">
+                <button
+                    mat-icon-button
+                    matTooltip="Delete Desk"
+                    (click)="remove()"
+                >
                     <app-icon>delete</app-icon>
                 </button>
             </div>
@@ -65,15 +81,22 @@ import { Desk, DesksService } from './desks.service';
                 pointer-events: auto;
             }
         `,
-    ]
-
+    ],
+    imports: [
+        MatCheckbox,
+        FormsModule,
+        MatIconButton,
+        MatTooltip,
+        IconComponent,
+    ],
 })
 export class DeskDetailsComponent {
     @Input() public item: Desk;
 
     public readonly edit = () => this._service.openDeskModal(this.item);
     public readonly remove = () => this._service.removeDesk(this.item);
-    public readonly setSelected = (s) => this._service.setSelected(this.item.id, s);
+    public readonly setSelected = (s) =>
+        this._service.setSelected(this.item.id, s);
 
     public get selected() {
         return this._service.isSelected(this.item.id);

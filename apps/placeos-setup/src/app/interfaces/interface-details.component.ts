@@ -1,8 +1,12 @@
 import { Component, Input } from '@angular/core';
 import { Interface, InterfacesService } from './interfaces.service';
+import { MatCheckbox } from '@angular/material/checkbox';
+import { FormsModule } from '@angular/forms';
+import { IconComponent } from '../../../../../libs/components/src/lib/icon.component';
+import { MatIconButton } from '@angular/material/button';
+import { MatTooltip } from '@angular/material/tooltip';
 
 @Component({
-    standalone: false,
     selector: `interface-details,[interface-details]`,
     template: `
         <div
@@ -10,7 +14,10 @@ import { Interface, InterfacesService } from './interfaces.service';
             class="flex items-center border-b border-neutral-500 text-sm hover:bg-black/10 relative"
         >
             <div thead class="min-w-0 w-10">
-                <mat-checkbox [ngModel]="selected" (ngModelChange)="setSelected($event)"></mat-checkbox>
+                <mat-checkbox
+                    [ngModel]="selected"
+                    (ngModelChange)="setSelected($event)"
+                ></mat-checkbox>
             </div>
             <div thead class="font-mono text-xs">{{ item.id }}</div>
             <div thead class="w-48">{{ item.building_name }}</div>
@@ -119,15 +126,23 @@ import { Interface, InterfacesService } from './interfaces.service';
             }
         `,
     ],
-
+    imports: [
+        MatCheckbox,
+        FormsModule,
+        IconComponent,
+        MatIconButton,
+        MatTooltip,
+    ],
 })
 export class InterfaceDetailsComponent {
     @Input() public item: Interface;
 
-    public readonly view = () => this._service.openInterfaceDetailsModal(this.item);
+    public readonly view = () =>
+        this._service.openInterfaceDetailsModal(this.item);
     public readonly edit = () => this._service.openInterfaceModal(this.item);
     public readonly remove = () => this._service.removeInterface(this.item);
-    public readonly setSelected = (s) => this._service.setSelected(this.item.id, s);
+    public readonly setSelected = (s) =>
+        this._service.setSelected(this.item.id, s);
 
     public get selected() {
         return this._service.isSelected(this.item.id);

@@ -15,6 +15,7 @@ import {
     ViewChild,
 } from '@angular/core';
 import { BaseClass } from '@placeos-tools/common';
+import { NgComponentOutlet, NgTemplateOutlet } from '@angular/common';
 
 @Injectable()
 export class CustomTooltipData<T = any> {
@@ -27,36 +28,32 @@ export class CustomTooltipData<T = any> {
 }
 
 @Component({
-    standalone: false,
     selector: '[customTooltip]',
     template: `
         <ng-content></ng-content>
 
         <ng-template cdk-portal>
-          <div custom-tooltip class="pointer-events-none">
-            @switch (type) {
-              @case ('component') {
+            <div custom-tooltip class="pointer-events-none">
+                @switch (type) { @case ('component') {
                 <ng-container
-                  *ngComponentOutlet="content; injector: injector"
+                    *ngComponentOutlet="content; injector: injector"
                 ></ng-container>
-              }
-              @case ('html') {
+                } @case ('html') {
                 <div [innerHTML]="content | sanitize"></div>
-              }
-              @default {
+                } @default {
                 <ng-container
-                  *ngTemplateOutlet="content; context: data"
+                    *ngTemplateOutlet="content; context: data"
                 ></ng-container>
-              }
-            }
-          </div>
+                } }
+            </div>
         </ng-template>
-        `,
-
+    `,
+    imports: [NgComponentOutlet, NgTemplateOutlet],
 })
 export class CustomTooltipComponent<T = any>
     extends BaseClass
-    implements OnChanges, OnDestroy {
+    implements OnChanges, OnDestroy
+{
     /** Horizontal position of the rendered overlay */
     @Input('xPosition') public x_pos: 'start' | 'center' | 'end';
     /** Vertical position of the rendered overlay */

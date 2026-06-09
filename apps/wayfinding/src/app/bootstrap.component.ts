@@ -1,7 +1,11 @@
 import { Component } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { MatFormField } from '@angular/material/form-field';
+import { MatInput } from '@angular/material/input';
+import { MatButton } from '@angular/material/button';
+import { RouterLink } from '@angular/router';
 
 @Component({
-    standalone: false,
     selector: 'wayfindiing-bootstrap',
     template: `
         <div class="absolute inset-0 bg-gray-100 flex justify-center">
@@ -32,7 +36,7 @@ import { Component } from '@angular/core';
         </div>
     `,
     styles: [``],
-
+    imports: [FormsModule, MatFormField, MatInput, MatButton, RouterLink],
 })
 export class BootstrapComponent {
     /** URL of the map to edit */

@@ -9,28 +9,26 @@ export interface MapRadiusData {
 }
 
 @Component({
-    standalone: false,
     selector: '[map-radius]',
     template: `
         @if (show) {
-          <div
+        <div
             class="center border-4 rounded-full border-dashed"
             [style.border-color]="stroke"
             [style.background-color]="fill + '40'"
             [style.width]="radius * 100 + '%'"
             [style.height]="radius * 100 + '%'"
-          ></div>
-          @if (message && show_message) {
-            <div
-              name="message"
-              [style.top]="'-' + radius * 100 + '%'"
-              class="p-2 m-2 rounded bg-white text-gray-700 shadow absolute top-0 whitespace-no-wrap"
-              >
-              {{ message }}
-            </div>
-          }
-        }
-        `,
+        ></div>
+        @if (message && show_message) {
+        <div
+            name="message"
+            [style.top]="'-' + radius * 100 + '%'"
+            class="p-2 m-2 rounded bg-white text-gray-700 shadow absolute top-0 whitespace-no-wrap"
+        >
+            {{ message }}
+        </div>
+        } }
+    `,
     styles: [
         `
             :host {
@@ -59,7 +57,6 @@ export interface MapRadiusData {
             }
         `,
     ],
-
 })
 export class MapRadiusComponent implements OnInit {
     /** Message to display above the pin */

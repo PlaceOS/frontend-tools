@@ -3,68 +3,76 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatChipInputEvent } from '@angular/material/chips';
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
 
-import { MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogClose } from '@angular/material/dialog';
 
 import { CateringMenuConfig } from './catering-state.service';
+import { MatIconButton, MatButton } from '@angular/material/button';
+import { IconComponent } from '../../../../../libs/components/src/lib/icon.component';
+import { CateringMenuComponent } from './catering-menu.component';
+import { MatTooltip } from '@angular/material/tooltip';
 
 @Component({
-    standalone: false,
     selector: 'catering-menu-modal',
     template: `
         <div
-          class="absolute inset-0 bg-white dark:bg-neutral-600 dark:text-white flex flex-col"
-          >
-          <header
-            class="w-full bg-blue-300 dark:bg-neutral-700 border-b border-gray-200 dark:border-neutral-500"
+            class="absolute inset-0 bg-white dark:bg-neutral-600 dark:text-white flex flex-col"
+        >
+            <header
+                class="w-full bg-blue-300 dark:bg-neutral-700 border-b border-gray-200 dark:border-neutral-500"
             >
-            <div class="mx-auto w-[640px] relative p-4 text-center">
-              <div class="font-medium">
-                Edit Catering Menu for {{ building }}
-              </div>
-              @if (!loading) {
+                <div class="mx-auto w-[640px] relative p-4 text-center">
+                    <div class="font-medium">
+                        Edit Catering Menu for {{ building }}
+                    </div>
+                    @if (!loading) {
+                    <button
+                        mat-icon-button
+                        mat-dialog-close
+                        class="absolute top-1/2 right-0 -translate-y-1/2"
+                    >
+                        <app-icon>close</app-icon>
+                    </button>
+                    }
+                </div>
+            </header>
+            @if (!loading) {
+            <main class="mx-auto w-[768px] max-w-full flex-1 h-1/2 relative">
+                <catering-menu></catering-menu>
                 <button
-                  mat-icon-button
-                  mat-dialog-close
-                  class="absolute top-1/2 right-0 -translate-y-1/2"
-                  >
-                  <app-icon>close</app-icon>
-                </button>
-              }
-            </div>
-          </header>
-          @if (!loading) {
-            <main
-              class="mx-auto w-[768px] max-w-full flex-1 h-1/2 relative"
-              >
-              <catering-menu></catering-menu>
-              <button
-                mat-icon-button
-                class="absolute bottom-2 right-2 bg-primary shadow"
-                matTooltip="Add Item to Menu"
-                (click)="add.emit()"
+                    mat-icon-button
+                    class="absolute bottom-2 right-2 bg-primary shadow"
+                    matTooltip="Add Item to Menu"
+                    (click)="add.emit()"
                 >
-                <app-icon>add</app-icon>
-              </button>
+                    <app-icon>add</app-icon>
+                </button>
             </main>
             <footer
-              class="w-full bg-blue-300 dark:bg-neutral-700 border-t border-gray-200 dark:border-neutral-500"
-              >
-              <div class="mx-auto w-[640px] relative p-4">
-                <button mat-button (click)="save()" class="w-32">
-                  Save
-                </button>
-              </div>
+                class="w-full bg-blue-300 dark:bg-neutral-700 border-t border-gray-200 dark:border-neutral-500"
+            >
+                <div class="mx-auto w-[640px] relative p-4">
+                    <button mat-button (click)="save()" class="w-32">
+                        Save
+                    </button>
+                </div>
             </footer>
-          } @else {
+            } @else {
             <div class="mx-auto w-[640px] p-4 flex-1 h-1/2">
-              <mat-spinner></mat-spinner>
-              <p>Saving catering menu data...</p>
+                <mat-spinner></mat-spinner>
+                <p>Saving catering menu data...</p>
             </div>
-          }
+            }
         </div>
-        `,
+    `,
     styles: [``],
-
+    imports: [
+        MatIconButton,
+        MatDialogClose,
+        IconComponent,
+        CateringMenuComponent,
+        MatTooltip,
+        MatButton,
+    ],
 })
 export class CateringMenuModalComponent {
     @Output() public add = new EventEmitter();

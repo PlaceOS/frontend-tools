@@ -1,227 +1,245 @@
 import { Component, Inject, Output, EventEmitter } from '@angular/core';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import {
+    FormControl,
+    FormGroup,
+    Validators,
+    FormsModule,
+    ReactiveFormsModule,
+} from '@angular/forms';
 import { MatChipInputEvent } from '@angular/material/chips';
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
 
-import { MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogClose } from '@angular/material/dialog';
 
 import { OrganisationService } from '../organisation/organisation.service';
 import { Asset } from './assets.service';
+import { MatIconButton, MatButton } from '@angular/material/button';
+import { IconComponent } from '../../../../../libs/components/src/lib/icon.component';
+import { MatFormField, MatHint, MatError } from '@angular/material/form-field';
+import { MatInput } from '@angular/material/input';
+import { MatSelect, MatOption } from '@angular/material/select';
+import { MatCheckbox } from '@angular/material/checkbox';
+import { AsyncPipe } from '@angular/common';
 
 @Component({
-    standalone: false,
     selector: 'asset-modal',
     template: `
         <div
-          class="absolute inset-0 bg-white dark:bg-neutral-600 dark:text-white flex flex-col"
-          >
-          <header
-            class="w-full bg-blue-300 dark:bg-neutral-700 border-b border-gray-200 dark:border-neutral-500"
+            class="absolute inset-0 bg-white dark:bg-neutral-600 dark:text-white flex flex-col"
+        >
+            <header
+                class="w-full bg-blue-300 dark:bg-neutral-700 border-b border-gray-200 dark:border-neutral-500"
             >
-            <div class="mx-auto w-[640px] relative p-4 text-center">
-              <div class="font-medium">
-                {{ form.value.id ? 'Edit' : 'New' }} Asset
-              </div>
-              @if (!loading) {
-                <button
-                  mat-icon-button
-                  mat-dialog-close
-                  class="absolute top-1/2 right-0 -translate-y-1/2"
-                  >
-                  <app-icon>close</app-icon>
-                </button>
-              }
-            </div>
-          </header>
-          @if (!loading) {
-            <main
-              class="mx-auto w-[640px] p-4 flex-1 h-1/2 overflow-auto"
-              [formGroup]="form"
-              >
-              <div class="w-full">
-                <label for="name">
-                  Name <span class="text-pending">*</span>
-                </label>
-                <mat-form-field appearance="outline" class="w-full">
-                  <input
-                    matInput
-                    name="name"
-                    formControlName="name"
-                    placeholder="Level Name"
-                    />
-                  <mat-hint>
-                    Organisational name for the asset
-                  </mat-hint>
-                  <mat-error>Name is required</mat-error>
-                </mat-form-field>
-              </div>
-              <div class="w-full">
-                <label for="building">Building</label>
-                <mat-form-field appearance="outline" class="w-full">
-                  <mat-select
-                    name="building"
-                    formControlName="building_id"
-                    placeholder="Building"
+                <div class="mx-auto w-[640px] relative p-4 text-center">
+                    <div class="font-medium">
+                        {{ form.value.id ? 'Edit' : 'New' }} Asset
+                    </div>
+                    @if (!loading) {
+                    <button
+                        mat-icon-button
+                        mat-dialog-close
+                        class="absolute top-1/2 right-0 -translate-y-1/2"
                     >
-                    @for (item of building_list | async; track item) {
-                      <mat-option
-                        [value]="item.id"
-                        >
-                        {{ item.display_name || item.name }}
-                      </mat-option>
+                        <app-icon>close</app-icon>
+                    </button>
                     }
-                  </mat-select>
-                  <mat-hint>
-                    Building that the level resides in
-                  </mat-hint>
-                  <mat-error>Building is required</mat-error>
-                </mat-form-field>
-              </div>
-              <div class="w-full">
-                <label for="brand">Brand</label>
-                <mat-form-field appearance="outline" class="w-full">
-                  <input
-                    matInput
-                    name="brand"
-                    formControlName="brand"
-                    placeholder="Brand"
-                    />
-                  <mat-hint>
-                    Brand of the asset
-                  </mat-hint>
-                  <mat-error>Brand is required</mat-error>
-                </mat-form-field>
-              </div>
-              <div class="w-full">
-                <label for="barcode">Barcode</label>
-                <mat-form-field appearance="outline" class="w-full">
-                  <input
-                    matInput
-                    name="barcode"
-                    formControlName="barcode"
-                    placeholder="Barcode"
-                    />
-                  <mat-hint>
-                    Barcode of the asset
-                  </mat-hint>
-                  <mat-error>Barcode is required</mat-error>
-                </mat-form-field>
-              </div>
-              <div class="w-full">
-                <label for="category">Category</label>
-                <mat-form-field appearance="outline" class="w-full">
-                  <input
-                    matInput
-                    name="category"
-                    formControlName="category"
-                    placeholder="Category"
-                    />
-                  <mat-hint>
-                    Organisational category of the asset
-                  </mat-hint>
-                  <mat-error>Category is required</mat-error>
-                </mat-form-field>
-              </div>
-              <div class="w-full">
-                <label for="purchase-date">Purchase Date</label>
-                <mat-form-field appearance="outline" class="w-full">
-                  <input
-                    matInput
-                    name="purchase-date"
-                    formControlName="purchase_date"
-                    placeholder="Purchase Date"
-                    />
-                  <mat-hint>
-                    Date of purchase for the asset
-                  </mat-hint>
-                  <mat-error>Date of Purchase is required</mat-error>
-                </mat-form-field>
-              </div>
-              <div class="w-full">
-                <label for="good-until">Good Until</label>
-                <mat-form-field appearance="outline" class="w-full">
-                  <input
-                    matInput
-                    name="good-until"
-                    formControlName="good_until"
-                    placeholder="Good Until date"
-                    />
-                  <mat-hint>
-                    Date that the asset is good to use until
-                  </mat-hint>
-                  <mat-error>Good until is required</mat-error>
-                </mat-form-field>
-              </div>
-              <div class="w-full py-2">
-                <mat-checkbox
-                  name="consumable"
-                  formControlName="consumable"
-                  >
-                  Is the asset consumable?
-                </mat-checkbox>
-              </div>
-              <div class="w-full py-2">
-                <mat-checkbox
-                  name="remind-returns"
-                  formControlName="remind_returns"
-                  >
-                  Send email reminders for returning asset?
-                </mat-checkbox>
-              </div>
-              @if (form.value.remind_returns) {
-                <div class="w-full">
-                  <label for="max-recurrences">Reminder Delay</label>
-                  <mat-form-field appearance="outline" class="w-full">
-                    <input
-                      matInput
-                      name="reminder-delay"
-                      type="number"
-                      formControlName="reminder_delay"
-                      placeholder="Reminder delay"
-                      />
-                    <mat-hint>
-                      Number of hours after the booking to remind user to return assets
-                    </mat-hint>
-                    <mat-error>Reminder delay is required</mat-error>
-                  </mat-form-field>
                 </div>
-              }
-              <div class="w-full py-2">
-                <mat-checkbox
-                  name="available-for-desks"
-                  formControlName="available_for_desks"
-                  >
-                  Should asset be available when booking desks?
-                </mat-checkbox>
-              </div>
-              <div class="w-full py-2">
-                <mat-checkbox
-                  name="available-for-spaces"
-                  formControlName="available_for_spaces"
-                  >
-                  Should asset be available when booking rooms?
-                </mat-checkbox>
-              </div>
+            </header>
+            @if (!loading) {
+            <main
+                class="mx-auto w-[640px] p-4 flex-1 h-1/2 overflow-auto"
+                [formGroup]="form"
+            >
+                <div class="w-full">
+                    <label for="name">
+                        Name <span class="text-pending">*</span>
+                    </label>
+                    <mat-form-field appearance="outline" class="w-full">
+                        <input
+                            matInput
+                            name="name"
+                            formControlName="name"
+                            placeholder="Level Name"
+                        />
+                        <mat-hint> Organisational name for the asset </mat-hint>
+                        <mat-error>Name is required</mat-error>
+                    </mat-form-field>
+                </div>
+                <div class="w-full">
+                    <label for="building">Building</label>
+                    <mat-form-field appearance="outline" class="w-full">
+                        <mat-select
+                            name="building"
+                            formControlName="building_id"
+                            placeholder="Building"
+                        >
+                            @for (item of building_list | async; track item) {
+                            <mat-option [value]="item.id">
+                                {{ item.display_name || item.name }}
+                            </mat-option>
+                            }
+                        </mat-select>
+                        <mat-hint>
+                            Building that the level resides in
+                        </mat-hint>
+                        <mat-error>Building is required</mat-error>
+                    </mat-form-field>
+                </div>
+                <div class="w-full">
+                    <label for="brand">Brand</label>
+                    <mat-form-field appearance="outline" class="w-full">
+                        <input
+                            matInput
+                            name="brand"
+                            formControlName="brand"
+                            placeholder="Brand"
+                        />
+                        <mat-hint> Brand of the asset </mat-hint>
+                        <mat-error>Brand is required</mat-error>
+                    </mat-form-field>
+                </div>
+                <div class="w-full">
+                    <label for="barcode">Barcode</label>
+                    <mat-form-field appearance="outline" class="w-full">
+                        <input
+                            matInput
+                            name="barcode"
+                            formControlName="barcode"
+                            placeholder="Barcode"
+                        />
+                        <mat-hint> Barcode of the asset </mat-hint>
+                        <mat-error>Barcode is required</mat-error>
+                    </mat-form-field>
+                </div>
+                <div class="w-full">
+                    <label for="category">Category</label>
+                    <mat-form-field appearance="outline" class="w-full">
+                        <input
+                            matInput
+                            name="category"
+                            formControlName="category"
+                            placeholder="Category"
+                        />
+                        <mat-hint>
+                            Organisational category of the asset
+                        </mat-hint>
+                        <mat-error>Category is required</mat-error>
+                    </mat-form-field>
+                </div>
+                <div class="w-full">
+                    <label for="purchase-date">Purchase Date</label>
+                    <mat-form-field appearance="outline" class="w-full">
+                        <input
+                            matInput
+                            name="purchase-date"
+                            formControlName="purchase_date"
+                            placeholder="Purchase Date"
+                        />
+                        <mat-hint> Date of purchase for the asset </mat-hint>
+                        <mat-error>Date of Purchase is required</mat-error>
+                    </mat-form-field>
+                </div>
+                <div class="w-full">
+                    <label for="good-until">Good Until</label>
+                    <mat-form-field appearance="outline" class="w-full">
+                        <input
+                            matInput
+                            name="good-until"
+                            formControlName="good_until"
+                            placeholder="Good Until date"
+                        />
+                        <mat-hint>
+                            Date that the asset is good to use until
+                        </mat-hint>
+                        <mat-error>Good until is required</mat-error>
+                    </mat-form-field>
+                </div>
+                <div class="w-full py-2">
+                    <mat-checkbox
+                        name="consumable"
+                        formControlName="consumable"
+                    >
+                        Is the asset consumable?
+                    </mat-checkbox>
+                </div>
+                <div class="w-full py-2">
+                    <mat-checkbox
+                        name="remind-returns"
+                        formControlName="remind_returns"
+                    >
+                        Send email reminders for returning asset?
+                    </mat-checkbox>
+                </div>
+                @if (form.value.remind_returns) {
+                <div class="w-full">
+                    <label for="max-recurrences">Reminder Delay</label>
+                    <mat-form-field appearance="outline" class="w-full">
+                        <input
+                            matInput
+                            name="reminder-delay"
+                            type="number"
+                            formControlName="reminder_delay"
+                            placeholder="Reminder delay"
+                        />
+                        <mat-hint>
+                            Number of hours after the booking to remind user to
+                            return assets
+                        </mat-hint>
+                        <mat-error>Reminder delay is required</mat-error>
+                    </mat-form-field>
+                </div>
+                }
+                <div class="w-full py-2">
+                    <mat-checkbox
+                        name="available-for-desks"
+                        formControlName="available_for_desks"
+                    >
+                        Should asset be available when booking desks?
+                    </mat-checkbox>
+                </div>
+                <div class="w-full py-2">
+                    <mat-checkbox
+                        name="available-for-spaces"
+                        formControlName="available_for_spaces"
+                    >
+                        Should asset be available when booking rooms?
+                    </mat-checkbox>
+                </div>
             </main>
             <footer
-              class="w-full bg-blue-300 dark:bg-neutral-700 border-t border-gray-200 dark:border-neutral-500"
-              >
-              <div class="mx-auto w-[640px] relative p-4">
-                <button mat-button (click)="save()" class="w-32">
-                  Save
-                </button>
-              </div>
+                class="w-full bg-blue-300 dark:bg-neutral-700 border-t border-gray-200 dark:border-neutral-500"
+            >
+                <div class="mx-auto w-[640px] relative p-4">
+                    <button mat-button (click)="save()" class="w-32">
+                        Save
+                    </button>
+                </div>
             </footer>
-          } @else {
+            } @else {
             <div class="mx-auto w-[640px] p-4 flex-1 h-1/2">
-              <mat-spinner></mat-spinner>
-              <p>Saving asset data...</p>
+                <mat-spinner></mat-spinner>
+                <p>Saving asset data...</p>
             </div>
-          }
+            }
         </div>
-        `,
+    `,
     styles: [``],
-
+    imports: [
+        MatIconButton,
+        MatDialogClose,
+        IconComponent,
+        FormsModule,
+        ReactiveFormsModule,
+        MatFormField,
+        MatInput,
+        MatHint,
+        MatError,
+        MatSelect,
+        MatOption,
+        MatCheckbox,
+        MatButton,
+        AsyncPipe,
+    ],
 })
 export class AssetModalComponent {
     @Output() public readonly onSave = new EventEmitter<Partial<Asset>>();

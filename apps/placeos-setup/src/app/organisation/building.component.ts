@@ -3,65 +3,78 @@ import { ANIMATION_SHOW_CONTRACT_EXPAND } from '@placeos-tools/common';
 import { BehaviorSubject, combineLatest } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Building, OrganisationService } from './organisation.service';
+import { MatCheckbox } from '@angular/material/checkbox';
+import { FormsModule } from '@angular/forms';
+import { MatIconButton } from '@angular/material/button';
+import { IconComponent } from '../../../../../libs/components/src/lib/icon.component';
+import { MatTooltip } from '@angular/material/tooltip';
+import { OrganisationLevelComponent } from './level.component';
+import { AsyncPipe } from '@angular/common';
 
 @Component({
-    standalone: false,
     selector: `org-building,[org-building]`,
     template: `
         <div
-          details
-          class="flex items-center border-b border-neutral-500 text-sm hover:bg-black/10 relative"
-          >
-          <div thead class="min-w-0">
-            <mat-checkbox [ngModel]="selected" (ngModelChange)="setSelected($event)"></mat-checkbox>
-          </div>
-          <div class="min-w-0 flex items-center w-10 p-0 justify-end">
-            <button
-              mat-icon-button
-              (click)="show = !show"
-              [disabled]="!(levels | async)?.length"
-              >
-              <app-icon>{{
-                show ? 'expand_less' : 'expand_more'
-              }}</app-icon>
-            </button>
-          </div>
-          <div class="w-56">{{ building.display_name }}</div>
-          <div>{{ building.country }}</div>
-          <div class="w-32">{{ building.city }}</div>
-          <div class="w-56">{{ building.address }}</div>
-          <div>{{ (levels | async)?.length || 0 }}</div>
-          <div>{{ building.currency }}</div>
-          <div>{{ building.allow_visitors ? 'YES' : 'NO' }}</div>
-          <div>{{ building.catering_available ? 'YES' : 'NO' }}</div>
-          <div
-            actions
-            class="absolute top-1/2 -translate-y-1/2 left-24 rounded-3xl flex items-center bg-white dark:bg-neutral-700 shadow !p-0 min-w-0"
+            details
+            class="flex items-center border-b border-neutral-500 text-sm hover:bg-black/10 relative"
+        >
+            <div thead class="min-w-0">
+                <mat-checkbox
+                    [ngModel]="selected"
+                    (ngModelChange)="setSelected($event)"
+                ></mat-checkbox>
+            </div>
+            <div class="min-w-0 flex items-center w-10 p-0 justify-end">
+                <button
+                    mat-icon-button
+                    (click)="show = !show"
+                    [disabled]="!(levels | async)?.length"
+                >
+                    <app-icon>{{
+                        show ? 'expand_less' : 'expand_more'
+                    }}</app-icon>
+                </button>
+            </div>
+            <div class="w-56">{{ building.display_name }}</div>
+            <div>{{ building.country }}</div>
+            <div class="w-32">{{ building.city }}</div>
+            <div class="w-56">{{ building.address }}</div>
+            <div>{{ (levels | async)?.length || 0 }}</div>
+            <div>{{ building.currency }}</div>
+            <div>{{ building.allow_visitors ? 'YES' : 'NO' }}</div>
+            <div>{{ building.catering_available ? 'YES' : 'NO' }}</div>
+            <div
+                actions
+                class="absolute top-1/2 -translate-y-1/2 left-24 rounded-3xl flex items-center bg-white dark:bg-neutral-700 shadow !p-0 min-w-0"
             >
-            <button mat-icon-button matTooltip="Edit Building" (click)="edit()">
-              <app-icon>edit</app-icon>
-            </button>
-            <button mat-icon-button matTooltip="Delete Building" (click)="remove()">
-              <app-icon>delete</app-icon>
-            </button>
-          </div>
+                <button
+                    mat-icon-button
+                    matTooltip="Edit Building"
+                    (click)="edit()"
+                >
+                    <app-icon>edit</app-icon>
+                </button>
+                <button
+                    mat-icon-button
+                    matTooltip="Delete Building"
+                    (click)="remove()"
+                >
+                    <app-icon>delete</app-icon>
+                </button>
+            </div>
         </div>
         @if ((levels | async)?.length) {
-          <ul
+        <ul
             class="list-none p-0 m-0 w-full relative z-0"
             [class.shown]="show"
             [@show]="show ? 'show' : 'hide'"
-            >
+        >
             @for (item of levels | async; track item; let i = $index) {
-              <li
-                org-level
-                class="flex items-center w-full"
-                [level]="item"
-              ></li>
+            <li org-level class="flex items-center w-full" [level]="item"></li>
             }
-          </ul>
+        </ul>
         }
-        `,
+    `,
     styles: [
         `
             :host {
@@ -87,7 +100,15 @@ import { Building, OrganisationService } from './organisation.service';
         `,
     ],
     animations: [ANIMATION_SHOW_CONTRACT_EXPAND],
-
+    imports: [
+        MatCheckbox,
+        FormsModule,
+        MatIconButton,
+        IconComponent,
+        MatTooltip,
+        OrganisationLevelComponent,
+        AsyncPipe,
+    ],
 })
 export class BuildingComponent {
     @Input() public building: Building;
@@ -103,7 +124,8 @@ export class BuildingComponent {
 
     public readonly edit = () => this._org.openBuildingModal(this.building);
     public readonly remove = () => this._org.removeBuilding(this.building);
-    public readonly setSelected = (s) => this._org.setSelected(this.building.id, s);
+    public readonly setSelected = (s) =>
+        this._org.setSelected(this.building.id, s);
 
     public get selected() {
         return this._org.isSelected(this.building.id);
