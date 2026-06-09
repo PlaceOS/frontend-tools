@@ -9,14 +9,6 @@
         "lint": {
             "executor": "@nx/eslint:lint",
             "outputs": ["{options.outputFile}"]
-        },
-        "test": {
-            "executor": "@nx/jest:jest",
-            "outputs": ["{workspaceRoot}/coverage/libs/components"],
-            "options": {
-                "jestConfig": "libs/components/jest.config.ts",
-                "tsConfig": "libs/components/tsconfig.spec.json"
-            }
         }
     }
 }

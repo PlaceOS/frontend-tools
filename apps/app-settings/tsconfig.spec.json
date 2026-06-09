@@ -3,11 +3,8 @@
     "compilerOptions": {
         "outDir": "../../dist/out-tsc",
         "module": "preserve",
-        "types": ["jest", "node"],
-        "target": "es2016",
-        "moduleResolution": "bundler",
-        "isolatedModules": true
+        "types": ["vitest/globals", "node"],
+        "moduleResolution": "bundler"
     },
-    "files": ["src/test-setup.ts"],
-    "include": ["**/*.spec.ts", "**/*.test.ts", "**/*.d.ts", "jest.config.ts"]
+    "include": ["src/polyfills.ts", "**/*.spec.ts", "**/*.test.ts", "**/*.d.ts"]
 }

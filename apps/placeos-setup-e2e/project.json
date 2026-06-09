@@ -7,16 +7,12 @@
     "implicitDependencies": ["placeos-setup"],
     "targets": {
         "e2e": {
-            "executor": "@nx/cypress:cypress",
+            "executor": "@nx/playwright:playwright",
+            "outputs": [
+                "{workspaceRoot}/dist/.playwright/apps/placeos-setup-e2e"
+            ],
             "options": {
-                "cypressConfig": "apps/placeos-setup-e2e/cypress.json",
-                "devServerTarget": "placeos-setup:serve:development",
-                "testingType": "e2e"
-            },
-            "configurations": {
-                "production": {
-                    "devServerTarget": "placeos-setup:serve:production"
-                }
+                "config": "apps/placeos-setup-e2e/playwright.config.ts"
             }
         },
         "lint": {

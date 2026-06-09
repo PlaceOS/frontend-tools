@@ -7,14 +7,12 @@
     "tags": [],
     "targets": {
         "build": {
-            "executor": "@angular-devkit/build-angular:browser",
-            "outputs": ["{options.outputPath}"],
+            "executor": "@angular/build:application",
             "options": {
                 "baseHref": ".",
                 "outputPath": "dist/apps/placeos-setup",
                 "index": "apps/placeos-setup/src/index.html",
-                "main": "apps/placeos-setup/src/main.ts",
-                "polyfills": "apps/placeos-setup/src/polyfills.ts",
+                "polyfills": ["apps/placeos-setup/src/polyfills.ts"],
                 "tsConfig": "apps/placeos-setup/tsconfig.app.json",
                 "assets": [
                     "apps/placeos-setup/src/favicon.ico",
@@ -28,7 +26,8 @@
                     "./node_modules/@material-design-icons/font/index.css",
                     "./node_modules/@angular/material/prebuilt-themes/indigo-pink.css"
                 ],
-                "scripts": []
+                "scripts": [],
+                "browser": "apps/placeos-setup/src/main.ts"
             },
             "configurations": {
                 "production": {
@@ -53,9 +52,7 @@
                     "outputHashing": "all"
                 },
                 "development": {
-                    "buildOptimizer": false,
                     "optimization": false,
-                    "vendorChunk": true,
                     "extractLicenses": false,
                     "sourceMap": true,
                     "namedChunks": true
@@ -64,7 +61,7 @@
             "defaultConfiguration": "production"
         },
         "serve": {
-            "executor": "@angular-devkit/build-angular:dev-server",
+            "executor": "@angular/build:dev-server",
             "configurations": {
                 "production": {
                     "buildTarget": "placeos-setup:build:production"
@@ -77,7 +74,7 @@
             "continuous": true
         },
         "extract-i18n": {
-            "executor": "@angular-devkit/build-angular:extract-i18n",
+            "executor": "@angular/build:extract-i18n",
             "options": {
                 "buildTarget": "placeos-setup:build"
             }
@@ -86,11 +83,16 @@
             "executor": "@nx/eslint:lint"
         },
         "test": {
-            "executor": "@nx/jest:jest",
+            "executor": "@nx/angular:unit-test",
             "outputs": ["{workspaceRoot}/coverage/apps/placeos-setup"],
             "options": {
-                "jestConfig": "apps/placeos-setup/jest.config.ts",
-                "tsConfig": "apps/placeos-setup/tsconfig.spec.json"
+                "tsConfig": "apps/placeos-setup/tsconfig.spec.json",
+                "watch": false
+            },
+            "configurations": {
+                "ci": {
+                    "coverage": true
+                }
             }
         }
     }

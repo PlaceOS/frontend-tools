@@ -7,15 +7,10 @@
     "implicitDependencies": ["sensor-map"],
     "targets": {
         "e2e": {
-            "executor": "@nx/cypress:cypress",
+            "executor": "@nx/playwright:playwright",
+            "outputs": ["{workspaceRoot}/dist/.playwright/apps/sensor-map-e2e"],
             "options": {
-                "cypressConfig": "apps/sensor-map-e2e/cypress.json",
-                "devServerTarget": "sensor-map:serve:development"
-            },
-            "configurations": {
-                "production": {
-                    "devServerTarget": "sensor-map:serve:production"
-                }
+                "config": "apps/sensor-map-e2e/playwright.config.ts"
             }
         },
         "lint": {

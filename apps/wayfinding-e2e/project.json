@@ -7,15 +7,10 @@
     "implicitDependencies": ["wayfinding"],
     "targets": {
         "e2e": {
-            "executor": "@nx/cypress:cypress",
+            "executor": "@nx/playwright:playwright",
+            "outputs": ["{workspaceRoot}/dist/.playwright/apps/wayfinding-e2e"],
             "options": {
-                "cypressConfig": "apps/wayfinding-e2e/cypress.json",
-                "devServerTarget": "wayfinding:serve:development"
-            },
-            "configurations": {
-                "production": {
-                    "devServerTarget": "wayfinding:serve:production"
-                }
+                "config": "apps/wayfinding-e2e/playwright.config.ts"
             }
         },
         "lint": {

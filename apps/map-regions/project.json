@@ -7,13 +7,12 @@
     "tags": [],
     "targets": {
         "build": {
-            "executor": "@angular-devkit/build-angular:browser",
+            "executor": "@angular/build:application",
             "options": {
                 "baseHref": ".",
                 "outputPath": "dist/apps/map-regions",
                 "index": "apps/map-regions/src/index.html",
-                "main": "apps/map-regions/src/main.ts",
-                "polyfills": "apps/map-regions/src/polyfills.ts",
+                "polyfills": ["apps/map-regions/src/polyfills.ts"],
                 "tsConfig": "apps/map-regions/tsconfig.app.json",
                 "assets": [
                     "apps/map-regions/src/favicon.ico",
@@ -33,12 +32,11 @@
                     "./node_modules/@material-design-icons/font/index.css"
                 ],
                 "scripts": [],
-                "vendorChunk": true,
                 "extractLicenses": false,
-                "buildOptimizer": false,
                 "sourceMap": true,
                 "optimization": false,
-                "namedChunks": true
+                "namedChunks": true,
+                "browser": "apps/map-regions/src/main.ts"
             },
             "configurations": {
                 "production": {
@@ -53,8 +51,6 @@
                     "sourceMap": false,
                     "namedChunks": false,
                     "extractLicenses": true,
-                    "vendorChunk": false,
-                    "buildOptimizer": true,
                     "budgets": [
                         {
                             "type": "initial",
@@ -67,14 +63,13 @@
                             "maximumError": "10kb"
                         }
                     ],
-                    "serviceWorker": true,
-                    "ngswConfigPath": "apps/map-regions/ngsw-config.json"
+                    "serviceWorker": "apps/map-regions/ngsw-config.json"
                 }
             },
             "defaultConfiguration": ""
         },
         "serve": {
-            "executor": "@angular-devkit/build-angular:dev-server",
+            "executor": "@angular/build:dev-server",
             "options": {
                 "buildTarget": "map-regions:build"
             },
@@ -86,7 +81,7 @@
             "continuous": true
         },
         "extract-i18n": {
-            "executor": "@angular-devkit/build-angular:extract-i18n",
+            "executor": "@angular/build:extract-i18n",
             "options": {
                 "buildTarget": "map-regions:build"
             }
@@ -96,11 +91,16 @@
             "outputs": ["{options.outputFile}"]
         },
         "test": {
-            "executor": "@nx/jest:jest",
+            "executor": "@nx/angular:unit-test",
             "outputs": ["{workspaceRoot}/coverage/apps/map-regions"],
             "options": {
-                "jestConfig": "apps/map-regions/jest.config.ts",
-                "tsConfig": "apps/map-regions/tsconfig.spec.json"
+                "tsConfig": "apps/map-regions/tsconfig.spec.json",
+                "watch": false
+            },
+            "configurations": {
+                "ci": {
+                    "coverage": true
+                }
             }
         }
     }

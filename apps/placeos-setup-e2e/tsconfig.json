@@ -4,7 +4,7 @@
         "sourceMap": false,
         "outDir": "../../dist/out-tsc",
         "allowJs": true,
-        "types": ["cypress", "node"],
+        "types": ["node", "@playwright/test"],
         "forceConsistentCasingInFileNames": true,
         "strict": true,
         "noImplicitOverride": true,
@@ -12,11 +12,12 @@
         "noImplicitReturns": true,
         "noFallthroughCasesInSwitch": true
     },
-    "include": ["src/**/*.ts", "src/**/*.js"],
+    "include": ["src/**/*.ts", "playwright.config.ts"],
     "angularCompilerOptions": {
         "enableI18nLegacyMessageIdFormat": false,
         "strictInjectionParameters": true,
         "strictInputAccessModifiers": true,
         "strictTemplates": true
-    }
+    },
+    "files": []
 }

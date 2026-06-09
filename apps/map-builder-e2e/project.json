@@ -7,15 +7,12 @@
     "implicitDependencies": ["map-builder"],
     "targets": {
         "e2e": {
-            "executor": "@nx/cypress:cypress",
+            "executor": "@nx/playwright:playwright",
+            "outputs": [
+                "{workspaceRoot}/dist/.playwright/apps/map-builder-e2e"
+            ],
             "options": {
-                "cypressConfig": "apps/map-builder-e2e/cypress.json",
-                "devServerTarget": "map-builder:serve"
-            },
-            "configurations": {
-                "production": {
-                    "devServerTarget": "map-builder:serve:production"
-                }
+                "config": "apps/map-builder-e2e/playwright.config.ts"
             }
         },
         "lint": {

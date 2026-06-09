@@ -7,15 +7,12 @@
     "implicitDependencies": ["app-settings"],
     "targets": {
         "e2e": {
-            "executor": "@nx/cypress:cypress",
+            "executor": "@nx/playwright:playwright",
+            "outputs": [
+                "{workspaceRoot}/dist/.playwright/apps/app-settings-e2e"
+            ],
             "options": {
-                "cypressConfig": "apps/app-settings-e2e/cypress.json",
-                "devServerTarget": "app-settings:serve:development"
-            },
-            "configurations": {
-                "production": {
-                    "devServerTarget": "app-settings:serve:production"
-                }
+                "config": "apps/app-settings-e2e/playwright.config.ts"
             }
         },
         "lint": {

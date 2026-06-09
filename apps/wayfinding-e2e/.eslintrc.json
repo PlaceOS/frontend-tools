@@ -1,35 +1,14 @@
 {
-    "extends": [
-        "plugin:cypress/recommended",
-        "../../.eslintrc.json"
-    ],
-    "ignorePatterns": [
-        "!**/*"
-    ],
+    "extends": ["../../.eslintrc.json"],
+    "ignorePatterns": ["!**/*"],
     "overrides": [
         {
-            "files": [
-                "*.ts",
-                "*.tsx",
-                "*.js",
-                "*.jsx"
-            ],
+            "files": ["*.ts", "*.tsx", "*.js", "*.jsx"],
             "rules": {
                 "@angular-eslint/component-selector": "off",
                 "@angular-eslint/directive-selector": "off",
                 "@angular-eslint/prefer-inject": "off",
                 "@angular-eslint/no-input-rename": "off",
-                "@angular-eslint/no-output-on-prefix": "off",
-                "@angular-eslint/template/no-negated-async": "off"
-            }
-        },
-        {
-            "files": [
-                "src/plugins/index.js"
-            ],
-            "rules": {
-                "@typescript-eslint/no-var-requires": "off",
-                "no-undef": "off",
                 "@angular-eslint/no-output-on-prefix": "off",
                 "@angular-eslint/template/no-negated-async": "off"
             }

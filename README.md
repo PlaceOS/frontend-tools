@@ -67,13 +67,13 @@ Run `ng build my-app` to build the project. The build artifacts will be stored i
 
 ## Running unit tests
 
-Run `ng test my-app` to execute the unit tests via [Jest](https://jestjs.io).
+Run `ng test my-app` to execute the unit tests via [Vitest](https://vitest.dev).
 
 Run `nx affected:test` to execute the unit tests affected by a change.
 
 ## Running end-to-end tests
 
-Run `ng e2e my-app` to execute the end-to-end tests via [Cypress](https://www.cypress.io).
+Run `ng e2e my-app` to execute the end-to-end tests via [Playwright](https://playwright.dev).
 
 Run `nx affected:e2e` to execute the end-to-end tests affected by a change.
 

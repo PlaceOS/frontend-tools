@@ -7,14 +7,12 @@
     "tags": [],
     "targets": {
         "build": {
-            "executor": "@angular-devkit/build-angular:browser",
-            "outputs": ["{options.outputPath}"],
+            "executor": "@angular/build:application",
             "options": {
                 "baseHref": ".",
                 "outputPath": "dist/apps/wayfinding",
                 "index": "apps/wayfinding/src/index.html",
-                "main": "apps/wayfinding/src/main.ts",
-                "polyfills": "apps/wayfinding/src/polyfills.ts",
+                "polyfills": ["apps/wayfinding/src/polyfills.ts"],
                 "tsConfig": "apps/wayfinding/tsconfig.app.json",
                 "assets": [
                     "apps/wayfinding/src/favicon.ico",
@@ -30,8 +28,8 @@
                     "./node_modules/@angular/material/prebuilt-themes/indigo-pink.css"
                 ],
                 "scripts": [],
-                "serviceWorker": true,
-                "ngswConfigPath": "apps/wayfinding/ngsw-config.json"
+                "serviceWorker": "apps/wayfinding/ngsw-config.json",
+                "browser": "apps/wayfinding/src/main.ts"
             },
             "configurations": {
                 "production": {
@@ -56,9 +54,7 @@
                     "outputHashing": "all"
                 },
                 "development": {
-                    "buildOptimizer": false,
                     "optimization": false,
-                    "vendorChunk": true,
                     "extractLicenses": false,
                     "sourceMap": true,
                     "namedChunks": true
@@ -67,7 +63,7 @@
             "defaultConfiguration": "production"
         },
         "serve": {
-            "executor": "@angular-devkit/build-angular:dev-server",
+            "executor": "@angular/build:dev-server",
             "configurations": {
                 "production": {
                     "buildTarget": "wayfinding:build:production"
@@ -80,21 +76,13 @@
             "continuous": true
         },
         "extract-i18n": {
-            "executor": "@angular-devkit/build-angular:extract-i18n",
+            "executor": "@angular/build:extract-i18n",
             "options": {
                 "buildTarget": "wayfinding:build"
             }
         },
         "lint": {
             "executor": "@nx/eslint:lint"
-        },
-        "test": {
-            "executor": "@nx/jest:jest",
-            "outputs": ["{workspaceRoot}/coverage/apps/wayfinding"],
-            "options": {
-                "jestConfig": "apps/wayfinding/jest.config.ts",
-                "tsConfig": "apps/wayfinding/tsconfig.spec.json"
-            }
         }
     }
 }

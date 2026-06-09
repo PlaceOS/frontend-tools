@@ -7,14 +7,12 @@
     "tags": [],
     "targets": {
         "build": {
-            "executor": "@angular-devkit/build-angular:browser",
-            "outputs": ["{options.outputPath}"],
+            "executor": "@angular/build:application",
             "options": {
                 "baseHref": ".",
                 "outputPath": "dist/apps/app-settings",
                 "index": "apps/app-settings/src/index.html",
-                "main": "apps/app-settings/src/main.ts",
-                "polyfills": "apps/app-settings/src/polyfills.ts",
+                "polyfills": ["apps/app-settings/src/polyfills.ts"],
                 "tsConfig": "apps/app-settings/tsconfig.app.json",
                 "assets": [
                     "apps/app-settings/src/favicon.ico",
@@ -30,8 +28,8 @@
                     "./node_modules/@angular/material/prebuilt-themes/indigo-pink.css"
                 ],
                 "scripts": [],
-                "serviceWorker": true,
-                "ngswConfigPath": "apps/app-settings/ngsw-config.json"
+                "serviceWorker": "apps/app-settings/ngsw-config.json",
+                "browser": "apps/app-settings/src/main.ts"
             },
             "configurations": {
                 "production": {
@@ -56,9 +54,7 @@
                     "outputHashing": "all"
                 },
                 "development": {
-                    "buildOptimizer": false,
                     "optimization": false,
-                    "vendorChunk": true,
                     "extractLicenses": false,
                     "sourceMap": true,
                     "namedChunks": true
@@ -67,7 +63,7 @@
             "defaultConfiguration": "production"
         },
         "serve": {
-            "executor": "@angular-devkit/build-angular:dev-server",
+            "executor": "@angular/build:dev-server",
             "configurations": {
                 "production": {
                     "buildTarget": "app-settings:build:production"
@@ -80,7 +76,7 @@
             "continuous": true
         },
         "extract-i18n": {
-            "executor": "@angular-devkit/build-angular:extract-i18n",
+            "executor": "@angular/build:extract-i18n",
             "options": {
                 "buildTarget": "app-settings:build"
             }
@@ -90,11 +86,16 @@
             "outputs": ["{options.outputFile}"]
         },
         "test": {
-            "executor": "@nx/jest:jest",
+            "executor": "@nx/angular:unit-test",
             "outputs": ["{workspaceRoot}/coverage/apps/app-settings"],
             "options": {
-                "jestConfig": "apps/app-settings/jest.config.ts",
-                "tsConfig": "apps/app-settings/tsconfig.spec.json"
+                "tsConfig": "apps/app-settings/tsconfig.spec.json",
+                "watch": false
+            },
+            "configurations": {
+                "ci": {
+                    "coverage": true
+                }
             }
         }
     }

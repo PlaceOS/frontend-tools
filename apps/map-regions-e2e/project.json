@@ -7,15 +7,12 @@
     "implicitDependencies": ["map-regions"],
     "targets": {
         "e2e": {
-            "executor": "@nx/cypress:cypress",
+            "executor": "@nx/playwright:playwright",
+            "outputs": [
+                "{workspaceRoot}/dist/.playwright/apps/map-regions-e2e"
+            ],
             "options": {
-                "cypressConfig": "apps/map-regions-e2e/cypress.json",
-                "devServerTarget": "map-regions:serve"
-            },
-            "configurations": {
-                "production": {
-                    "devServerTarget": "map-regions:serve:production"
-                }
+                "config": "apps/map-regions-e2e/playwright.config.ts"
             }
         },
         "lint": {
