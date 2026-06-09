@@ -1,6 +1,5 @@
 import { Component, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { MatButton } from '@angular/material/button';
 import { MatFormField } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
 import { RouterLink } from '@angular/router';
@@ -8,38 +7,42 @@ import { RouterLink } from '@angular/router';
 @Component({
     selector: 'map-region-bootstrap',
     template: `
-        <div class="absolute inset-0 flex justify-center bg-gray-100">
+        <div class="bg-base-200 absolute inset-0">
             <form
-                class="m-4 flex h-52 w-[32rem] flex-none flex-col items-center space-y-2 overflow-hidden rounded bg-white shadow"
+                class="bg-base-100 border-base-300 absolute top-2 left-1/2 w-120 -translate-x-1/2 overflow-hidden rounded-lg border shadow"
             >
-                <h3 class="mb-2 w-full bg-red-700 px-4 py-2 text-lg text-white">
+                <h3 class="mb-0! w-full p-3 text-xl font-medium text-white">
                     Input SVG URL to continue
                 </h3>
-                <mat-form-field appearance="outline">
-                    <input
-                        matInput
-                        name="map-url"
-                        class="w-[calc(100%-2rem)]"
-                        [ngModel]="url()"
-                        (ngModelChange)="url.set($event)"
-                        [ngModelOptions]="{ standalone: true }"
-                        placeholder="SVG URL e.g. https://my.domain/path/to/file.svg"
-                    />
-                </mat-form-field>
-                <a
-                    button
-                    mat-button
-                    class="w-32"
-                    [disabled]="!url()"
-                    [routerLink]="['/editor', url()]"
-                >
-                    View Map
-                </a>
+                <div class="flex flex-col gap-4 p-4">
+                    <mat-form-field
+                        appearance="outline"
+                        class="no-subscript w-full"
+                    >
+                        <input
+                            matInput
+                            name="map-url"
+                            [ngModel]="url()"
+                            (ngModelChange)="url.set($event)"
+                            [ngModelOptions]="{ standalone: true }"
+                            placeholder="SVG URL e.g. https://my.domain/path/to/file.svg"
+                        />
+                    </mat-form-field>
+                    <a btn class="w-32" [routerLink]="['/editor', url()]">
+                        View Map
+                    </a>
+                </div>
             </form>
         </div>
     `,
-    styles: [``],
-    imports: [FormsModule, MatFormField, MatInput, MatButton, RouterLink],
+    styles: [
+        `
+            h3 {
+                background-color: #b71c1c;
+            }
+        `,
+    ],
+    imports: [FormsModule, MatFormField, MatInput, RouterLink],
 })
 export class BootstrapComponent {
     /** URL of the map to edit */

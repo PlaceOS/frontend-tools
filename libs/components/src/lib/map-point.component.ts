@@ -21,10 +21,7 @@ export interface MapPointData {
                 yPosition="bottom"
                 [backdrop]="false"
             >
-                <div
-                    class="absolute inset-0 -translate-x-1.5"
-                    [class.opacity-0]="!active()"
-                >
+                <div class="absolute inset-0" [class.opacity-0]="!active()">
                     <div
                         class="bg-success absolute inline-flex h-full w-full animate-ping rounded-full opacity-75"
                     ></div>

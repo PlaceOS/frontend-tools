@@ -3,6 +3,7 @@ import { ActivatedRoute, ParamMap } from '@angular/router';
 import { BaseClass, sendMessage } from '@placeos-tools/common';
 
 import { MatRipple } from '@angular/material/core';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { IconComponent } from '../../../../../libs/components/src/lib/icon.component';
 import { DynamicMapComponent } from '../../../../../libs/components/src/lib/map-viewer/dynamic-map.component';
 import { EditorSensorListComponent } from './editor-sensor-list.component';
@@ -11,31 +12,36 @@ import { EditorStateService } from './editor-state.service';
 @Component({
     selector: '[sensor-map-editor]',
     template: `
-        <div class="relative h-full flex-1">
+        <div class="relative h-full w-1/2 flex-1 gap-2">
             <i-map
-                class="h-screen w-screen"
                 [src]="url()"
                 [features]="features()"
                 [actions]="actions()"
             />
-            <div
-                class="absolute right-2 bottom-2 flex flex-wrap items-center justify-end"
-            >
-                <button btn matRipple class="m-1" (click)="saveMetadata()">
-                    <div class="flex items-center">
-                        <app-icon class="mr-4">save_alt</app-icon>
-                        {{ embeded() ? 'Save' : 'Download' }} Metadata
-                    </div>
+            <div class="absolute right-2 bottom-2 flex gap-2">
+                <button
+                    icon
+                    default
+                    matRipple
+                    [matTooltip]="
+                        (embeded() ? 'Save' : 'Download') + ' Metadata'
+                    "
+                    (click)="saveMetadata()"
+                >
+                    <icon>{{ embeded() ? 'save' : 'save_alt' }}</icon>
                 </button>
-                <button btn matRipple class="m-1" (click)="copyMetadata()">
-                    <div class="flex items-center">
-                        <app-icon class="mr-4">content_copy</app-icon>
-                        Copy Metadata
-                    </div>
+                <button
+                    icon
+                    default
+                    matRipple
+                    matTooltip="Copy Metadata"
+                    (click)="copyMetadata()"
+                >
+                    <icon>content_copy</icon>
                 </button>
             </div>
         </div>
-        <div class="h-full w-64">
+        <div class="ml-2 h-full w-64">
             <editor-sensor-list />
         </div>
     `,
@@ -61,6 +67,7 @@ import { EditorStateService } from './editor-state.service';
         DynamicMapComponent,
         MatRipple,
         IconComponent,
+        MatTooltipModule,
         EditorSensorListComponent,
     ],
 })

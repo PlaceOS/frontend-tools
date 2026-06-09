@@ -9,8 +9,6 @@ import {
 } from '@placeos-tools/common';
 import { MapPointComponent } from '@placeos-tools/components';
 
-const TYPES = ['temperature', 'humidity', 'presense'];
-
 export interface PlaceSensor {
     id?: string;
     name: string;
@@ -19,6 +17,8 @@ export interface PlaceSensor {
 
 export interface PlaceSensorLocation {
     id?: string;
+    /** Sensor ID associated with the location */
+    sensor_id?: string;
     /** Zone associated with the sensor */
     zone?: string;
     /** Override for sensor name */
@@ -42,17 +42,20 @@ export class EditorStateService {
 
     private _sensor_locations = signal<PlaceSensorLocation[]>([]);
 
-    private _sensor_list = signal([]);
+    private _sensor_list = signal<PlaceSensor[]>([]);
 
     public readonly sensor_details = computed(() =>
-        this._sensor_list().map((_) => {
-            const location =
-                this._sensor_locations().find((l) => l.id === _.id) ||
-                ({} as any);
+        this._sensor_list().map((sensor) => {
+            const location: Partial<PlaceSensorLocation> =
+                this._sensor_locations().find(
+                    (l) => sensorLocationId(l) === sensor.id,
+                ) || {};
             return {
-                ..._,
+                ...sensor,
                 ...location,
-                has_location: location.x || location.y,
+                id: sensor.id,
+                has_location:
+                    Number.isFinite(location.x) && Number.isFinite(location.y),
             };
         }),
     );
@@ -163,9 +166,13 @@ export class EditorStateService {
         for (const id in location_map) {
             location_list.push({
                 ...location_map[id],
-                id,
+                id: location_map[id]?.id || location_map[id]?.sensor_id || id,
             });
         }
         this._sensor_locations.set(location_list);
     }
+}
+
+function sensorLocationId(location: PlaceSensorLocation) {
+    return location.id || location.sensor_id;
 }
