@@ -6,99 +6,129 @@
 @import '@angular/material/prebuilt-themes/indigo-pink.css';
 
 :root {
+    /* Brand */
+    --brand-100: hsl(336, 57%, 48%);
+    --brand-200: hsl(217, 91%, 60%);
+    --brand-300: hsl(200, 15%, 94%);
+    --brand-400: hsl(336, 57%, 48%);
+    --brand-500: hsl(336, 57%, 48%);
+    --brand-600: hsl(336, 57%, 48%);
+    --brand-content: hsl(0, 0%, 100%);
+
     /* Primary */
-    --p: hsl(336, 57%, 48%); /* #C52B67 */
-    --pf: hsl(336, 57%, 38%); /* Darker shade */
-    --pc: hsl(0, 0%, 100%); /* White content for contrast */
+    --primary: hsl(336, 57%, 48%);
+    --primary-focus: hsl(336, 57%, 38%);
+    --primary-content: hsl(0, 0%, 100%);
 
     /* Secondary */
-    --s: hsl(237, 37%, 20%); /* #292F5B */
-    --sf: hsl(237, 37%, 10%); /* Darker shade */
-    --sc: hsl(0, 0%, 100%); /* White content for contrast */
+    --secondary: hsl(237, 37%, 20%);
+    --secondary-focus: hsl(237, 37%, 10%);
+    --secondary-content: hsl(0, 0%, 100%);
 
-    /* Accent (Complementary color to Primary) */
-    --a: hsl(156, 57%, 48%); /* A contrasting greenish tone */
-    --af: hsl(156, 57%, 38%); /* Darker shade of the a */
-    --ac: hsl(0, 0%, 0%); /* Black content for contrast */
+    /* Ternary */
+    --ternary: hsl(237, 37%, 20%);
+    --ternary-focus: hsl(237, 37%, 10%);
+    --ternary-content: hsl(0, 0%, 100%);
+
+    /* Accent */
+    --accent: hsl(156, 57%, 48%);
+    --accent-focus: hsl(156, 57%, 38%);
+    --accent-content: hsl(0, 0%, 0%);
 
     /* Neutral */
-    --n: hsl(0, 0%, 50%); /* Grey */
-    --nf: hsl(0, 0%, 40%); /* Darker Grey */
-    --nc: hsl(0, 0%, 100%); /* White content on grey background */
+    --neutral: hsl(0, 0%, 50%);
+    --neutral-focus: hsl(0, 0%, 40%);
+    --neutral-content: hsl(0, 0%, 100%);
 
     /* Base */
-    --b1: hsl(0, 0%, 98%); /* Near White */
-    --b2: hsl(0, 0%, 90%); /* Light Grey */
-    --b3: hsl(206, 23%, 85%); /* Mid Grey */
-    --bc: hsl(0, 0%, 0%); /* Black content on white background */
+    --base-100: hsl(0, 0%, 98.5%);
+    --base-200: hsl(49, 2%, 92%);
+    --base-300: hsl(56, 5%, 71%);
+    --base-400: hsl(58, 7%, 55%);
+    --base-content: hsl(0, 0%, 0%);
 
     /* Info */
-    --in: hsla(217, 91%, 60%, 1); /* Light Blue */
-    --inl: hsla(214, 100%, 97%, 1); /* Light Blue */
-    --inc: hsl(0, 0%, 100%); /* White content on light blue background */
-
-    /* Success */
-    --su: hsla(118, 50%, 43%, 1); /* Light Green */
-    --sul: hsla(152, 81%, 96%, 1); /* Light Green */
-    --suc: hsl(0, 0%, 100%); /* White content on light green background */
+    --info: hsl(217, 91%, 60%);
+    --info-light: hsl(207, 89%, 94%);
+    --info-content: hsl(214, 100%, 97%);
 
     /* Warning */
-    --wa: hsla(45, 100%, 64%, 1); /* Yellow */
-    --wal: hsla(48, 100%, 96%, 1); /* Yellow */
-    --wac: hsl(0, 0%, 0%); /* Black content on yellow background */
+    --warn: #ffa000;
+    --warn-light: hsl(60, 100%, 95%);
+    --warn-content: hsl(0, 0%, 0%);
+
+    /* Success */
+    --success: hsl(118, 50%, 43%);
+    --success-light: hsl(120, 39%, 94%);
+    --success-content: hsl(152, 81%, 96%);
 
     /* Error */
-    --er: hsla(354, 75%, 53%, 1); /* Red */
-    --erl: hsla(356, 100%, 97%, 1); /* Red */
-    --erc: hsl(0, 0%, 100%); /* White content on red background */
+    --error: hsl(354, 75%, 53%);
+    --error-light: hsl(350, 100%, 96%);
+    --error-content: hsl(0, 0%, 100%);
 }
 
 .theme-dark {
+    /* Brand */
+    --brand-100: hsl(336, 57%, 48%);
+    --brand-200: hsl(217, 91%, 60%);
+    --brand-300: hsl(232, 50%, 48%);
+    --brand-400: hsl(336, 57%, 48%);
+    --brand-500: hsl(336, 57%, 48%);
+    --brand-600: hsl(336, 57%, 48%);
+    --brand-content: hsl(0, 0%, 100%);
+
     /* Primary */
-    --p: hsl(237, 37%, 20%); /* #292F5B */
-    --pf: hsl(237, 37%, 10%); /* Darker shade */
-    --pc: hsl(0, 0%, 100%); /* White content for contrast */
+    --primary: hsl(336, 57%, 48%);
+    --primary-focus: hsl(336, 57%, 38%);
+    --primary-content: hsl(0, 0%, 100%);
 
     /* Secondary */
-    --s: hsla(233, 74%, 74%, 1); /* #C52B67 */
-    --sf: hsl(336, 57%, 38%); /* Darker shade */
-    --sc: hsl(0, 0%, 0%); /* White content for contrast */
+    --secondary: hsl(336, 57%, 48%);
+    --secondary-focus: hsl(336, 57%, 38%);
+    --secondary-content: hsl(0, 0%, 100%);
+
+    /* Ternary */
+    --ternary: hsl(206, 23%, 30%);
+    --ternary-focus: hsl(206, 23%, 24%);
+    --ternary-content: hsl(0, 0%, 80%);
 
     /* Accent */
-    --a: hsl(156, 57%, 28%); /* Darker shade of complementary color */
-    --af: hsl(158, 17%, 9%); /* Even darker shade */
-    --ac: hsl(0, 0%, 80%); /* Lighter text for contrast */
+    --accent: hsl(156, 57%, 28%);
+    --accent-focus: hsl(158, 17%, 9%);
+    --accent-content: hsl(0, 0%, 80%);
 
     /* Neutral */
-    --n: hsl(0, 0%, 20%); /* Dark Grey */
-    --nf: hsl(0, 0%, 15%); /* Even darker Grey */
-    --nc: hsl(0, 0%, 80%); /* Light grey text for contrast */
+    --neutral: hsl(0, 0%, 20%);
+    --neutral-focus: hsl(0, 0%, 15%);
+    --neutral-content: hsl(0, 0%, 80%);
 
     /* Base */
-    --b1: hsl(0, 0%, 10%); /* Near Black */
-    --b2: hsl(0, 0%, 15%); /* Dark Grey */
-    --b3: hsl(0, 0%, 20%); /* Mid-Dark Grey */
-    --bc: hsl(0, 0%, 80%); /* Light grey text for contrast */
+    --base-100: hsl(0, 0%, 10%);
+    --base-200: hsl(0, 0%, 15%);
+    --base-300: hsl(0, 0%, 20%);
+    --base-400: hsl(0, 0%, 30%);
+    --base-content: hsl(0, 0%, 80%);
 
     /* Info */
-    --in: hsla(217, 91%, 60%, 1); /* Light Blue */
-    --inl: hsla(214, 100%, 97%, 1); /* Light Blue */
-    --inc: hsl(0, 0%, 100%); /* White content on light blue background */
-
-    /* Success */
-    --su: hsla(118, 50%, 43%, 1); /* Light Green */
-    --sul: hsla(152, 81%, 96%, 1); /* Light Green */
-    --suc: hsl(0, 0%, 100%); /* White content on light green background */
+    --info: hsl(211, 80%, 42%);
+    --info-light: hsl(206, 90%, 61%);
+    --info-content: hsl(0, 0%, 100%);
 
     /* Warning */
-    --wa: hsla(45, 100%, 64%, 1); /* Yellow */
-    --wal: hsla(48, 100%, 96%, 1); /* Yellow */
-    --wac: hsl(0, 0%, 0%); /* Black content on yellow background */
+    --warn: hsl(34, 100%, 50%);
+    --warn-light: hsl(44, 100%, 65%);
+    --warn-content: hsl(0, 0%, 0%);
+
+    /* Success */
+    --success: hsl(122, 46%, 34%);
+    --success-light: hsl(122, 39%, 57%);
+    --success-content: hsl(0, 0%, 100%);
 
     /* Error */
-    --er: hsla(354, 75%, 53%, 1); /* Red */
-    --erl: hsla(356, 100%, 97%, 1); /* Red */
-    --erc: hsl(0, 0%, 100%); /* White content on red background */
+    --error: hsl(0, 66%, 47%);
+    --error-light: hsl(4, 83%, 63%);
+    --error-content: hsl(0, 0%, 100%);
 }
 
 @media screen {
@@ -216,6 +246,64 @@ span.highlight {
     font-family: monospace;
 }
 
+button[btn]:not([icon]),
+a[btn] {
+    --bg-color: var(--secondary);
+    --color: var(--secondary-content);
+    background-color: var(--bg-color);
+    border: 1px solid var(--bg-color);
+    color: var(--color);
+    padding: 0 1rem;
+    min-height: 3rem;
+    border-radius: 0.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &.inverse {
+        color: var(--bg-color);
+        background-color: transparent;
+    }
+
+    &.clear {
+        --color: var(--base-content);
+        background: none;
+        border: none;
+    }
+
+    &.info {
+        --bg-color: var(--info);
+        --color: var(--info-content);
+    }
+
+    &.error {
+        --bg-color: var(--error);
+        --color: var(--error-content);
+    }
+
+    &.success {
+        --bg-color: var(--success);
+        --color: var(--success-content);
+    }
+
+    &.base {
+        --bg-color: var(--base-100);
+        --color: var(--base-content);
+    }
+
+    &.white {
+        --bg-color: #fff;
+        --color: #000;
+    }
+
+    &:not([disabled='false'])[disabled] {
+        --bg-color: var(--base-400);
+        --color: var(--base-content);
+        opacity: 0.3;
+        pointer-events: none;
+    }
+}
+
 #placeos .mdc-icon-button,
 button[icon],
 a[icon] {
@@ -249,9 +337,11 @@ a[icon] {
         &:hover {
             background: var(--base-200);
             border-color: var(--base-400);
-            --tw-shadow: 0 4px 6px -1px var(--tw-shadow-color, rgb(0 0 0 / 0.1)),
+            --tw-shadow:
+                0 4px 6px -1px var(--tw-shadow-color, rgb(0 0 0 / 0.1)),
                 0 2px 4px -2px var(--tw-shadow-color, rgb(0 0 0 / 0.1));
-            box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow),
+            box-shadow:
+                var(--tw-inset-shadow), var(--tw-inset-ring-shadow),
                 var(--tw-ring-offset-shadow), var(--tw-ring-shadow),
                 var(--tw-shadow);
         }

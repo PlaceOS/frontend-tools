@@ -1,60 +1,52 @@
 import { Component, inject } from '@angular/core';
-import { EditorStateService } from './editor-state.service';
 import { MatRipple } from '@angular/material/core';
 import { MatTooltip } from '@angular/material/tooltip';
-import { IconComponent } from '../../../../../libs/components/src/lib/icon.component';
+import { IconComponent } from 'libs/components/src/lib/icon.component';
+import { EditorStateService } from './editor-state.service';
 
 @Component({
     selector: 'editor-controls',
     template: `
-        <div
-            class="flex flex-col items-center bg-base-100 border border-base-300 rounded overflow-hidden shadow"
-        >
+        <div class="flex flex-col items-center gap-1 overflow-hidden">
             <button
                 icon
+                default
                 matRipple
-                class="rounded"
-                [class.bg-primary]="action === 'rect'"
-                [class.text-white]="action === 'rect'"
+                [class.bg-primary!]="action === 'rect'"
+                [class.text-primary-content!]="action === 'rect'"
                 matTooltip="Draw Rectangle"
                 matTooltipPosition="right"
                 (click)="setAction('rect')"
             >
-                <app-icon>aspect_ratio</app-icon>
+                <icon>aspect_ratio</icon>
             </button>
             <button
                 icon
+                default
                 matRipple
-                class="rounded"
-                [class.bg-primary]="action === 'add_points'"
-                [class.text-white]="action === 'add_points'"
+                [class.bg-primary!]="action === 'add_points'"
+                [class.text-primary-content!]="action === 'add_points'"
                 matTooltip="Add Points"
                 matTooltipPosition="right"
                 (click)="setAction('add_points')"
             >
-                <app-icon>add_circle</app-icon>
+                <icon>add_circle</icon>
             </button>
             <button
                 icon
+                default
                 matRipple
-                class="rounded"
-                [class.bg-primary]="action === 'remove_points'"
-                [class.text-white]="action === 'remove_points'"
+                [class.bg-primary!]="action === 'remove_points'"
+                [class.text-primary-content!]="action === 'remove_points'"
                 matTooltip="Remove Points"
                 matTooltipPosition="right"
                 (click)="setAction('remove_points')"
             >
-                <app-icon>remove_circle</app-icon>
+                <icon>remove_circle</icon>
             </button>
         </div>
     `,
-    styles: [
-        `
-            button {
-                border-radius: 0;
-            }
-        `,
-    ],
+    styles: [``],
     imports: [MatRipple, MatTooltip, IconComponent],
 })
 export class EditorControlsComponent {

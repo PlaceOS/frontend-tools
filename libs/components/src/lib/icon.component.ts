@@ -2,16 +2,17 @@ import { Component, input } from '@angular/core';
 import { ApplicationIcon } from '@placeos-tools/common';
 
 @Component({
-    selector: 'app-icon',
+    selector: 'app-icon,icon',
     template: `
         <div class="app-icon">
             @if (!icon() || icon()?.type !== 'img') {
-            <i [class]="icon()?.class || className()">
-                {{ icon()?.content }}
-                <ng-content />
-            </i>
-            } @if (icon() && icon()?.type === 'img') {
-            <img [src]="icon()?.src | safe: 'resource'" />
+                <i [class]="icon()?.class || className()">
+                    {{ icon()?.content }}
+                    <ng-content />
+                </i>
+            }
+            @if (icon() && icon()?.type === 'img') {
+                <img [src]="icon()?.src | safe: 'resource'" />
             }
         </div>
     `,

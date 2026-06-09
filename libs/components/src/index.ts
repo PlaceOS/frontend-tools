@@ -1,3 +1,4 @@
+export * from './lib/compact-counter.component';
 export * from './lib/confirm-modal.component';
 export * from './lib/custom-tooltip.component';
 export * from './lib/icon.component';

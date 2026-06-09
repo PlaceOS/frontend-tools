@@ -83,7 +83,7 @@ code {
         align-items: center;
         padding: 0.5em 1em;
         width: 100%;
-        @apply border-b border-base-200;
+        @apply border-base-200 border-b;
 
         h1,
         h2,
@@ -396,7 +396,9 @@ a-date-picker {
         height: 12px;
         width: 12px;
         transform: rotate(45deg);
-        transition: transform 200ms, top 200ms;
+        transition:
+            transform 200ms,
+            top 200ms;
         border-bottom: 3px solid var(--bc);
         border-right: 3px solid var(--bc);
     }
@@ -511,89 +513,6 @@ custom-table[header-dark] {
         [cdk-header-cell] {
             background: none;
         }
-    }
-}
-
-button[btn]:not([icon]),
-a[btn] {
-    --color: var(--s);
-    background-color: var(--color);
-    border: 1px solid var(--color);
-    color: var(--sc);
-    font-size: 1rem;
-    min-height: 2.75em;
-    padding: 0 1em;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 0.25rem;
-
-    &.inverse {
-        background: none;
-        color: var(--color);
-        border-color: currentColor;
-    }
-
-    &.success {
-        --color: var(--su);
-    }
-
-    &.clear {
-        background: none;
-        border: none;
-        color: var(--bc);
-    }
-
-    &.error {
-        --color: var(--er);
-        color: var(--erc);
-    }
-
-    &.black {
-        --color: var(--bc);
-    }
-
-    &.base {
-        --color: var(--b1);
-        background-color: var(--color);
-        color: var(--bc);
-    }
-
-    &[disabled] {
-        background-color: var(--n);
-        color: var(--nc);
-        border-color: var(--n);
-        pointer-events: none;
-        opacity: 0.3;
-    }
-}
-
-#placeos .mdc-icon-button,
-button[icon],
-a[icon] {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 2.5em;
-    width: 2.5em;
-    min-width: 2.5em;
-    font-size: 1em;
-    padding: 0;
-    border-radius: 9999px;
-
-    .mdc-button-wrapper {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        height: 100%;
-    }
-
-    app-icon {
-        font-size: 1.5em;
-    }
-
-    &[disabled] {
-        opacity: 0.35;
     }
 }
 
@@ -1063,15 +982,15 @@ a[icon] {
 
 .markdown {
     h1 {
-        @apply text-2xl mt-2 mb-4 font-medium;
+        @apply mt-2 mb-4 text-2xl font-medium;
     }
     h2,
     h3 {
-        @apply text-xl mb-2;
+        @apply mb-2 text-xl;
     }
     ul {
         list-style: initial;
-        @apply pl-6 mb-2;
+        @apply mb-2 pl-6;
     }
 }
 
