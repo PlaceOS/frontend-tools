@@ -18,7 +18,7 @@ import { MapCanvasComponent } from 'libs/components/src/lib/map-canvas.component
                 [src]="url | async"
                 [features]="features"
                 [actions]="actions"
-                [options]="{ disable_pan: true, disable_zoon: true }"
+                [options]="{ disable_pan: true, disable_zoom: true }"
                 (aspect_ratio)="setRatio($event)"
             ></i-map>
             <editor-controls
@@ -52,8 +52,9 @@ export class EditorComponent extends BaseClass implements OnInit {
     /** Map regions for active map URL */
     public features = [
         {
-            location: { x: 0.5, y: 0.5 },
+            location: 'map-viewer-root',
             content: MapCanvasComponent,
+            full_size: true,
             data: { polygons$: this._editor.regions },
         },
     ];
@@ -92,7 +93,6 @@ export class EditorComponent extends BaseClass implements OnInit {
                     name: params.get('src'),
                     content: {},
                 }).catch((_) => '');
-                console.log('Source:', src, params.get('src'));
                 this._editor.setURL(
                     src || params.get('src'),
                     params.get('src')

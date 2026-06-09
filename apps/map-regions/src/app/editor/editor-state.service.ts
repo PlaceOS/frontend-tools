@@ -7,7 +7,7 @@ import {
     retrieveData,
     sendMessage,
 } from '@placeos-tools/common';
-import { Point } from '@placeos/svg-viewer';
+import { Point } from '@placeos-tools/components';
 import { BehaviorSubject } from 'rxjs';
 
 import { MapRegion } from './types';
@@ -159,7 +159,6 @@ export class EditorStateService {
     }
 
     private handleAddPoints({ x, y }: Point) {
-        console.log('Add Point');
         const active_region = this._active_region.getValue();
         if (!active_region) return;
         x = Math.floor(x * 200) / 200;

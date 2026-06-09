@@ -54,7 +54,7 @@ import { EditorStateService } from './editor-state.service';
               @if ((regions | async)?.length) {
                 @for (
                   region of regions | async; track
-                  region; let i = $index) {
+                  region.id; let i = $index) {
                   <div
                     class="p-2 hover:bg-base-300 even:bg-base-200 border border-base-100 rounded flex items-center space-x-1 cursor-pointer"
                     (click)="setActiveRegion(region)"

@@ -65,7 +65,6 @@
         "@nx/eslint-plugin": "22.7.5",
         "@nx/jest": "22.7.5",
         "@nx/workspace": "22.7.5",
-        "@placeos/svg-viewer": "1.0.5",
         "@placeos/ts-client": "5.0.0",
         "@schematics/angular": "21.2.9",
         "@tailwindcss/postcss": "^4.3.0",

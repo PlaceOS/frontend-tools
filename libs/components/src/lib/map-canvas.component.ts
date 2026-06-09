@@ -7,7 +7,7 @@ import {
 } from '@angular/core';
 import { BaseClass } from '@placeos-tools/common';
 import { Observable, combineLatest, of } from 'rxjs';
-import { MAP_FEATURE_DATA } from './interactive-map.component';
+import { MAP_FEATURE_DATA } from './map-viewer/map-types';
 import { take } from 'rxjs/operators';
 
 export interface Polygon {
@@ -35,9 +35,7 @@ export interface MapPolygonData {
     template: `
         <canvas
             #canvas
-            class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-auto"
-            [style.width]="width * svg_ratio * zoom + '%'"
-            [style.height]="width * svg_ratio * zoom + '%'"
+            class="absolute inset-0 h-full w-full pointer-events-none"
         ></canvas>
     `,
     styles: [],
@@ -90,15 +88,18 @@ export class MapCanvasComponent extends BaseClass implements OnInit {
         this.svg_ratio = svg_ratio;
         const width = this.width / 10;
         const height = (this.width * this.ratio) / 10;
-
-        if (old_ratio === ratio) return;
-
         const canvas = this.canvas_element.nativeElement;
+
+        if (
+            old_ratio === ratio &&
+            canvas.width === width &&
+            canvas.height === height
+        )
+            return;
+
         canvas.width = width;
         canvas.height = height;
 
-        console.log('Map:', zoom, ratio, svg_ratio);
-        console.log('Map Size:', width, height);
         const polygons = await this._data.polygons$.pipe(take(1)).toPromise();
         this._handleStateChange(polygons);
     }

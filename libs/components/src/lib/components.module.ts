@@ -6,7 +6,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule } from '@angular/material/dialog';
 
 import { IconComponent } from './icon.component';
-import { InteractiveMapComponent } from './interactive-map.component';
+import { DynamicMapComponent } from './map-viewer/dynamic-map.component';
 import { MapPinComponent } from './map-pin.component';
 import { MapRadiusComponent } from './map-radius.component';
 import { MapPolygonComponent } from './map-polygon.component';
@@ -17,7 +17,9 @@ import { ConfirmModalComponent } from './confirm-modal.component';
 import { MapCanvasComponent } from './map-canvas.component';
 
 export * from './icon.component';
-export * from './interactive-map.component';
+export * from './map-viewer/dynamic-map.component';
+export * from './map-viewer/map-types';
+export { DynamicMapComponent as InteractiveMapComponent } from './map-viewer/dynamic-map.component';
 export * from './map-pin.component';
 export * from './map-polygon.component';
 export * from './map-point.component';
@@ -25,7 +27,6 @@ export * from './map-radius.component';
 
 const COMPONENTS: Type<any>[] = [
     IconComponent,
-    InteractiveMapComponent,
     MapPinComponent,
     MapCanvasComponent,
     MapRadiusComponent,
@@ -39,11 +40,12 @@ const COMPONENTS: Type<any>[] = [
     declarations: [...COMPONENTS],
     imports: [
         CommonModule,
+        DynamicMapComponent,
         MatButtonModule,
         MatDialogModule,
         MatProgressSpinnerModule,
         PortalModule,
     ],
-    exports: [...COMPONENTS],
+    exports: [DynamicMapComponent, ...COMPONENTS],
 })
 export class ComponentsModule {}

@@ -1,5 +1,5 @@
 import { Component, ElementRef, Inject, OnInit } from '@angular/core';
-import { MAP_FEATURE_DATA } from './interactive-map.component';
+import { MAP_FEATURE_DATA } from './map-viewer/map-types';
 
 export interface MapRadiusData {
     message: string;

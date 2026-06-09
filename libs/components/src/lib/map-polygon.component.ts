@@ -7,7 +7,7 @@ import {
 } from '@angular/core';
 import { BaseClass } from '@placeos-tools/common';
 import { Observable, combineLatest } from 'rxjs';
-import { MAP_FEATURE_DATA } from './interactive-map.component';
+import { MAP_FEATURE_DATA } from './map-viewer/map-types';
 
 export interface Polygon {
     /** Name of the region */
@@ -78,7 +78,6 @@ export class MapPolygonComponent extends BaseClass implements OnInit {
         this.zoom = zoom;
         this.ratio = ratio;
         this.svg_ratio = svg_ratio;
-        console.log('Polygon:', ratio, zoom, points);
         if (!points?.length) return;
         const width = this.width / 10;
         const height = (this.height * this.ratio) / 10;

@@ -6,7 +6,7 @@ import {
     retrieveData,
     sendMessage,
 } from '@placeos-tools/common';
-import { getViewerByURL, Point } from '@placeos/svg-viewer';
+import { Point } from '@placeos-tools/components';
 import { BehaviorSubject, combineLatest } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
 import { findPath } from './astar';
@@ -46,8 +46,7 @@ export class EditorStateService {
         this._grid_size,
     ]).pipe(
         switchMap(async ([path, [width]]) => {
-            const viewer = await getViewerByURL(this._map_url.getValue());
-            const height = Math.floor(width * (viewer?.ratio || 1));
+            const height = width;
             const angle = 0;
             for (let i = 1; i < path.length; i++) {}
         })
@@ -61,18 +60,16 @@ export class EditorStateService {
         this._method,
     ]).pipe(
         switchMap(async ([points, active, links, path_points, method]) => {
-            const viewer = await getViewerByURL(this._map_url.getValue());
             const list: any[] = [
                 {
-                    location: 'svg-viewer-root',
+                    location: 'map-viewer-root',
                     content: MapWaypointDisplayComponent,
                     full_size: true,
-                    no_scale: true,
                     data: {
                         points,
                         links,
                         active,
-                        ratio: viewer?.ratio,
+                        ratio: 1,
                         testing: method === 'testing',
                     },
                 },
@@ -93,18 +90,16 @@ export class EditorStateService {
                     if (link) nav_links.push(link);
                 }
                 list.push({
-                    location: 'svg-viewer-root',
+                    location: 'map-viewer-root',
                     content: MapNavPathDisplayComponent,
                     full_size: true,
-                    no_scale: true,
                     data: {
                         points,
                         links: nav_links,
-                        ratio: viewer?.ratio,
+                        ratio: 1,
                         color: '#1976d2',
                     },
                 });
-                console.log(list);
             }
             return list;
         })
@@ -183,7 +178,6 @@ export class EditorStateService {
     public async loadWayfindingGrid() {
         if (!this._embeded.getValue()) return;
         const { size, points, links } = await retrieveData('wayfinding-grid');
-        console.log('Loaded data:', size, points, links);
         this._waypoints.next(points);
         this._waypoints_links.next(links);
         this._grid_size.next(size);
@@ -316,7 +310,6 @@ function getPathBetweenPoints(
 ): GridPoint[] {
     const [nearest_start] = nearestPoint(points, [sx, sy]);
     const [nearest_end] = nearestPoint(points, [ex, ey]);
-    console.log('Points:', [sx, sy], [ex, ey], nearest_start, nearest_end);
     let path = findPath(links as any, nearest_start as any, nearest_end as any);
     const set = new Set<GridPoint>();
     set.add(nearest_start);
