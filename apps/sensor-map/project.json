@@ -17,6 +17,16 @@
                 "assets": [
                     "apps/sensor-map/src/favicon.ico",
                     "apps/sensor-map/src/assets",
+                    {
+                        "glob": "**",
+                        "input": "shared/assets",
+                        "output": "/assets/"
+                    },
+                    {
+                        "glob": "*.woff2",
+                        "input": "node_modules/material-symbols",
+                        "output": "/assets/"
+                    },
                     "apps/sensor-map/src/manifest.webmanifest"
                 ],
                 "styles": [
@@ -24,7 +34,6 @@
                     "shared/styles/application.css",
                     "shared/styles/custom-elements.css",
                     "shared/styles/native-elements.css",
-                    "./node_modules/@material-design-icons/font/index.css",
                     "./node_modules/@angular/material/prebuilt-themes/indigo-pink.css"
                 ],
                 "scripts": [],

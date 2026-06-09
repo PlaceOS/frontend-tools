@@ -22,14 +22,18 @@
                         "input": "shared/assets",
                         "output": "/assets/"
                     },
+                    {
+                        "glob": "*.woff2",
+                        "input": "node_modules/material-symbols",
+                        "output": "/assets/"
+                    },
                     "apps/map-builder/src/manifest.webmanifest"
                 ],
                 "styles": [
                     "apps/map-builder/src/styles.css",
                     "shared/styles/application.css",
                     "shared/styles/custom-elements.css",
-                    "shared/styles/native-elements.css",
-                    "./node_modules/@material-design-icons/font/index.css"
+                    "shared/styles/native-elements.css"
                 ],
                 "scripts": [],
                 "extractLicenses": false,
