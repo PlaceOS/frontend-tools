@@ -4,44 +4,35 @@ import { Component } from '@angular/core';
     standalone: false,
     selector: 'map-region-bootstrap',
     template: `
-        <div class="absolute inset-0 bg-gray-100 flex justify-center">
+        <div class="absolute inset-0 bg-base-200">
             <form
-                class="bg-white shadow rounded m-4 flex flex-col space-y-2 flex-none items-center h-52 overflow-hidden"
+                class="absolute w-120 top-2 left-1/2 -translate-x-1/2 bg-base-100 shadow rounded-lg overflow-hidden border border-base-300"
             >
-                <h3 class="text-white w-full mb-2 py-2 px-4 text-lg">
+                <h3 class="text-white w-full p-3 mb-0! text-xl font-medium">
                     Input SVG URL to continue
                 </h3>
-                <mat-form-field appearance="outline">
-                    <input
-                        matInput
-                        name="map-url"
-                        [(ngModel)]="url"
-                        [ngModelOptions]="{ standalone: true }"
-                        placeholder="SVG URL e.g. https://my.domain/path/to/file.svg"
-                    />
-                </mat-form-field>
-                <a
-                    button
-                    mat-button
-                    class="w-32"
-                    [disabled]="!url"
-                    [routerLink]="['/editor', url]"
-                >
-                    View Map
-                </a>
+                <div class="p-4 flex flex-col gap-4">
+                    <mat-form-field
+                        appearance="outline"
+                        class="w-full no-subscript"
+                    >
+                        <input
+                            matInput
+                            name="map-url"
+                            [(ngModel)]="url"
+                            [ngModelOptions]="{ standalone: true }"
+                            placeholder="SVG URL e.g. https://my.domain/path/to/file.svg"
+                        />
+                    </mat-form-field>
+                    <a btn class="w-32" [routerLink]="['/editor', url]">
+                        View Map
+                    </a>
+                </div>
             </form>
         </div>
     `,
     styles: [
         `
-            form {
-                width: 32em;
-            }
-
-            mat-form-field {
-                width: 30em;
-            }
-
             h3 {
                 background-color: #b71c1c;
             }
