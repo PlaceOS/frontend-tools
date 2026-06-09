@@ -88,8 +88,8 @@ export class CounterComponent implements ControlValueAccessor {
         const step = this.ctrl_key()
             ? 100 * this.step()
             : this.shift_key()
-            ? 10 * this.step()
-            : this.step() || 1;
+              ? 10 * this.step()
+              : this.step() || 1;
         value += step;
         if (value > this.max()) {
             value = this.max() || 10;
@@ -106,8 +106,8 @@ export class CounterComponent implements ControlValueAccessor {
         const step = this.ctrl_key()
             ? 100 * this.step()
             : this.shift_key()
-            ? 10 * this.step()
-            : this.step() || 1;
+              ? 10 * this.step()
+              : this.step() || 1;
         value -= step;
         if (value < this.min()) {
             value = this.min() || 0;

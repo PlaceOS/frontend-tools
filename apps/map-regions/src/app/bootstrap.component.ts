@@ -7,17 +7,17 @@ import { RouterLink } from '@angular/router';
 @Component({
     selector: 'map-region-bootstrap',
     template: `
-        <div class="absolute inset-0 bg-base-200">
+        <div class="bg-base-200 absolute inset-0">
             <form
-                class="absolute w-120 top-2 left-1/2 -translate-x-1/2 bg-base-100 shadow rounded-lg overflow-hidden border border-base-300"
+                class="bg-base-100 border-base-300 absolute top-2 left-1/2 w-120 -translate-x-1/2 overflow-hidden rounded-lg border shadow"
             >
-                <h3 class="text-white w-full p-3 mb-0! text-xl font-medium">
+                <h3 class="mb-0! w-full p-3 text-xl font-medium text-white">
                     Input SVG URL to continue
                 </h3>
-                <div class="p-4 flex flex-col gap-4">
+                <div class="flex flex-col gap-4 p-4">
                     <mat-form-field
                         appearance="outline"
-                        class="w-full no-subscript"
+                        class="no-subscript w-full"
                     >
                         <input
                             matInput

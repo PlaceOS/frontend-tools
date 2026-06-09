@@ -24,7 +24,7 @@ import { Building, OrganisationService } from './organisation.service';
         >
             <div thead class="min-w-0">
                 <mat-checkbox
-                    [ngModel]="selected"
+                    [ngModel]="selected()"
                     (ngModelChange)="setSelected($event)"
                 />
             </div>
@@ -135,9 +135,9 @@ export class BuildingComponent {
     public readonly setSelected = (s) =>
         this._org.setSelected(this.building().id, s);
 
-    public get selected() {
+    public readonly selected = computed(() => {
         return this._org.isSelected(this.building().id);
-    }
+    });
 
     public ngOnChanges(changes: SimpleChanges) {
         if (changes.building) {

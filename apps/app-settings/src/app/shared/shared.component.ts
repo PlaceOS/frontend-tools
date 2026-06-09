@@ -1,20 +1,20 @@
 import { Component, inject } from '@angular/core';
-import { SettingsStateService } from '../settings-state.service';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { MatButton } from '@angular/material/button';
 import { MatFormField } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
 import { ColorListFieldComponent } from '../components/color-list-field.component';
-import { MatButton } from '@angular/material/button';
+import { SettingsStateService } from '../settings-state.service';
 
 @Component({
     selector: 'app-shared',
     template: `
-        <form [formGroup]="form" class="w-full">
+        <form [formGroup]="form()" class="w-full">
             <div
-                class="flex flex-col w-full p-4 space-y-2"
+                class="flex w-full flex-col space-y-2 p-4"
                 formGroupName="shared"
             >
-                <div class="flex flex-col w-full">
+                <div class="flex w-full flex-col">
                     <label>Application Name</label>
                     <mat-form-field
                         no-label
@@ -24,7 +24,7 @@ import { MatButton } from '@angular/material/button';
                         <input matInput placeholder="Application Name" />
                     </mat-form-field>
                 </div>
-                <div class="flex flex-col w-full">
+                <div class="flex w-full flex-col">
                     <label>Application Title</label>
                     <mat-form-field
                         no-label
@@ -34,7 +34,7 @@ import { MatButton } from '@angular/material/button';
                         <input matInput placeholder="Application Title" />
                     </mat-form-field>
                 </div>
-                <div class="flex flex-col w-full">
+                <div class="flex w-full flex-col">
                     <label>Short Name</label>
                     <mat-form-field
                         no-label
@@ -44,7 +44,7 @@ import { MatButton } from '@angular/material/button';
                         <input matInput placeholder="Short Name" />
                     </mat-form-field>
                 </div>
-                <div class="flex flex-col w-full">
+                <div class="flex w-full flex-col">
                     <label>Logo(Light Backgrounds)</label>
                     <mat-form-field
                         no-label
@@ -57,7 +57,7 @@ import { MatButton } from '@angular/material/button';
                         />
                     </mat-form-field>
                 </div>
-                <div class="flex flex-col w-full">
+                <div class="flex w-full flex-col">
                     <label>Logo(Dark Backgrounds)</label>
                     <mat-form-field
                         no-label
@@ -71,11 +71,10 @@ import { MatButton } from '@angular/material/button';
                     </mat-form-field>
                 </div>
                 <h3 class="text-lg font-medium">Theme</h3>
-                <color-list-field formControlName="css_variables"
-                 />
+                <color-list-field formControlName="css_variables" />
             </div>
         </form>
-        <button mat-button class="mx-auto w-32 my-2" (click)="save()">
+        <button mat-button class="mx-auto my-2 w-32" (click)="save()">
             Save Changes
         </button>
     `,

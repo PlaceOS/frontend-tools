@@ -31,7 +31,7 @@ import { AccessControl } from './access-control.service';
             >
                 <div class="relative mx-auto w-[640px] p-4 text-center">
                     <div class="font-medium">
-                        {{ form.value.id ? 'Edit' : 'New' }} Access Control
+                        {{ form().value.id ? 'Edit' : 'New' }} Access Control
                     </div>
                     @if (!loading()) {
                         <button
@@ -47,7 +47,7 @@ import { AccessControl } from './access-control.service';
             @if (!loading()) {
                 <main
                     class="mx-auto h-1/2 w-[640px] flex-1 overflow-auto p-4"
-                    [formGroup]="form"
+                    [formGroup]="form()"
                 >
                     <div class="w-full">
                         <label for="building">Building</label>
@@ -164,15 +164,17 @@ export class AccessControlModalComponent {
     public readonly separatorKeysCodes = [ENTER, COMMA] as const;
     public readonly building_list = this._org.buildings;
     public readonly level_list = this._org.levels;
-    public readonly form = new FormGroup({
-        id: new FormControl(''),
-        building_id: new FormControl('', [Validators.required]),
-        type: new FormControl(''),
-        managed_onsite: new FormControl(false),
-        isolated: new FormControl(false),
-        linked_to_staff_db: new FormControl(false),
-        access_tied_to_identity: new FormControl(false),
-    });
+    public readonly form = signal(
+        new FormGroup({
+            id: new FormControl(''),
+            building_id: new FormControl('', [Validators.required]),
+            type: new FormControl(''),
+            managed_onsite: new FormControl(false),
+            isolated: new FormControl(false),
+            linked_to_staff_db: new FormControl(false),
+            access_tied_to_identity: new FormControl(false),
+        }),
+    );
 
     public add(event: MatChipInputEvent, control: FormControl<string[]>): void {
         const value = (event.value || '').trim();
@@ -186,13 +188,13 @@ export class AccessControlModalComponent {
     }
 
     constructor() {
-        this.form.patchValue(this._data as any);
+        this.form().patchValue(this._data as any);
     }
 
     public save() {
-        this.form.markAllAsTouched();
-        if (!this.form.valid) return;
+        this.form().markAllAsTouched();
+        if (!this.form().valid) return;
         this.loading.set(true);
-        this.onSave.emit(this.form.getRawValue() as any);
+        this.onSave.emit(this.form().getRawValue() as any);
     }
 }

@@ -1,13 +1,13 @@
 import { Component } from '@angular/core';
-import { SidebarComponent } from './components/sidebar.component';
 import { RouterOutlet } from '@angular/router';
+import { SidebarComponent } from './components/sidebar.component';
 
 @Component({
     selector: 'placeos-tools-root',
     template: `
-        <div class="absolute inset-0 overflow-hidden flex dark:bg-neutral-600">
+        <div class="absolute inset-0 flex overflow-hidden dark:bg-neutral-600">
             <sidebar class="h-full" />
-            <div class="flex-1 w-1/2 h-full border-l border-neutral-500">
+            <div class="h-full w-1/2 flex-1 border-l border-neutral-500">
                 <router-outlet />
             </div>
         </div>

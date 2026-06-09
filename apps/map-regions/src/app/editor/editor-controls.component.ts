@@ -2,7 +2,10 @@ import { Component, inject } from '@angular/core';
 import { MatRipple } from '@angular/material/core';
 import { MatTooltip } from '@angular/material/tooltip';
 import { IconComponent } from 'libs/components/src/lib/icon.component';
-import { EditorStateService } from './editor-state.service';
+import {
+    EditorAction,
+    EditorStateService,
+} from './editor-state.service';
 
 @Component({
     selector: 'editor-controls',
@@ -12,8 +15,8 @@ import { EditorStateService } from './editor-state.service';
                 icon
                 default
                 matRipple
-                [class.bg-primary!]="action === 'rect'"
-                [class.text-primary-content!]="action === 'rect'"
+                [class.bg-primary!]="action() === 'rect'"
+                [class.text-primary-content!]="action() === 'rect'"
                 matTooltip="Draw Rectangle"
                 matTooltipPosition="right"
                 (click)="setAction('rect')"
@@ -24,8 +27,8 @@ import { EditorStateService } from './editor-state.service';
                 icon
                 default
                 matRipple
-                [class.bg-primary!]="action === 'add_points'"
-                [class.text-primary-content!]="action === 'add_points'"
+                [class.bg-primary!]="action() === 'add_points'"
+                [class.text-primary-content!]="action() === 'add_points'"
                 matTooltip="Add Points"
                 matTooltipPosition="right"
                 (click)="setAction('add_points')"
@@ -36,8 +39,8 @@ import { EditorStateService } from './editor-state.service';
                 icon
                 default
                 matRipple
-                [class.bg-primary!]="action === 'remove_points'"
-                [class.text-primary-content!]="action === 'remove_points'"
+                [class.bg-primary!]="action() === 'remove_points'"
+                [class.text-primary-content!]="action() === 'remove_points'"
                 matTooltip="Remove Points"
                 matTooltipPosition="right"
                 (click)="setAction('remove_points')"
@@ -52,9 +55,7 @@ import { EditorStateService } from './editor-state.service';
 export class EditorControlsComponent {
     private _state = inject(EditorStateService);
 
-    public get action() {
-        return this._state.action;
-    }
+    public readonly action = this._state.action;
 
-    public readonly setAction = (a) => this._state.setAction(a);
+    public readonly setAction = (a: EditorAction) => this._state.setAction(a);
 }

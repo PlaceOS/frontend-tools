@@ -1,6 +1,6 @@
-import { Component, inject } from '@angular/core';
-import { MAP_FEATURE_DATA } from './map-viewer/map-types';
+import { Component, computed, inject, signal } from '@angular/core';
 import { CustomTooltipComponent } from './custom-tooltip.component';
+import { MAP_FEATURE_DATA } from './map-viewer/map-types';
 
 export interface MapPointData {
     name: string;
@@ -13,7 +13,7 @@ export interface MapPointData {
     template: `
         <div (click)="onClick($event)">
             <div
-                class="flex h-3 w-3 absolute transform top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-auto "
+                class="pointer-events-auto absolute top-1/2 left-1/2 flex h-3 w-3 -translate-x-1/2 -translate-y-1/2 transform"
                 customTooltip
                 [content]="name_display"
                 [hover]="true"
@@ -23,24 +23,24 @@ export interface MapPointData {
             >
                 <div
                     class="absolute inset-0 -translate-x-1.5"
-                    [class.opacity-0]="!active"
+                    [class.opacity-0]="!active()"
                 >
                     <div
-                        class="animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-75"
+                        class="bg-success absolute inline-flex h-full w-full animate-ping rounded-full opacity-75"
                     ></div>
                 </div>
                 <div
-                    class="relative inline-flex rounded-full h-full w-full border-2 bg-white"
-                    [class.border-black]="!active"
-                    [class.border-success]="active"
+                    class="relative inline-flex h-full w-full rounded-full border-2 bg-white"
+                    [class.border-black]="!active()"
+                    [class.border-success]="active()"
                 ></div>
             </div>
         </div>
         <ng-template #name_display>
             <div
-                class="bg-white px-2 py-1 shadow pointer-events-none m-2 rounded border border-gray-50 text-sm"
+                class="pointer-events-none m-2 rounded border border-gray-50 bg-white px-2 py-1 text-sm shadow"
             >
-                {{ name || '&lt;No name&gt;' }}
+                {{ name() || '&lt;No name&gt;' }}
             </div>
         </ng-template>
     `,
@@ -48,16 +48,16 @@ export interface MapPointData {
     imports: [CustomTooltipComponent],
 })
 export class MapPointComponent {
-    private _details = inject<MapPointData>(MAP_FEATURE_DATA);
+    private readonly _details = signal(inject<MapPointData>(MAP_FEATURE_DATA));
 
     /** Whether point should be displayed as active */
-    public readonly active = this._details.active;
-    /** Whether point should be displayed as active */
-    public readonly name = this._details.name;
+    public readonly active = computed(() => this._details().active);
+    /** Point display name */
+    public readonly name = computed(() => this._details().name);
 
     public readonly onClick = (e) => {
         e.preventDefault();
         e.stopPropagation();
-        this._details.clicked && !this.active ? this._details.clicked() : null;
+        if (!this.active()) this._details().clicked?.();
     };
 }

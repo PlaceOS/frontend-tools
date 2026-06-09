@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { MatButton } from '@angular/material/button';
 import { RouterLink } from '@angular/router';
 import { IconComponent } from '../../../../libs/components/src/lib/icon.component';
@@ -23,13 +23,13 @@ import { ExportService } from './data/export.service';
                     <div>Before continuing please read this carefully.</div>
                 </div>
                 <p class="p-2">
-                    Identifiers for resources such as Rooms and Desks are
+                    Identifiers for resources() such as Rooms and Desks are
                     permanent and won't be able to be changed one they are added
                     to the live PlaceOS instance.
                 </p>
                 <p class="p-2">
                     It is strongly recommended to set unique identitiers for
-                    these resources that match up with the ones that have been
+                    these resources() that match up with the ones that have been
                     assigned to the floorplan.
                 </p>
             </div>
@@ -39,7 +39,7 @@ import { ExportService } from './data/export.service';
             <div
                 class="flex w-[640px] flex-wrap rounded border border-gray-200 bg-white p-4 dark:border-neutral-500 dark:bg-neutral-700"
             >
-                @for (item of resources; track item) {
+                @for (item of resources(); track item) {
                     <a
                         menu
                         matRipple
@@ -88,7 +88,7 @@ import { ExportService } from './data/export.service';
 export class LandingPageComponent {
     private _export = inject(ExportService);
 
-    public readonly resources = [
+    public readonly resources = signal([
         {
             name: 'Organisation',
             route: '/organisation',
@@ -161,7 +161,7 @@ export class LandingPageComponent {
             icon: { content: 'badge' },
             count: this._export.access_control_count,
         },
-    ];
+    ]);
 
     public readonly export = () => this._export.exportData();
 }

@@ -31,9 +31,9 @@ import { Interface } from './interfaces.service';
             >
                 <div class="relative mx-auto w-[640px] p-4 text-center">
                     <div class="font-medium">
-                        {{ form.value.id ? 'Edit' : 'New' }}
+                        {{ form().value.id ? 'Edit' : 'New' }}
                         {{
-                            form.value.building_id === 'default'
+                            form().value.building_id === 'default'
                                 ? 'Default'
                                 : ''
                         }}
@@ -53,9 +53,9 @@ import { Interface } from './interfaces.service';
             @if (!loading()) {
                 <main
                     class="mx-auto flex h-1/2 w-[640px] flex-1 flex-col space-y-2 overflow-auto p-4"
-                    [formGroup]="form"
+                    [formGroup]="form()"
                 >
-                    @if (form.value.building_id !== 'default') {
+                    @if (form().value.building_id !== 'default') {
                         <div class="w-full">
                             <label for="building">Building</label>
                             <mat-form-field appearance="outline" class="w-full">
@@ -97,7 +97,9 @@ import { Interface } from './interfaces.service';
                         <div
                             class="rounded border border-gray-200 dark:border-neutral-500"
                             [@show]="
-                                form.value.workplace.required ? 'show' : 'hide'
+                                form().value.workplace.required
+                                    ? 'show'
+                                    : 'hide'
                             "
                         >
                             <div class="flex flex-col space-y-2 p-4">
@@ -143,7 +145,9 @@ import { Interface } from './interfaces.service';
                         <div
                             class="rounded border border-gray-200 dark:border-neutral-500"
                             [@show]="
-                                form.value.concierge.required ? 'show' : 'hide'
+                                form().value.concierge.required
+                                    ? 'show'
+                                    : 'hide'
                             "
                         >
                             <div class="flex flex-col space-y-2 p-4">
@@ -160,7 +164,7 @@ import { Interface } from './interfaces.service';
                         <div
                             class="rounded border border-gray-200 dark:border-neutral-500"
                             [@show]="
-                                form.value.booking_panel.required
+                                form().value.booking_panel.required
                                     ? 'show'
                                     : 'hide'
                             "
@@ -188,7 +192,7 @@ import { Interface } from './interfaces.service';
                         <div
                             class="rounded border border-gray-200 dark:border-neutral-500"
                             [@show]="
-                                form.value.visitor_kiosk.required
+                                form().value.visitor_kiosk.required
                                     ? 'show'
                                     : 'hide'
                             "
@@ -210,7 +214,9 @@ import { Interface } from './interfaces.service';
                         <div
                             class="rounded border border-gray-200 dark:border-neutral-500"
                             [@show]="
-                                form.value.map_kiosk.required ? 'show' : 'hide'
+                                form().value.map_kiosk.required
+                                    ? 'show'
+                                    : 'hide'
                             "
                         >
                             <div class="flex flex-col space-y-2 p-4">
@@ -271,47 +277,49 @@ export class InterfaceModalComponent {
     public readonly separatorKeysCodes = [ENTER, COMMA] as const;
     public readonly building_list = this._org.buildings;
     public readonly level_list = this._org.levels;
-    public readonly form = new FormGroup({
-        id: new FormControl(''),
-        building_id: new FormControl('', [Validators.required]),
-        building_name: new FormControl(''),
-        required: new FormControl([]),
-        workplace: new FormGroup({
-            required: new FormControl(true),
-            meetings: new FormControl(true),
-            catering: new FormControl(false),
-            assets: new FormControl(false),
-            desks: new FormControl(true),
-            group_desks: new FormControl(false),
-            parking: new FormControl(false),
-            lockers: new FormControl(false),
-            visitors: new FormControl(true),
-            standalone_visitors: new FormControl(true),
+    public readonly form = signal(
+        new FormGroup({
+            id: new FormControl(''),
+            building_id: new FormControl('', [Validators.required]),
+            building_name: new FormControl(''),
+            required: new FormControl([]),
+            workplace: new FormGroup({
+                required: new FormControl(true),
+                meetings: new FormControl(true),
+                catering: new FormControl(false),
+                assets: new FormControl(false),
+                desks: new FormControl(true),
+                group_desks: new FormControl(false),
+                parking: new FormControl(false),
+                lockers: new FormControl(false),
+                visitors: new FormControl(true),
+                standalone_visitors: new FormControl(true),
+            }),
+            concierge: new FormGroup({
+                required: new FormControl(true),
+                match_workplace: new FormControl(true),
+            }),
+            booking_panel: new FormGroup({
+                required: new FormControl(true),
+                show_title: new FormControl(true),
+                show_host: new FormControl(true),
+                show_images: new FormControl(true),
+                show_qrcode: new FormControl(true),
+            }),
+            visitor_kiosk: new FormGroup({
+                required: new FormControl(false),
+                induction: new FormControl(true),
+                catering: new FormControl(false),
+            }),
+            map_kiosk: new FormGroup({
+                required: new FormControl(false),
+                touch_enabled: new FormControl(true),
+            }),
+            outlook_plugin: new FormGroup({
+                required: new FormControl(false),
+            }),
         }),
-        concierge: new FormGroup({
-            required: new FormControl(true),
-            match_workplace: new FormControl(true),
-        }),
-        booking_panel: new FormGroup({
-            required: new FormControl(true),
-            show_title: new FormControl(true),
-            show_host: new FormControl(true),
-            show_images: new FormControl(true),
-            show_qrcode: new FormControl(true),
-        }),
-        visitor_kiosk: new FormGroup({
-            required: new FormControl(false),
-            induction: new FormControl(true),
-            catering: new FormControl(false),
-        }),
-        map_kiosk: new FormGroup({
-            required: new FormControl(false),
-            touch_enabled: new FormControl(true),
-        }),
-        outlook_plugin: new FormGroup({
-            required: new FormControl(false),
-        }),
-    });
+    );
 
     public add(event: MatChipInputEvent, control: FormControl<string[]>): void {
         const value = (event.value || '').trim();
@@ -325,13 +333,13 @@ export class InterfaceModalComponent {
     }
 
     constructor() {
-        this.form.patchValue(this._data as any);
+        this.form().patchValue(this._data as any);
     }
 
     public save() {
-        this.form.markAllAsTouched();
-        if (!this.form.valid) return;
+        this.form().markAllAsTouched();
+        if (!this.form().valid) return;
         this.loading.set(true);
-        this.onSave.emit(this.form.getRawValue() as any);
+        this.onSave.emit(this.form().getRawValue() as any);
     }
 }

@@ -1,12 +1,12 @@
 import { Component, forwardRef, input, signal } from '@angular/core';
 import {
     ControlValueAccessor,
-    NG_VALUE_ACCESSOR,
     FormsModule,
+    NG_VALUE_ACCESSOR,
 } from '@angular/forms';
+import { MatButton } from '@angular/material/button';
 import { MatFormField } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
-import { MatButton } from '@angular/material/button';
 
 type FieldValue<T> = T;
 type FieldFn<T> = (_: T) => void;
@@ -15,52 +15,53 @@ type FieldFn<T> = (_: T) => void;
     selector: 'color-list-field',
     template: `
         @for (item of color_list(); track item; let i = $index) {
-        <div class="flex mb-2 space-x-2">
-            <div class="flex flex-col flex-1">
-                @if (i === 0) {
-                <label>Key</label>
-                }
-                <mat-form-field
-                    no-label
-                    appearance="outline"
-                    class="h-[3.25rem] w-full"
-                >
-                    <input
-                        matInput
-                        [disabled]="!edit_keys()"
-                        [ngModel]="item[0]"
-                        (ngModelChange)="
-                            item[0] = $event; setValue(color_list())
-                        "
-                        placeholder="Variable Key"
-                    />
-                </mat-form-field>
+            <div class="mb-2 flex space-x-2">
+                <div class="flex flex-1 flex-col">
+                    @if (i === 0) {
+                        <label>Key</label>
+                    }
+                    <mat-form-field
+                        no-label
+                        appearance="outline"
+                        class="h-[3.25rem] w-full"
+                    >
+                        <input
+                            matInput
+                            [disabled]="!edit_keys()"
+                            [ngModel]="item[0]"
+                            (ngModelChange)="
+                                item[0] = $event; setValue(color_list())
+                            "
+                            placeholder="Variable Key"
+                        />
+                    </mat-form-field>
+                </div>
+                <div class="flex flex-1 flex-col">
+                    @if (i === 0) {
+                        <label>Value</label>
+                    }
+                    <mat-form-field
+                        no-label
+                        appearance="outline"
+                        class="h-[3.25rem] w-full"
+                    >
+                        <input
+                            matInput
+                            type="color"
+                            [ngModel]="item[1]"
+                            (ngModelChange)="
+                                item[1] = $event; setValue(color_list())
+                            "
+                            placeholder="Variable Value"
+                        />
+                    </mat-form-field>
+                </div>
             </div>
-            <div class="flex flex-col flex-1">
-                @if (i === 0) {
-                <label>Value</label>
-                }
-                <mat-form-field
-                    no-label
-                    appearance="outline"
-                    class="h-[3.25rem] w-full"
-                >
-                    <input
-                        matInput
-                        type="color"
-                        [ngModel]="item[1]"
-                        (ngModelChange)="
-                            item[1] = $event; setValue(color_list())
-                        "
-                        placeholder="Variable Value"
-                    />
-                </mat-form-field>
-            </div>
-        </div>
-        } @if (add_new()) {
-        <button mat-button class="w-full" (click)="addNewPair()">
-            Add Key Value Pair
-        </button>
+        }
+        @if (add_new()) {
+            <button mat-button class="w-full" (click)="addNewPair()">
+                Add Key Value Pair
+            </button>
         }
     `,
     styles: [``],

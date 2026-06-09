@@ -1,27 +1,28 @@
-import { Component, inject, input } from '@angular/core';
-import { BuildingLevel, OrganisationService } from './organisation.service';
-import { MatCheckbox } from '@angular/material/checkbox';
+import { Component, computed, inject, input } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatIconButton } from '@angular/material/button';
+import { MatCheckbox } from '@angular/material/checkbox';
 import { MatTooltip } from '@angular/material/tooltip';
 import { IconComponent } from '../../../../../libs/components/src/lib/icon.component';
+import { BuildingLevel, OrganisationService } from './organisation.service';
 
 @Component({
     selector: `org-level,[org-level]`,
     template: `
         <div
-            class="absolute bg-neutral-800 left-0 top-0 bottom-px w-2 min-h-0"
+            class="absolute top-0 bottom-px left-0 min-h-0 w-2 bg-neutral-800"
         ></div>
         <div
             details
             class="flex items-center border-b border-neutral-500 text-sm hover:bg-black/10"
         >
-            <div thead class="min-w-0 relative">
-                <mat-checkbox [ngModel]="selected"
+            <div thead class="relative min-w-0">
+                <mat-checkbox
+                    [ngModel]="selected()"
                     (ngModelChange)="setSelected($event)"
-                 />
+                />
             </div>
-            <div class="min-w-0 w-10 p-0"></div>
+            <div class="w-10 min-w-0 p-0"></div>
             <div class="w-56">{{ level().display_name }}</div>
             <div></div>
             <div class="w-32"></div>
@@ -32,7 +33,7 @@ import { IconComponent } from '../../../../../libs/components/src/lib/icon.compo
             <div>{{ level().catering_available ? 'YES' : 'NO' }}</div>
             <div
                 actions
-                class="absolute top-1/2 -translate-y-1/2 left-24 rounded-3xl flex items-center bg-white dark:bg-neutral-700 shadow !p-0 min-w-0"
+                class="absolute top-1/2 left-24 flex min-w-0 -translate-y-1/2 items-center rounded-3xl bg-white !p-0 shadow dark:bg-neutral-700"
             >
                 <button
                     mat-icon-button
@@ -94,7 +95,7 @@ export class OrganisationLevelComponent {
     public readonly setSelected = (s) =>
         this._org.setSelected(this.level().id, s);
 
-    public get selected() {
+    public readonly selected = computed(() => {
         return this._org.isSelected(this.level().id);
-    }
+    });
 }

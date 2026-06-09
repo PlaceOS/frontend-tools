@@ -1,32 +1,32 @@
-import { Component, OnInit, inject, output, signal } from '@angular/core';
+import { Component, computed, inject, output, signal } from '@angular/core';
 import {
-    FormGroup,
     FormControl,
-    Validators,
+    FormGroup,
     FormsModule,
     ReactiveFormsModule,
+    Validators,
 } from '@angular/forms';
 import {
-    MatDialog,
     MAT_DIALOG_DATA,
+    MatDialog,
     MatDialogClose,
 } from '@angular/material/dialog';
 
-import { DialogEvent } from 'libs/common/src/lib/types';
 import { openGenericModal, randomInt } from 'libs/common/src/lib/general';
+import { DialogEvent } from 'libs/common/src/lib/types';
 
+import {
+    MatAutocomplete,
+    MatAutocompleteTrigger,
+} from '@angular/material/autocomplete';
+import { MatButton, MatIconButton } from '@angular/material/button';
+import { MatCheckbox } from '@angular/material/checkbox';
+import { MatError, MatFormField } from '@angular/material/form-field';
+import { MatInput } from '@angular/material/input';
+import { MatOption } from '@angular/material/select';
+import { IconComponent } from '../../../../../libs/components/src/lib/icon.component';
 import { CateringItem } from './catering-item.class';
 import { CateringOption } from './catering.interfaces';
-import { MatIconButton, MatButton } from '@angular/material/button';
-import { IconComponent } from '../../../../../libs/components/src/lib/icon.component';
-import { MatFormField, MatError } from '@angular/material/form-field';
-import { MatInput } from '@angular/material/input';
-import {
-    MatAutocompleteTrigger,
-    MatAutocomplete,
-} from '@angular/material/autocomplete';
-import { MatCheckbox } from '@angular/material/checkbox';
-import { MatOption } from '@angular/material/select';
 
 export interface CateringItemOptionModalData {
     parent: CateringItem;
@@ -36,7 +36,7 @@ export interface CateringItemOptionModalData {
 
 export async function openCateringItemOptionModal(
     data: CateringItemOptionModalData,
-    dialog: MatDialog
+    dialog: MatDialog,
 ) {
     return openGenericModal(CateringItemOptionModalComponent, data, dialog);
 }
@@ -45,106 +45,114 @@ export async function openCateringItemOptionModal(
     selector: 'catering-option-modal',
     template: `
         <header
-            class="flex items-center p-2 justify-between border-b border-gray-200 dark:border-neutral-500"
+            class="flex items-center justify-between border-b border-gray-200 p-2 dark:border-neutral-500"
         >
             <h3 class="p-2 font-medium">
-                {{ option.id ? 'Edit' : 'Add' }} Item Option
+                {{ option().id ? 'Edit' : 'Add' }} Item Option
             </h3>
             @if (!loading()) {
-            <button mat-icon-button mat-dialog-close>
-                <app-icon>close</app-icon>
-            </button>
+                <button mat-icon-button mat-dialog-close>
+                    <app-icon>close</app-icon>
+                </button>
             }
         </header>
-        @if (form && !loading()) {
-        <form class="p-4 overflow-auto" [formGroup]="form">
-            @if (form.controls.name) {
-            <div class="flex flex-col">
-                <label
-                    for="title"
-                    [class.error]="
-                        form.controls.name.invalid && form.controls.name.touched
-                    "
-                >
-                    Name<span required>*</span>:
-                </label>
-                <mat-form-field appearance="outline">
-                    <input
-                        matInput
-                        name="name"
-                        placeholder="Item name"
-                        formControlName="name"
-                    />
-                    <mat-error>Name is required</mat-error>
-                </mat-form-field>
-            </div>
-            } @if (form.controls.group) {
-            <div class="flex flex-col">
-                <label
-                    for="group"
-                    [class.error]="
-                        form.controls.group.invalid &&
-                        form.controls.group.touched
-                    "
-                >
-                    Type<span required>*</span>:
-                </label>
-                <mat-form-field appearance="outline">
-                    <input
-                        matInput
-                        name="group"
-                        placeholder="Type of option e.g. Number of sugars"
-                        formControlName="group"
-                        [matAutocomplete]="auto"
-                    />
-                    <mat-error>Type is required</mat-error>
-                </mat-form-field>
-            </div>
-            } @if (form.controls.unit_price) {
-            <div class="flex flex-col">
-                <label for="title">Unit Price:</label>
-                <mat-form-field appearance="outline">
-                    <input
-                        matInput
-                        name="unit-price"
-                        type="number"
-                        placeholder="Unit Price"
-                        formControlName="unit_price"
-                    />
-                </mat-form-field>
-            </div>
-            } @if (form.controls.multiple) {
-            <div class="flex flex-col">
-                <mat-checkbox name="multiple" formControlName="multiple">
-                    Can select multiple of type
-                </mat-checkbox>
-            </div>
-            }
-        </form>
+        @if (form() && !loading()) {
+            <form class="overflow-auto p-4" [formGroup]="form()">
+                @if (form().controls.name) {
+                    <div class="flex flex-col">
+                        <label
+                            for="title"
+                            [class.error]="
+                                form().controls.name.invalid &&
+                                form().controls.name.touched
+                            "
+                        >
+                            Name<span required>*</span>:
+                        </label>
+                        <mat-form-field appearance="outline">
+                            <input
+                                matInput
+                                name="name"
+                                placeholder="Item name"
+                                formControlName="name"
+                            />
+                            <mat-error>Name is required</mat-error>
+                        </mat-form-field>
+                    </div>
+                }
+                @if (form().controls.group) {
+                    <div class="flex flex-col">
+                        <label
+                            for="group"
+                            [class.error]="
+                                form().controls.group.invalid &&
+                                form().controls.group.touched
+                            "
+                        >
+                            Type<span required>*</span>:
+                        </label>
+                        <mat-form-field appearance="outline">
+                            <input
+                                matInput
+                                name="group"
+                                placeholder="Type of option e.g. Number of sugars"
+                                formControlName="group"
+                                [matAutocomplete]="auto"
+                            />
+                            <mat-error>Type is required</mat-error>
+                        </mat-form-field>
+                    </div>
+                }
+                @if (form().controls.unit_price) {
+                    <div class="flex flex-col">
+                        <label for="title">Unit Price:</label>
+                        <mat-form-field appearance="outline">
+                            <input
+                                matInput
+                                name="unit-price"
+                                type="number"
+                                placeholder="Unit Price"
+                                formControlName="unit_price"
+                            />
+                        </mat-form-field>
+                    </div>
+                }
+                @if (form().controls.multiple) {
+                    <div class="flex flex-col">
+                        <mat-checkbox
+                            name="multiple"
+                            formControlName="multiple"
+                        >
+                            Can select multiple of type
+                        </mat-checkbox>
+                    </div>
+                }
+            </form>
         } @else {
-        <div loading class="flex flex-col items-center p-8 space-y-2 w-64">
-            <mat-spinner diameter="32" />
-            <p>Saving catering item option...</p>
-        </div>
-        } @if (!loading()) {
-        <footer
-            class="flex p-2 items-center justify-center border-t border-solid border-gray-300 dark:border-neutral-500"
-        >
-            <button
-                mat-button
-                class="w-32"
-                [disabled]="!form.dirty"
-                (click)="saveChanges()"
+            <div loading class="flex w-64 flex-col items-center space-y-2 p-8">
+                <mat-spinner diameter="32" />
+                <p>Saving catering item option...</p>
+            </div>
+        }
+        @if (!loading()) {
+            <footer
+                class="flex items-center justify-center border-t border-solid border-gray-300 p-2 dark:border-neutral-500"
             >
-                Save
-            </button>
-        </footer>
+                <button
+                    mat-button
+                    class="w-32"
+                    [disabled]="!form().dirty"
+                    (click)="saveChanges()"
+                >
+                    Save
+                </button>
+            </footer>
         }
         <mat-autocomplete #auto="matAutocomplete">
-            @for (option of types; track option) {
-            <mat-option [value]="option">
-                {{ option }}
-            </mat-option>
+            @for (option of types(); track option) {
+                <mat-option [value]="option">
+                    {{ option }}
+                </mat-option>
             }
         </mat-autocomplete>
     `,
@@ -172,44 +180,52 @@ export async function openCateringItemOptionModal(
     ],
 })
 export class CateringItemOptionModalComponent {
-    private _data = inject<CateringItemOptionModalData>(MAT_DIALOG_DATA);
+    private readonly _data = signal(
+        inject<CateringItemOptionModalData>(MAT_DIALOG_DATA),
+    );
 
     /** Emitter for events on the modal */
     public readonly event = output<DialogEvent>();
     /** Form fields for item */
-    public form = new FormGroup({
-        name: new FormControl(this.option.name || '', [Validators.required]),
-        group: new FormControl(this.option.group || '', [Validators.required]),
-        unit_price: new FormControl(this.option.unit_price),
-        multiple: new FormControl(!!this.option.multiple, []),
-    });
+    public form = signal(
+        new FormGroup({
+            name: new FormControl(this._data().option.name || '', [
+                Validators.required,
+            ]),
+            group: new FormControl(this._data().option.group || '', [
+                Validators.required,
+            ]),
+            unit_price: new FormControl(this._data().option.unit_price),
+            multiple: new FormControl(!!this._data().option.multiple, []),
+        }),
+    );
     /** Whether changes are being saved */
     public readonly loading = signal(false);
 
     /** Current item details */
-    public get option(): CateringOption {
-        return this._data.option;
-    }
+    public readonly option = computed(() => {
+        return this._data().option;
+    });
 
     /** List of available categories */
-    public get types(): string[] {
-        return this._data.types || [];
-    }
+    public readonly types = computed(() => {
+        return this._data().types || [];
+    });
 
     public saveChanges() {
         this.loading.set(true);
         const new_option = {
-            ...this.option,
-            id: this.option.id || `option-${randomInt(9999_9999)}`,
-            ...this.form.value,
+            ...this.option(),
+            id: this.option().id || `option-${randomInt(9999_9999)}`,
+            ...this.form().value,
         } as CateringOption;
         this.event.emit({
             reason: 'done',
             metadata: {
                 item: new CateringItem({
-                    ...this._data.parent,
-                    options: this._data.parent.options
-                        .filter((i) => i.id !== new_option.id)
+                    ...this._data().parent,
+                    options: this._data()
+                        .parent.options.filter((i) => i.id !== new_option.id)
                         .concat([new_option]),
                 }),
             },

@@ -30,7 +30,7 @@ import { FloorPlan } from './floorplans.service';
             >
                 <div class="relative mx-auto w-[640px] p-4 text-center">
                     <div class="font-medium">
-                        {{ form.value.id ? 'Edit' : 'New' }} Floor Plan
+                        {{ form().value.id ? 'Edit' : 'New' }} Floor Plan
                     </div>
                     @if (!loading()) {
                         <button
@@ -46,7 +46,7 @@ import { FloorPlan } from './floorplans.service';
             @if (!loading()) {
                 <main
                     class="mx-auto h-1/2 w-[640px] flex-1 overflow-auto p-4"
-                    [formGroup]="form"
+                    [formGroup]="form()"
                 >
                     <div class="w-full">
                         <label for="building">Building</label>
@@ -172,15 +172,17 @@ export class FloorPlanModalComponent {
     public readonly separatorKeysCodes = [ENTER, COMMA] as const;
     public readonly building_list = this._org.buildings;
     public readonly level_list = this._org.levels;
-    public readonly form = new FormGroup({
-        id: new FormControl(''),
-        building_id: new FormControl('', [Validators.required]),
-        level_id: new FormControl('', [Validators.required]),
-        map_available: new FormControl(false),
-        features_setup: new FormControl(false),
-        zones_setup: new FormControl(false),
-        sensors_setup: new FormControl(false),
-    });
+    public readonly form = signal(
+        new FormGroup({
+            id: new FormControl(''),
+            building_id: new FormControl('', [Validators.required]),
+            level_id: new FormControl('', [Validators.required]),
+            map_available: new FormControl(false),
+            features_setup: new FormControl(false),
+            zones_setup: new FormControl(false),
+            sensors_setup: new FormControl(false),
+        }),
+    );
 
     public add(event: MatChipInputEvent, control: FormControl<string[]>): void {
         const value = (event.value || '').trim();
@@ -194,13 +196,13 @@ export class FloorPlanModalComponent {
     }
 
     constructor() {
-        this.form.patchValue(this._data as any);
+        this.form().patchValue(this._data as any);
     }
 
     public save() {
-        this.form.markAllAsTouched();
-        if (!this.form.valid) return;
+        this.form().markAllAsTouched();
+        if (!this.form().valid) return;
         this.loading.set(true);
-        this.onSave.emit(this.form.getRawValue() as any);
+        this.onSave.emit(this.form().getRawValue() as any);
     }
 }

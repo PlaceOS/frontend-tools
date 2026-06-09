@@ -5,6 +5,7 @@ import {
     Signal,
     effect,
     inject,
+    signal,
     viewChild,
 } from '@angular/core';
 import { BaseClass } from '@placeos-tools/common';
@@ -40,12 +41,12 @@ export interface MapPolygonData {
     styles: [],
 })
 export class MapCanvasComponent extends BaseClass implements OnInit {
-    private _data = inject<MapPolygonData>(MAP_FEATURE_DATA);
+    private readonly _data = signal(inject<MapPolygonData>(MAP_FEATURE_DATA));
 
-    public zoom = 1;
-    public ratio = 1;
-    public svg_ratio = 1;
-    public width = 10000;
+    public readonly zoom = signal(1);
+    public readonly ratio = signal(1);
+    public readonly svg_ratio = signal(1);
+    public readonly width = signal(10000);
 
     private readonly canvas_element =
         viewChild<ElementRef<HTMLCanvasElement>>('canvas');
@@ -54,20 +55,20 @@ export class MapCanvasComponent extends BaseClass implements OnInit {
         super();
         effect(() => {
             this._handleMapChange(
-                this._data.ratio?.() ?? 1,
-                this._data.zoom?.() ?? 1,
-                this._data.svg_ratio?.() ?? 1,
+                this._data().ratio?.() ?? 1,
+                this._data().zoom?.() ?? 1,
+                this._data().svg_ratio?.() ?? 1,
             );
         });
-        effect(() => this._handleStateChange(this._data.polygons()));
+        effect(() => this._handleStateChange(this._data().polygons()));
     }
 
     public get ratioed_height(): number {
-        return +(this.width * this.ratio).toFixed(2);
+        return +(this.width() * this.ratio()).toFixed(2);
     }
 
     public ngOnInit(): void {
-        this._handleStateChange(this._data.polygons());
+        this._handleStateChange(this._data().polygons());
     }
 
     private async _handleMapChange(
@@ -75,12 +76,12 @@ export class MapCanvasComponent extends BaseClass implements OnInit {
         zoom: number,
         svg_ratio: number,
     ) {
-        const old_ratio = this.ratio;
-        this.zoom = zoom;
-        this.ratio = ratio;
-        this.svg_ratio = svg_ratio;
-        const width = this.width / 10;
-        const height = (this.width * this.ratio) / 10;
+        const old_ratio = this.ratio();
+        this.zoom.set(zoom);
+        this.ratio.set(ratio);
+        this.svg_ratio.set(svg_ratio);
+        const width = this.width() / 10;
+        const height = (this.width() * this.ratio()) / 10;
         const canvas = this.canvas_element()?.nativeElement;
         if (!canvas) return;
 
@@ -94,7 +95,7 @@ export class MapCanvasComponent extends BaseClass implements OnInit {
         canvas.width = width;
         canvas.height = height;
 
-        this._handleStateChange(this._data.polygons());
+        this._handleStateChange(this._data().polygons());
     }
 
     private _handleStateChange(polygon_list: Polygon[]): void {
@@ -129,7 +130,7 @@ export class MapCanvasComponent extends BaseClass implements OnInit {
         ctx.closePath();
         ctx.stroke();
         // Draw Points
-        if (this._data.draw_points !== false) {
+        if (this._data().draw_points !== false) {
             ctx.fillStyle = '#fff';
             ctx.strokeStyle = polygon.color;
             ctx.lineWidth = 4;
@@ -141,7 +142,7 @@ export class MapCanvasComponent extends BaseClass implements OnInit {
             });
         }
         // Draw Text
-        if (this._data.draw_labels !== false) {
+        if (this._data().draw_labels !== false) {
             const center = points.reduce(
                 (acc, [x, y]) => [acc[0] + x, acc[1] + y],
                 [0, 0],

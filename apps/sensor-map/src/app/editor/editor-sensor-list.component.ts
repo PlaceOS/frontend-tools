@@ -62,7 +62,7 @@ export class EditorSensorListComponent {
         this._state
             .sensor_details()
             .filter((_) =>
-                _.name?.toLowerCase().includes(this.search()?.toLowerCase()),
+                _.name?.toLowerCase.includes(this.search()?.toLowerCase()),
             ),
     );
     public readonly active_sensor = this._state.active_sensor;

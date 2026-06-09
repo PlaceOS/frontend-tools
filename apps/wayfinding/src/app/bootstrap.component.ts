@@ -1,18 +1,18 @@
 import { Component, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { MatButton } from '@angular/material/button';
 import { MatFormField } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
-import { MatButton } from '@angular/material/button';
 import { RouterLink } from '@angular/router';
 
 @Component({
     selector: 'wayfindiing-bootstrap',
     template: `
-        <div class="absolute inset-0 bg-gray-100 flex justify-center">
+        <div class="absolute inset-0 flex justify-center bg-gray-100">
             <form
-                class="bg-white shadow rounded m-4 flex flex-col space-y-2 flex-none items-center h-52 overflow-hidden w-[32rem]"
+                class="m-4 flex h-52 w-[32rem] flex-none flex-col items-center space-y-2 overflow-hidden rounded bg-white shadow"
             >
-                <h3 class="text-white w-full mb-2 py-2 px-4 text-lg bg-red-700">
+                <h3 class="mb-2 w-full bg-red-700 px-4 py-2 text-lg text-white">
                     Input SVG URL to continue
                 </h3>
                 <mat-form-field appearance="outline" class="w-[30rem]">

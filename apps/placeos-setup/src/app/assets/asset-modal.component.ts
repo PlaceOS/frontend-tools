@@ -31,7 +31,7 @@ import { Asset } from './assets.service';
             >
                 <div class="relative mx-auto w-[640px] p-4 text-center">
                     <div class="font-medium">
-                        {{ form.value.id ? 'Edit' : 'New' }} Asset
+                        {{ form().value.id ? 'Edit' : 'New' }} Asset
                     </div>
                     @if (!loading()) {
                         <button
@@ -47,7 +47,7 @@ import { Asset } from './assets.service';
             @if (!loading()) {
                 <main
                     class="mx-auto h-1/2 w-[640px] flex-1 overflow-auto p-4"
-                    [formGroup]="form"
+                    [formGroup]="form()"
                 >
                     <div class="w-full">
                         <label for="name">
@@ -173,7 +173,7 @@ import { Asset } from './assets.service';
                             Send email reminders for returning asset?
                         </mat-checkbox>
                     </div>
-                    @if (form.value.remind_returns) {
+                    @if (form().value.remind_returns) {
                         <div class="w-full">
                             <label for="max-recurrences">Reminder Delay</label>
                             <mat-form-field appearance="outline" class="w-full">
@@ -256,22 +256,24 @@ export class AssetModalComponent {
     public readonly separatorKeysCodes = [ENTER, COMMA] as const;
     public readonly building_list = this._org.buildings;
     public readonly level_list = this._org.levels;
-    public readonly form = new FormGroup({
-        id: new FormControl(''),
-        building_id: new FormControl('', [Validators.required]),
-        name: new FormControl('', [Validators.required]),
-        brand: new FormControl(''),
-        barcode: new FormControl(''),
-        category: new FormControl(''),
-        purchase_date: new FormControl(''),
-        good_until: new FormControl(''),
-        consumable: new FormControl(false),
-        quantity: new FormControl(1),
-        remind_returns: new FormControl(false),
-        reminder_delay: new FormControl(24),
-        available_for_desks: new FormControl(false),
-        available_for_spaces: new FormControl(false),
-    });
+    public readonly form = signal(
+        new FormGroup({
+            id: new FormControl(''),
+            building_id: new FormControl('', [Validators.required]),
+            name: new FormControl('', [Validators.required]),
+            brand: new FormControl(''),
+            barcode: new FormControl(''),
+            category: new FormControl(''),
+            purchase_date: new FormControl(''),
+            good_until: new FormControl(''),
+            consumable: new FormControl(false),
+            quantity: new FormControl(1),
+            remind_returns: new FormControl(false),
+            reminder_delay: new FormControl(24),
+            available_for_desks: new FormControl(false),
+            available_for_spaces: new FormControl(false),
+        }),
+    );
 
     public add(event: MatChipInputEvent, control: FormControl<string[]>): void {
         const value = (event.value || '').trim();
@@ -285,13 +287,13 @@ export class AssetModalComponent {
     }
 
     constructor() {
-        this.form.patchValue(this._data as any);
+        this.form().patchValue(this._data as any);
     }
 
     public save() {
-        this.form.markAllAsTouched();
-        if (!this.form.valid) return;
+        this.form().markAllAsTouched();
+        if (!this.form().valid) return;
         this.loading.set(true);
-        this.onSave.emit(this.form.getRawValue() as any);
+        this.onSave.emit(this.form().getRawValue() as any);
     }
 }

@@ -22,7 +22,7 @@ import { EditorStateService } from './editor-state.service';
                 class="h-screen w-screen"
                 [src]="url()"
                 [features]="features()"
-                [actions]="actions"
+                [actions]="actions()"
             />
         </div>
         @if (method() !== 'testing') {

@@ -3,6 +3,7 @@ import {
     ElementRef,
     OnInit,
     Signal,
+    computed,
     effect,
     inject,
     signal,
@@ -41,9 +42,9 @@ export interface MapPolygonData {
     styles: [],
 })
 export class MapPolygonComponent extends BaseClass implements OnInit {
-    private _data = inject<MapPolygonData>(MAP_FEATURE_DATA);
+    private readonly _data = signal(inject<MapPolygonData>(MAP_FEATURE_DATA));
 
-    public readonly polygon = signal<Polygon>(this._data.polygon);
+    public readonly polygon = computed(() => this._data().polygon);
     public readonly zoom = signal(1);
     public readonly ratio = signal(1);
     public readonly svg_ratio = signal(1);
@@ -57,9 +58,9 @@ export class MapPolygonComponent extends BaseClass implements OnInit {
         super();
         effect(() => {
             this._handleStateChange(
-                this._data.ratio?.() ?? 1,
-                this._data.zoom?.() ?? 1,
-                this._data.svg_ratio?.() ?? 1,
+                this._data().ratio?.() ?? 1,
+                this._data().zoom?.() ?? 1,
+                this._data().svg_ratio?.() ?? 1,
             );
         });
     }

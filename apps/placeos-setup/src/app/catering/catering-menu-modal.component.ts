@@ -1,66 +1,65 @@
-import { Component, inject, output, signal } from '@angular/core';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { MatChipInputEvent } from '@angular/material/chips';
-import { COMMA, ENTER } from '@angular/cdk/keycodes';
+import { Component, computed, inject, output, signal } from '@angular/core';
 
 import { MAT_DIALOG_DATA, MatDialogClose } from '@angular/material/dialog';
 
-import { CateringMenuConfig } from './catering-state.service';
-import { MatIconButton, MatButton } from '@angular/material/button';
+import { MatButton, MatIconButton } from '@angular/material/button';
+import { MatTooltip } from '@angular/material/tooltip';
 import { IconComponent } from '../../../../../libs/components/src/lib/icon.component';
 import { CateringMenuComponent } from './catering-menu.component';
-import { MatTooltip } from '@angular/material/tooltip';
+import { CateringMenuConfig } from './catering-state.service';
 
 @Component({
     selector: 'catering-menu-modal',
     template: `
         <div
-            class="absolute inset-0 bg-white dark:bg-neutral-600 dark:text-white flex flex-col"
+            class="absolute inset-0 flex flex-col bg-white dark:bg-neutral-600 dark:text-white"
         >
             <header
-                class="w-full bg-blue-300 dark:bg-neutral-700 border-b border-gray-200 dark:border-neutral-500"
+                class="w-full border-b border-gray-200 bg-blue-300 dark:border-neutral-500 dark:bg-neutral-700"
             >
-                <div class="mx-auto w-[640px] relative p-4 text-center">
+                <div class="relative mx-auto w-[640px] p-4 text-center">
                     <div class="font-medium">
-                        Edit Catering Menu for {{ building }}
+                        Edit Catering Menu for {{ building() }}
                     </div>
                     @if (!loading()) {
-                    <button
-                        mat-icon-button
-                        mat-dialog-close
-                        class="absolute top-1/2 right-0 -translate-y-1/2"
-                    >
-                        <app-icon>close</app-icon>
-                    </button>
+                        <button
+                            mat-icon-button
+                            mat-dialog-close
+                            class="absolute top-1/2 right-0 -translate-y-1/2"
+                        >
+                            <app-icon>close</app-icon>
+                        </button>
                     }
                 </div>
             </header>
             @if (!loading()) {
-            <main class="mx-auto w-[768px] max-w-full flex-1 h-1/2 relative">
-                <catering-menu />
-                <button
-                    mat-icon-button
-                    class="absolute bottom-2 right-2 bg-primary shadow"
-                    matTooltip="Add Item to Menu"
-                    (click)="add.emit()"
+                <main
+                    class="relative mx-auto h-1/2 w-[768px] max-w-full flex-1"
                 >
-                    <app-icon>add</app-icon>
-                </button>
-            </main>
-            <footer
-                class="w-full bg-blue-300 dark:bg-neutral-700 border-t border-gray-200 dark:border-neutral-500"
-            >
-                <div class="mx-auto w-[640px] relative p-4">
-                    <button mat-button (click)="save()" class="w-32">
-                        Save
+                    <catering-menu />
+                    <button
+                        mat-icon-button
+                        class="bg-primary absolute right-2 bottom-2 shadow"
+                        matTooltip="Add Item to Menu"
+                        (click)="add.emit()"
+                    >
+                        <app-icon>add</app-icon>
                     </button>
-                </div>
-            </footer>
+                </main>
+                <footer
+                    class="w-full border-t border-gray-200 bg-blue-300 dark:border-neutral-500 dark:bg-neutral-700"
+                >
+                    <div class="relative mx-auto w-[640px] p-4">
+                        <button mat-button (click)="save()" class="w-32">
+                            Save
+                        </button>
+                    </div>
+                </footer>
             } @else {
-            <div class="mx-auto w-[640px] p-4 flex-1 h-1/2">
-                <mat-spinner />
-                <p>Saving catering menu data...</p>
-            </div>
+                <div class="mx-auto h-1/2 w-[640px] flex-1 p-4">
+                    <mat-spinner />
+                    <p>Saving catering menu data...</p>
+                </div>
             }
         </div>
     `,
@@ -75,10 +74,12 @@ import { MatTooltip } from '@angular/material/tooltip';
     ],
 })
 export class CateringMenuModalComponent {
-    private _data = inject<CateringMenuConfig>(MAT_DIALOG_DATA);
+    private readonly _data = signal(
+        inject<CateringMenuConfig>(MAT_DIALOG_DATA),
+    );
 
     public readonly add = output();
     public readonly loading = signal(false);
 
-    public readonly building = this._data.name;
+    public readonly building = computed(() => this._data().name);
 }

@@ -11,6 +11,8 @@ import { Point } from '@placeos-tools/components';
 
 import { MapRegion } from './types';
 
+export type EditorAction = 'rect' | 'add_points' | 'remove_points';
+
 export const COLOURS = [
     '#e53935',
     '#d81b60',
@@ -65,7 +67,7 @@ export class EditorStateService {
     private _end_point: Point;
     private _shift: boolean;
     private _move: boolean;
-    private _action: 'rect' | 'add_points' | 'remove_points' = 'rect';
+    private _action = signal<EditorAction>('rect');
     /** URL of the map to be displayed */
     public readonly url = this._map_url.asReadonly();
     /** Regions for the active map URL */
@@ -78,10 +80,8 @@ export class EditorStateService {
     public readonly height = this._map_height.asReadonly();
     /** Width of the active map */
     public readonly width = this._map_width.asReadonly();
-
-    public get action() {
-        return this._action;
-    }
+    /** Active editor action */
+    public readonly action = this._action.asReadonly();
 
     constructor() {
         document.addEventListener('keydown', (ev) =>
@@ -117,13 +117,13 @@ export class EditorStateService {
         setTimeout(() => this._map_regions.set(this._map_regions()), 200);
     }
 
-    public setAction(action: 'rect' | 'add_points' | 'remove_points') {
-        this._action = action;
+    public setAction(action: EditorAction) {
+        this._action.set(action);
         this._cleanUpPoint();
     }
 
     public handleMapClick(event: 'start' | 'move' | 'end', point: Point) {
-        switch (this._action) {
+        switch (this._action()) {
             case 'add_points':
                 event === 'move'
                     ? this.handleMovePoint(point)

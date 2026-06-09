@@ -7,7 +7,7 @@ import { IconComponent } from '../../../../../libs/components/src/lib/icon.compo
     selector: 'example-floorplan-modal',
     template: `
         <div
-            class="relative max-w-[80vw] max-h-[80vh] bg-white dark:bg-neutral-700 overflow-hidden rounded p-10"
+            class="relative max-h-[80vh] max-w-[80vw] overflow-hidden rounded bg-white p-10 dark:bg-neutral-700"
         >
             <button
                 mat-icon-button

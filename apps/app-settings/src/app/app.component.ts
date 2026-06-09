@@ -9,7 +9,7 @@ import { SettingsStateService } from './settings-state.service';
     template: `
         <div class="flex h-full flex-col">
             <nav mat-tab-nav-bar class="mx-auto w-[768px] max-w-full">
-                @for (link of links; track link) {
+                @for (link of links(); track link) {
                     <a
                         mat-tab-link
                         [routerLink]="[link.path]"
@@ -50,10 +50,10 @@ export class AppComponent {
     private _state = inject(SettingsStateService);
 
     public readonly path = signal('');
-    public readonly links = [
+    public readonly links = signal([
         { path: '/shared', name: 'Shared' },
         { path: '/workplace', name: 'Workplace' },
         { path: '/concierge', name: 'Concierge' },
-    ];
+    ]);
     public readonly loading = this._state.loading;
 }

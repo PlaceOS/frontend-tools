@@ -1,4 +1,4 @@
-import { Component, inject, input, signal } from '@angular/core';
+import { Component, computed, inject, input, signal } from '@angular/core';
 
 import { CurrencyPipe } from '@angular/common';
 import { MatIconButton } from '@angular/material/button';
@@ -146,6 +146,8 @@ export class CateringMenuItemComponent {
     public readonly item = input.required<CateringItem>();
     /** Whether to show item options */
     public readonly show_options = signal(false);
+    /** Currency symbol for active menu */
+    public readonly symbol = computed(() => this._catering.currency());
 
     public readonly addOption = () => this._catering.addOption(this.item());
 
@@ -158,9 +160,4 @@ export class CateringMenuItemComponent {
     public readonly editItem = () => this._catering.addItem(this.item());
 
     public readonly removeItem = () => this._catering.deleteItem(this.item());
-
-    /** Currency symbol for active menu */
-    public get symbol() {
-        return this._catering.currency;
-    }
 }

@@ -1,5 +1,6 @@
 import { Overlay, OverlayRef } from '@angular/cdk/overlay';
 import { CdkPortal } from '@angular/cdk/portal';
+import { NgComponentOutlet, NgTemplateOutlet } from '@angular/common';
 import {
     Component,
     ElementRef,
@@ -17,7 +18,6 @@ import {
     viewChild,
 } from '@angular/core';
 import { BaseClass } from '@placeos-tools/common';
-import { NgComponentOutlet, NgTemplateOutlet } from '@angular/common';
 
 @Injectable()
 export class CustomTooltipData<T = any> {
@@ -32,15 +32,21 @@ export class CustomTooltipData<T = any> {
 
         <ng-template cdk-portal>
             <div custom-tooltip class="pointer-events-none">
-                @switch (type()) { @case ('component') {
-                <ng-container *ngComponentOutlet="content(); injector: injector()"
-                 />
-                } @case ('html') {
-                <div [innerHTML]="content() | sanitize"></div>
-                } @default {
-                <ng-container *ngTemplateOutlet="content(); context: data()"
-                 />
-                } }
+                @switch (type()) {
+                    @case ('component') {
+                        <ng-container
+                            *ngComponentOutlet="content(); injector: injector()"
+                        />
+                    }
+                    @case ('html') {
+                        <div [innerHTML]="content | sanitize"></div>
+                    }
+                    @default {
+                        <ng-container
+                            *ngTemplateOutlet="content(); context: data()"
+                        />
+                    }
+                }
             </div>
         </ng-template>
     `,
@@ -64,7 +70,7 @@ export class CustomTooltipComponent<T = any>
     });
     /** Content to render in the tooltip */
     public readonly content = input<TemplateRef<any> | Type<any> | string>(
-        undefined
+        undefined,
     );
     /** Data associated with the tooltip content */
     public readonly data = input<T>(undefined);
@@ -74,7 +80,7 @@ export class CustomTooltipComponent<T = any>
     public readonly backdrop = input(true);
     /** Type of content to render */
     public readonly type = signal<'template' | 'component' | 'html'>(
-        'template'
+        'template',
     );
 
     public readonly injector = signal<Injector>(this._injector);
@@ -86,9 +92,9 @@ export class CustomTooltipComponent<T = any>
     @HostListener('click') public readonly onClick = () =>
         this.hover() ? '' : this.open();
     @HostListener('mouseenter') public readonly onEnter = () =>
-        this.hover() ? this.open() : '';
+        this.hover() ? this.open : '';
     @HostListener('mouseleave') public readonly onLeave = () =>
-        this.hover() ? this.close() : '';
+        this.hover() ? this.close : '';
 
     public ngOnChanges(changes: SimpleChanges): void {
         this._updateInjector();
@@ -124,8 +130,8 @@ export class CustomTooltipComponent<T = any>
                             (y_pos === 'top'
                                 ? 'bottom'
                                 : y_pos == 'bottom'
-                                ? 'top'
-                                : y_pos) || 'bottom',
+                                  ? 'top'
+                                  : y_pos) || 'bottom',
                         overlayX: this.x_pos() || 'end',
                         overlayY: this.y_pos() || 'top',
                     },
@@ -135,7 +141,7 @@ export class CustomTooltipComponent<T = any>
         if (this.backdrop()) {
             this.subscription(
                 'backdrop',
-                this._overlay_ref.backdropClick().subscribe(() => this.close())
+                this._overlay_ref.backdropClick().subscribe(() => this.close()),
             );
         }
     }
@@ -153,8 +159,8 @@ export class CustomTooltipComponent<T = any>
             typeof content === 'string'
                 ? 'html'
                 : content instanceof TemplateRef
-                ? 'template'
-                : 'component'
+                  ? 'template'
+                  : 'component',
         );
     }
 
@@ -171,7 +177,7 @@ export class CustomTooltipComponent<T = any>
                     },
                 ],
                 parent: this._injector,
-            })
+            }),
         );
     }
 }

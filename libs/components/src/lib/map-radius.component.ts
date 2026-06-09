@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { MAP_FEATURE_DATA } from './map-viewer/map-types';
 
 export interface MapRadiusData {
@@ -12,22 +12,23 @@ export interface MapRadiusData {
     selector: '[map-radius]',
     template: `
         @if (show()) {
-        <div
-            class="center border-4 rounded-full border-dashed"
-            [style.border-color]="stroke"
-            [style.background-color]="fill + '40'"
-            [style.width]="radius * 100 + '%'"
-            [style.height]="radius * 100 + '%'"
-        ></div>
-        @if (message && show_message()) {
-        <div
-            name="message"
-            [style.top]="'-' + radius * 100 + '%'"
-            class="p-2 m-2 rounded bg-white text-gray-700 shadow absolute top-0 whitespace-no-wrap"
-        >
-            {{ message }}
-        </div>
-        } }
+            <div
+                class="center rounded-full border-4 border-dashed"
+                [style.border-color]="stroke()"
+                [style.background-color]="fill() + '40'"
+                [style.width]="radius() * 100 + '%'"
+                [style.height]="radius() * 100 + '%'"
+            ></div>
+            @if (message() && show_message()) {
+                <div
+                    name="message()"
+                    [style.top]="'-' + radius() * 100 + '%'"
+                    class="whitespace-no-wrap absolute top-0 m-2 rounded bg-white p-2 text-gray-700 shadow"
+                >
+                    {{ message() }}
+                </div>
+            }
+        }
     `,
     styles: [
         `
@@ -59,16 +60,18 @@ export interface MapRadiusData {
     ],
 })
 export class MapRadiusComponent implements OnInit {
-    private _details = inject<MapRadiusData>(MAP_FEATURE_DATA);
+    private readonly _details = signal(inject<MapRadiusData>(MAP_FEATURE_DATA));
 
     /** Message to display above the pin */
-    public readonly message = this._details.message;
+    public readonly message = computed(() => this._details().message);
     /** Fill colour for the pin SVG */
-    public readonly fill = this._details.fill || '#e53935';
+    public readonly fill = computed(() => this._details().fill || '#e53935');
     /** Fill colour for the pin SVG */
-    public readonly radius = this._details.radius || 10;
+    public readonly radius = computed(() => this._details().radius || 10);
     /** Stroke colour for the pin SVG */
-    public readonly stroke = this._details.stroke || '#e53935';
+    public readonly stroke = computed(
+        () => this._details().stroke || '#e53935',
+    );
 
     public readonly show = signal(false);
     public readonly show_message = signal(false);

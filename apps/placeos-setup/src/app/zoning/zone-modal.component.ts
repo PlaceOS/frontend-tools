@@ -36,7 +36,7 @@ import { Zone } from './zoning.service';
             >
                 <div class="relative mx-auto w-[640px] p-4 text-center">
                     <div class="font-medium">
-                        {{ form.value.id ? 'Edit' : 'New' }} Zone
+                        {{ form().value.id ? 'Edit' : 'New' }} Zone
                     </div>
                     @if (!loading()) {
                         <button
@@ -52,7 +52,7 @@ import { Zone } from './zoning.service';
             @if (!loading()) {
                 <main
                     class="mx-auto h-1/2 w-[640px] flex-1 overflow-auto p-4"
-                    [formGroup]="form"
+                    [formGroup]="form()"
                 >
                     <div class="w-full">
                         <label for="name">
@@ -119,14 +119,14 @@ import { Zone } from './zoning.service';
                                 aria-label="Whitelist User Groups"
                             >
                                 @for (
-                                    item of form.value.whitelist_groups;
+                                    item of form().value.whitelist_groups;
                                     track item
                                 ) {
                                     <mat-chip
                                         (removed)="
                                             remove(
                                                 item,
-                                                form.get('whitelist_groups')
+                                                form().get('whitelist_groups')
                                             )
                                         "
                                     >
@@ -140,13 +140,13 @@ import { Zone } from './zoning.service';
                                     placeholder="New group..."
                                     [matChipInputFor]="groupList"
                                     [matChipInputSeparatorKeyCodes]="
-                                        separatorKeysCodes
+                                        separatorKeysCodes()
                                     "
-                                    [matChipInputAddOnBlur]="addOnBlur"
+                                    [matChipInputAddOnBlur]="addOnBlur()"
                                     (matChipInputTokenEnd)="
                                         add(
                                             $event,
-                                            form.get('whitelist_groups')
+                                            form().get('whitelist_groups')
                                         )
                                     "
                                 />
@@ -165,7 +165,7 @@ import { Zone } from './zoning.service';
                             Should people counting be enabled?
                         </mat-checkbox>
                     </div>
-                    @if (form.value.people_counting) {
+                    @if (form().value.people_counting) {
                         <div class="w-full">
                             <label for="counting-method"
                                 >People Counting Method</label
@@ -196,7 +196,7 @@ import { Zone } from './zoning.service';
                             Should people finding be enabled?
                         </mat-checkbox>
                     </div>
-                    @if (form.value.people_finding) {
+                    @if (form().value.people_finding) {
                         <div class="w-full">
                             <label for="finding-method"
                                 >People Finding Method</label
@@ -287,26 +287,28 @@ export class ZoneModalComponent {
 
     public readonly onSave = output<Partial<Zone>>();
     public readonly loading = signal(false);
-    public addOnBlur = true;
+    public addOnBlur = signal(true);
 
-    public readonly separatorKeysCodes = [ENTER, COMMA] as const;
+    public readonly separatorKeysCodes = signal([ENTER, COMMA] as const);
     public readonly building_list = this._org.buildings;
     public readonly level_list = this._org.levels;
-    public readonly form = new FormGroup({
-        id: new FormControl(''),
-        building_id: new FormControl('', [Validators.required]),
-        level_id: new FormControl('', [Validators.required]),
-        name: new FormControl('', [Validators.required]),
-        capacity: new FormControl(2),
-        whitelist_groups: new FormControl([]),
-        people_counting: new FormControl(false),
-        counting_method: new FormControl(''),
-        people_finding: new FormControl(false),
-        finding_method: new FormControl(''),
-        locatable_firewarden: new FormControl(false),
-        locatable_firstaiders: new FormControl(false),
-        locatable_marshall: new FormControl(false),
-    });
+    public readonly form = signal(
+        new FormGroup({
+            id: new FormControl(''),
+            building_id: new FormControl('', [Validators.required]),
+            level_id: new FormControl('', [Validators.required]),
+            name: new FormControl('', [Validators.required]),
+            capacity: new FormControl(2),
+            whitelist_groups: new FormControl([]),
+            people_counting: new FormControl(false),
+            counting_method: new FormControl(''),
+            people_finding: new FormControl(false),
+            finding_method: new FormControl(''),
+            locatable_firewarden: new FormControl(false),
+            locatable_firstaiders: new FormControl(false),
+            locatable_marshall: new FormControl(false),
+        }),
+    );
 
     public add(event: MatChipInputEvent, control: FormControl<string[]>): void {
         const value = (event.value || '').trim();
@@ -320,13 +322,13 @@ export class ZoneModalComponent {
     }
 
     constructor() {
-        this.form.patchValue(this._data as any);
+        this.form().patchValue(this._data as any);
     }
 
     public save() {
-        this.form.markAllAsTouched();
-        if (!this.form.valid) return;
+        this.form().markAllAsTouched();
+        if (!this.form().valid) return;
         this.loading.set(true);
-        this.onSave.emit(this.form.getRawValue() as any);
+        this.onSave.emit(this.form().getRawValue() as any);
     }
 }

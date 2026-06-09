@@ -12,15 +12,15 @@ import { EditorStateService } from './editor-state.service';
     selector: 'editor-options',
     template: `
         <div
-            class="bg-base-100 divide-base-200 border-base-300 flex h-full flex-col items-center divide-y border-r shadow"
+            class="bg-base-100 divide-base-300 border-base-300 flex h-full flex-col items-center divide-y border-r shadow"
         >
-            <div class="w-full p-4">
+            <div class="w-full">
                 <div
-                    class="bg-base-300/50 mb-2! w-full rounded px-4 py-3 text-lg font-medium shadow"
+                    class="bg-base-300/50 mb-2! w-full px-4 py-3 text-lg font-medium"
                 >
                     Map Settings
                 </div>
-                <div class="flex items-center space-x-2 px-2">
+                <div class="mb-2 flex items-center space-x-2 px-2">
                     <div class="w-px flex-1">
                         <label class="mb-2">Width:</label>
                         <compact-counter
@@ -39,9 +39,9 @@ import { EditorStateService } from './editor-state.service';
                     </div>
                 </div>
             </div>
-            <div class="flex h-1/2 w-full flex-1 flex-col p-4">
+            <div class="flex h-1/2 w-full flex-1 flex-col">
                 <div
-                    class="bg-base-300/50 mb-2 flex items-center justify-center gap-1 rounded p-2 shadow"
+                    class="bg-base-300/50 flex items-center justify-center gap-1 p-2"
                 >
                     <div class="flex-1 px-2 text-lg font-medium">Regions</div>
                     <button
@@ -75,7 +75,7 @@ import { EditorStateService } from './editor-state.service';
                     </button>
                 </div>
                 <div
-                    class="flex h-[50vh] w-full flex-1 flex-col gap-2 overflow-auto"
+                    class="flex h-[50vh] w-full flex-1 flex-col gap-2 overflow-auto p-2"
                 >
                     @if (regions()?.length) {
                         @for (
@@ -172,13 +172,13 @@ export class EditorOptionsComponent {
 
     /** Map regions for active map URL */
     public readonly regions = this._state.regions;
-    /** Map regions for active map URL */
+    /** Whether the editor is embedded */
     public readonly embeded = this._state.embeded;
-    /** Map regions for active map URL */
+    /** Active map region */
     public readonly active_region = this._state.active_region;
-    /** Map regions for active map URL */
+    /** Map height */
     public readonly height = this._state.height;
-    /** Map regions for active map URL */
+    /** Map width */
     public readonly width = this._state.width;
 
     public readonly setActiveRegion = (r) => this._state.setActiveRegion(r);

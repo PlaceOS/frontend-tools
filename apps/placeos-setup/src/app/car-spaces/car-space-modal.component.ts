@@ -36,7 +36,7 @@ import { CarSpace } from './car-spaces.service';
             >
                 <div class="relative mx-auto w-[640px] p-4 text-center">
                     <div class="font-medium">
-                        {{ form.value.id ? 'Edit' : 'New' }} Car Space
+                        {{ form().value.id ? 'Edit' : 'New' }} Car Space
                     </div>
                     @if (!loading()) {
                         <button
@@ -52,7 +52,7 @@ import { CarSpace } from './car-spaces.service';
             @if (!loading()) {
                 <main
                     class="mx-auto h-1/2 w-[640px] flex-1 overflow-auto p-4"
-                    [formGroup]="form"
+                    [formGroup]="form()"
                 >
                     <div class="w-full">
                         <label for="car-space-id">Car Space ID</label>
@@ -152,10 +152,13 @@ import { CarSpace } from './car-spaces.service';
                                 #featureList
                                 aria-label="Car Space Features"
                             >
-                                @for (item of form.value.features; track item) {
+                                @for (
+                                    item of form().value.features;
+                                    track item
+                                ) {
                                     <mat-chip
                                         (removed)="
-                                            remove(item, form.get('features'))
+                                            remove(item, form().get('features'))
                                         "
                                     >
                                         {{ item }}
@@ -168,11 +171,11 @@ import { CarSpace } from './car-spaces.service';
                                     placeholder="New feature..."
                                     [matChipInputFor]="featureList"
                                     [matChipInputSeparatorKeyCodes]="
-                                        separatorKeysCodes
+                                        separatorKeysCodes()
                                     "
-                                    [matChipInputAddOnBlur]="addOnBlur"
+                                    [matChipInputAddOnBlur]="addOnBlur()"
                                     (matChipInputTokenEnd)="
-                                        add($event, form.get('features'))
+                                        add($event, form().get('features'))
                                     "
                                 />
                             </mat-chip-list>
@@ -191,14 +194,14 @@ import { CarSpace } from './car-spaces.service';
                                 aria-label="Whitelist User Groups"
                             >
                                 @for (
-                                    item of form.value.whitelist_groups;
+                                    item of form().value.whitelist_groups;
                                     track item
                                 ) {
                                     <mat-chip
                                         (removed)="
                                             remove(
                                                 item,
-                                                form.get('whitelist_groups')
+                                                form().get('whitelist_groups')
                                             )
                                         "
                                     >
@@ -212,13 +215,13 @@ import { CarSpace } from './car-spaces.service';
                                     placeholder="New group..."
                                     [matChipInputFor]="groupList"
                                     [matChipInputSeparatorKeyCodes]="
-                                        separatorKeysCodes
+                                        separatorKeysCodes()
                                     "
-                                    [matChipInputAddOnBlur]="addOnBlur"
+                                    [matChipInputAddOnBlur]="addOnBlur()"
                                     (matChipInputTokenEnd)="
                                         add(
                                             $event,
-                                            form.get('whitelist_groups')
+                                            form().get('whitelist_groups')
                                         )
                                     "
                                 />
@@ -263,7 +266,7 @@ import { CarSpace } from './car-spaces.service';
                             space?
                         </mat-checkbox>
                     </div>
-                    @if (form.value.recurrence) {
+                    @if (form().value.recurrence) {
                         <div class="w-full">
                             <label for="max-recurrences">Max Recurrences</label>
                             <mat-form-field appearance="outline" class="w-full">
@@ -328,27 +331,29 @@ export class CarSpaceModalComponent {
 
     public readonly onSave = output<Partial<CarSpace>>();
     public readonly loading = signal(false);
-    public addOnBlur = true;
+    public addOnBlur = signal(true);
 
-    public readonly separatorKeysCodes = [ENTER, COMMA] as const;
+    public readonly separatorKeysCodes = signal([ENTER, COMMA] as const);
     public readonly building_list = this._org.buildings;
     public readonly level_list = this._org.levels;
-    public readonly form = new FormGroup({
-        id: new FormControl(''),
-        map_id: new FormControl('', [Validators.required]),
-        building_id: new FormControl('', [Validators.required]),
-        level_id: new FormControl('', [Validators.required]),
-        name: new FormControl('', [Validators.required]),
-        type: new FormControl(''),
-        features: new FormControl([]),
-        whitelist_groups: new FormControl([]),
-        bookable: new FormControl(false),
-        plate_detection: new FormControl(false),
-        auto_release: new FormControl(false),
-        auto_release_delay: new FormControl(15),
-        recurrence: new FormControl(false),
-        max_recurrence: new FormControl(0),
-    });
+    public readonly form = signal(
+        new FormGroup({
+            id: new FormControl(''),
+            map_id: new FormControl('', [Validators.required]),
+            building_id: new FormControl('', [Validators.required]),
+            level_id: new FormControl('', [Validators.required]),
+            name: new FormControl('', [Validators.required]),
+            type: new FormControl(''),
+            features: new FormControl([]),
+            whitelist_groups: new FormControl([]),
+            bookable: new FormControl(false),
+            plate_detection: new FormControl(false),
+            auto_release: new FormControl(false),
+            auto_release_delay: new FormControl(15),
+            recurrence: new FormControl(false),
+            max_recurrence: new FormControl(0),
+        }),
+    );
 
     public add(event: MatChipInputEvent, control: FormControl<string[]>): void {
         const value = (event.value || '').trim();
@@ -362,13 +367,13 @@ export class CarSpaceModalComponent {
     }
 
     constructor() {
-        this.form.patchValue(this._data as any);
+        this.form().patchValue(this._data as any);
     }
 
     public save() {
-        this.form.markAllAsTouched();
-        if (!this.form.valid) return;
+        this.form().markAllAsTouched();
+        if (!this.form().valid) return;
         this.loading.set(true);
-        this.onSave.emit(this.form.getRawValue() as any);
+        this.onSave.emit(this.form().getRawValue() as any);
     }
 }

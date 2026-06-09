@@ -93,14 +93,14 @@ export class EditorStateService {
     /** URL of the map to be displayed */
     public readonly url = this._map_url.asReadonly();
 
-    public readonly actions = [
+    public readonly actions = signal([
         { id: '*', action: 'click', callback: (_, p) => this._handleClick(p) },
         {
             id: '*',
             action: 'touchend',
             callback: (_, p) => this._handleClick(p),
         },
-    ];
+    ]);
     /** Whether application is embeded within another */
     public readonly embeded = this._embeded.asReadonly();
     /** Size parameters for wayfinding grid */

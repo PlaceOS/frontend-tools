@@ -36,7 +36,7 @@ import { Space } from './spaces.service';
             >
                 <div class="relative mx-auto w-[640px] p-4 text-center">
                     <div class="font-medium">
-                        {{ form.value.id ? 'Edit' : 'New' }} Room
+                        {{ form().value.id ? 'Edit' : 'New' }} Room
                     </div>
                     @if (!loading()) {
                         <button
@@ -52,7 +52,7 @@ import { Space } from './spaces.service';
             @if (!loading()) {
                 <main
                     class="mx-auto h-1/2 w-[640px] flex-1 overflow-auto p-4"
-                    [formGroup]="form"
+                    [formGroup]="form()"
                 >
                     <div class="w-full">
                         <label for="room-id">Room ID</label>
@@ -163,10 +163,13 @@ import { Space } from './spaces.service';
                                 #featureList
                                 aria-label="Room Features"
                             >
-                                @for (item of form.value.features; track item) {
+                                @for (
+                                    item of form().value.features;
+                                    track item
+                                ) {
                                     <mat-chip
                                         (removed)="
-                                            remove(item, form.get('features'))
+                                            remove(item, form().get('features'))
                                         "
                                     >
                                         {{ item }}
@@ -179,11 +182,11 @@ import { Space } from './spaces.service';
                                     placeholder="New feature..."
                                     [matChipInputFor]="featureList"
                                     [matChipInputSeparatorKeyCodes]="
-                                        separatorKeysCodes
+                                        separatorKeysCodes()
                                     "
-                                    [matChipInputAddOnBlur]="addOnBlur"
+                                    [matChipInputAddOnBlur]="addOnBlur()"
                                     (matChipInputTokenEnd)="
-                                        add($event, form.get('features'))
+                                        add($event, form().get('features'))
                                     "
                                 />
                             </mat-chip-list>
@@ -202,14 +205,14 @@ import { Space } from './spaces.service';
                                 aria-label="Whitelist User Groups"
                             >
                                 @for (
-                                    item of form.value.whitelist_groups;
+                                    item of form().value.whitelist_groups;
                                     track item
                                 ) {
                                     <mat-chip
                                         (removed)="
                                             remove(
                                                 item,
-                                                form.get('whitelist_groups')
+                                                form().get('whitelist_groups')
                                             )
                                         "
                                     >
@@ -223,13 +226,13 @@ import { Space } from './spaces.service';
                                     placeholder="New group..."
                                     [matChipInputFor]="groupList"
                                     [matChipInputSeparatorKeyCodes]="
-                                        separatorKeysCodes
+                                        separatorKeysCodes()
                                     "
-                                    [matChipInputAddOnBlur]="addOnBlur"
+                                    [matChipInputAddOnBlur]="addOnBlur()"
                                     (matChipInputTokenEnd)="
                                         add(
                                             $event,
-                                            form.get('whitelist_groups')
+                                            form().get('whitelist_groups')
                                         )
                                     "
                                 />
@@ -280,7 +283,7 @@ import { Space } from './spaces.service';
                             Should bookings be released if not checked into?
                         </mat-checkbox>
                     </div>
-                    @if (form.value.auto_release) {
+                    @if (form().value.auto_release) {
                         <div class="w-full">
                             <label for="auto-release-delay"
                                 >Auto-release delay</label
@@ -311,7 +314,7 @@ import { Space } from './spaces.service';
                             Should recurring bookings be allowed in this room?
                         </mat-checkbox>
                     </div>
-                    @if (form.value.recurrence) {
+                    @if (form().value.recurrence) {
                         <div class="w-full">
                             <label for="max-recurrences">Max Recurrences</label>
                             <mat-form-field appearance="outline" class="w-full">
@@ -387,36 +390,38 @@ export class SpaceModalComponent {
 
     public readonly onSave = output<Partial<Space>>();
     public readonly loading = signal(false);
-    public addOnBlur = true;
+    public addOnBlur = signal(true);
 
-    public readonly separatorKeysCodes = [ENTER, COMMA] as const;
+    public readonly separatorKeysCodes = signal([ENTER, COMMA] as const);
     public readonly building_list = this._org.buildings;
     public readonly level_list = this._org.levels;
-    public readonly form = new FormGroup({
-        id: new FormControl(''),
-        room_id: new FormControl('', [Validators.required]),
-        building_id: new FormControl('', [Validators.required]),
-        level_id: new FormControl('', [Validators.required]),
-        display_name: new FormControl(''),
-        name: new FormControl('', [Validators.required]),
-        email: new FormControl('', [Validators.email]),
-        capacity: new FormControl(2),
-        type: new FormControl(''),
-        features: new FormControl([]),
-        whitelist_groups: new FormControl([]),
-        pets_allowed: new FormControl(false),
-        allow_visitors: new FormControl(false),
-        catering_available: new FormControl(false),
-        requires_approval: new FormControl(false),
-        visitors: new FormControl(false),
-        auto_release: new FormControl(false),
-        auto_release_delay: new FormControl(15),
-        sensor_brand: new FormControl(''),
-        recurrence: new FormControl(false),
-        max_recurrence: new FormControl(0),
-        all_day: new FormControl(false),
-        images: new FormControl(false),
-    });
+    public readonly form = signal(
+        new FormGroup({
+            id: new FormControl(''),
+            room_id: new FormControl('', [Validators.required]),
+            building_id: new FormControl('', [Validators.required]),
+            level_id: new FormControl('', [Validators.required]),
+            display_name: new FormControl(''),
+            name: new FormControl('', [Validators.required]),
+            email: new FormControl('', [Validators.email]),
+            capacity: new FormControl(2),
+            type: new FormControl(''),
+            features: new FormControl([]),
+            whitelist_groups: new FormControl([]),
+            pets_allowed: new FormControl(false),
+            allow_visitors: new FormControl(false),
+            catering_available: new FormControl(false),
+            requires_approval: new FormControl(false),
+            visitors: new FormControl(false),
+            auto_release: new FormControl(false),
+            auto_release_delay: new FormControl(15),
+            sensor_brand: new FormControl(''),
+            recurrence: new FormControl(false),
+            max_recurrence: new FormControl(0),
+            all_day: new FormControl(false),
+            images: new FormControl(false),
+        }),
+    );
 
     public add(event: MatChipInputEvent, control: FormControl<string[]>): void {
         const value = (event.value || '').trim();
@@ -430,13 +435,13 @@ export class SpaceModalComponent {
     }
 
     constructor() {
-        this.form.patchValue(this._data as any);
+        this.form().patchValue(this._data as any);
     }
 
     public save() {
-        this.form.markAllAsTouched();
-        if (!this.form.valid) return;
+        this.form().markAllAsTouched();
+        if (!this.form().valid) return;
         this.loading.set(true);
-        this.onSave.emit(this.form.getRawValue() as any);
+        this.onSave.emit(this.form().getRawValue() as any);
     }
 }

@@ -7,7 +7,7 @@ import { generateSettingsForm } from './helpers';
 })
 export class SettingsStateService {
     private _loading = signal('');
-    public readonly form = generateSettingsForm();
+    public readonly form = signal(generateSettingsForm());
 
     public readonly loading = this._loading.asReadonly();
 
@@ -19,7 +19,7 @@ export class SettingsStateService {
         const general = await retrieveData('settings');
         const workplace = await retrieveData('workplace_app');
         const concierge = await retrieveData('concierge_app');
-        this.form.patchValue({
+        this.form().patchValue({
             general,
             workplace,
             concierge,
@@ -27,7 +27,7 @@ export class SettingsStateService {
     }
 
     public async saveSettings(type = 'settings') {
-        const data = this.form.value;
+        const data = this.form().value;
         console.log(
             'Data:',
             data[type] || data[type.replace('_app', '')] || data.shared || {},
