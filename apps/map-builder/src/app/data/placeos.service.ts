@@ -1,0 +1,252 @@
+import { Injectable, signal } from '@angular/core';
+
+const SETTINGS_KEY = 'MAP_BUILDER.placeos';
+
+export interface PlaceOSSettings {
+    domain: string;
+    api_key: string;
+}
+
+export interface PlaceOSConfig {
+    configured: boolean;
+    domain: string;
+    has_key: boolean;
+}
+
+export interface PlaceOSUser {
+    name: string;
+    email: string;
+    sys_admin: boolean;
+}
+
+export interface PlaceOSZone {
+    id: string;
+    name: string;
+    description: string;
+    tags: string[];
+    display_name: string;
+    map_id: string;
+    parent_id: string;
+    capacity: number;
+    timezone: string;
+}
+
+export interface PlaceOSSystem {
+    id: string;
+    name: string;
+    map_id: string;
+    bookable: boolean;
+    capacity: number;
+    zones: string[];
+    display_name: string;
+    features: string[];
+}
+
+interface PlaceOSUpload {
+    id: string;
+    upload_url: string;
+    upload_headers: Record<string, string>;
+}
+
+function loadSettings(): PlaceOSSettings {
+    try {
+        return {
+            domain: '',
+            api_key: '',
+            ...JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}'),
+        };
+    } catch {
+        return { domain: '', api_key: '' };
+    }
+}
+
+/**
+ * Talks to the PlaceOS engine API directly from the browser.
+ *
+ * The reference application proxied these calls through its own server; with
+ * no server here the requests go straight out, with the domain and API key
+ * held in local storage. Leave the domain blank to use the current origin,
+ * which is what the dev proxy in `config/proxy.conf.js` expects.
+ */
+@Injectable({ providedIn: 'root' })
+export class PlaceOSService {
+    private readonly _settings = signal<PlaceOSSettings>(loadSettings());
+
+    /** Current connection settings */
+    public readonly settings = this._settings.asReadonly();
+
+    public get config(): PlaceOSConfig {
+        const { domain, api_key } = this._settings();
+        return {
+            configured: !!api_key,
+            domain,
+            has_key: !!api_key,
+        };
+    }
+
+    public setConfig(domain: string, api_key: string): void {
+        const settings = { domain: domain.replace(/\/$/, ''), api_key };
+        this._settings.set(settings);
+        localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+    }
+
+    /** Checks the stored credentials by fetching the current user */
+    public async testConnection(): Promise<{
+        ok: boolean;
+        user?: PlaceOSUser;
+        error?: string;
+    }> {
+        try {
+            const user = await this._request<PlaceOSUser>('/users/current');
+            return {
+                ok: true,
+                user: {
+                    name: user.name,
+                    email: user.email,
+                    sys_admin: user.sys_admin,
+                },
+            };
+        } catch (error) {
+            return {
+                ok: false,
+                error:
+                    error instanceof Error
+                        ? error.message
+                        : 'Connection failed',
+            };
+        }
+    }
+
+    // ── Zones ───────────────────────────────────────────────────────────────
+
+    public getZones(tags?: string, parent_id?: string): Promise<PlaceOSZone[]> {
+        return this._request<PlaceOSZone[]>('/zones', {
+            limit: '100',
+            ...(tags ? { tags } : {}),
+            ...(parent_id ? { parent_id } : {}),
+        });
+    }
+
+    public getZone(id: string): Promise<PlaceOSZone> {
+        return this._request<PlaceOSZone>(`/zones/${id}`);
+    }
+
+    public updateZone(
+        id: string,
+        data: Partial<PlaceOSZone>,
+    ): Promise<PlaceOSZone> {
+        return this._request<PlaceOSZone>(
+            `/zones/${id}`,
+            {},
+            {
+                method: 'PUT',
+                body: JSON.stringify(data),
+            },
+        );
+    }
+
+    // ── Systems ─────────────────────────────────────────────────────────────
+
+    public getSystems(
+        zone_id?: string,
+        bookable?: boolean,
+    ): Promise<PlaceOSSystem[]> {
+        return this._request<PlaceOSSystem[]>('/systems', {
+            limit: '100',
+            ...(zone_id ? { zone_id } : {}),
+            ...(bookable === undefined ? {} : { bookable: `${bookable}` }),
+        });
+    }
+
+    public updateSystem(
+        id: string,
+        data: Partial<PlaceOSSystem>,
+    ): Promise<PlaceOSSystem> {
+        return this._request<PlaceOSSystem>(
+            `/systems/${id}`,
+            {},
+            {
+                method: 'PUT',
+                body: JSON.stringify(data),
+            },
+        );
+    }
+
+    // ── Uploads ─────────────────────────────────────────────────────────────
+
+    /**
+     * Publishes a generated map to PlaceOS storage. Three steps: reserve the
+     * upload, PUT the contents at the signed URL, then mark it complete.
+     */
+    public async uploadSvg(
+        svg_content: string,
+        filename: string,
+    ): Promise<{ upload_id: string; file_url: string }> {
+        const blob = new Blob([svg_content], { type: 'image/svg+xml' });
+        const upload = await this._request<PlaceOSUpload>(
+            '/uploads',
+            {},
+            {
+                method: 'POST',
+                body: JSON.stringify({
+                    file_name: filename,
+                    file_size: blob.size,
+                    file_mime: 'image/svg+xml',
+                    public: true,
+                }),
+            },
+        );
+
+        const stored = await fetch(upload.upload_url, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'image/svg+xml',
+                ...upload.upload_headers,
+            },
+            body: svg_content,
+        });
+        if (!stored.ok)
+            throw new Error(`Upload to storage failed: ${stored.status}`);
+
+        const finalised = await this._request<{ public_url?: string }>(
+            `/uploads/${upload.id}`,
+            {},
+            { method: 'PUT', body: JSON.stringify({ upload_complete: true }) },
+        );
+
+        return {
+            upload_id: upload.id,
+            file_url:
+                finalised.public_url ??
+                `/api/engine/v2/uploads/${upload.id}/url`,
+        };
+    }
+
+    private async _request<T>(
+        path: string,
+        params: Record<string, string> = {},
+        options: RequestInit = {},
+    ): Promise<T> {
+        const { domain, api_key } = this._settings();
+        if (!api_key) throw new Error('PlaceOS not configured');
+        const query = new URLSearchParams(params).toString();
+        const response = await fetch(
+            `${domain}/api/engine/v2${path}${query ? `?${query}` : ''}`,
+            {
+                ...options,
+                headers: {
+                    'X-API-Key': api_key,
+                    'Content-Type': 'application/json',
+                    ...(options.headers ?? {}),
+                },
+            },
+        );
+        if (!response.ok) {
+            const detail = await response.text().catch(() => '');
+            throw new Error(
+                `PlaceOS ${response.status}: ${detail || response.statusText}`,
+            );
+        }
+        return response.json() as Promise<T>;
+    }
+}

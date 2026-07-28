@@ -16,6 +16,7 @@
                 "tsConfig": "apps/map-builder/tsconfig.app.json",
                 "assets": [
                     "apps/map-builder/src/favicon.ico",
+                    "apps/map-builder/src/favicon.svg",
                     "apps/map-builder/src/assets",
                     {
                         "glob": "**",
