@@ -30,7 +30,7 @@ export class CustomTooltipData<T = any> {
     template: `
         <ng-content />
 
-        <ng-template cdk-portal>
+        <ng-template cdkPortal>
             <div custom-tooltip class="pointer-events-none">
                 @switch (type()) {
                     @case ('component') {
@@ -39,7 +39,7 @@ export class CustomTooltipData<T = any> {
                         />
                     }
                     @case ('html') {
-                        <div [innerHTML]="content | sanitize"></div>
+                        <div [innerHTML]="content()"></div>
                     }
                     @default {
                         <ng-container
@@ -50,7 +50,7 @@ export class CustomTooltipData<T = any> {
             </div>
         </ng-template>
     `,
-    imports: [NgComponentOutlet, NgTemplateOutlet],
+    imports: [CdkPortal, NgComponentOutlet, NgTemplateOutlet],
 })
 export class CustomTooltipComponent<T = any>
     extends BaseClass
@@ -92,9 +92,9 @@ export class CustomTooltipComponent<T = any>
     @HostListener('click') public readonly onClick = () =>
         this.hover() ? '' : this.open();
     @HostListener('mouseenter') public readonly onEnter = () =>
-        this.hover() ? this.open : '';
+        this.hover() ? this.open() : '';
     @HostListener('mouseleave') public readonly onLeave = () =>
-        this.hover() ? this.close : '';
+        this.hover() ? this.close() : '';
 
     public ngOnChanges(changes: SimpleChanges): void {
         this._updateInjector();
@@ -112,7 +112,6 @@ export class CustomTooltipComponent<T = any>
     }
 
     public open() {
-        console.log('Open Tooltip');
         this._updateType();
         if (this._overlay_ref) this.close();
         const _portal = this._portal();
