@@ -66,12 +66,30 @@ interface EdgeHover {
     py: number;
 }
 
+interface PanState {
+    x: number;
+    y: number;
+    scrollLeft: number;
+    scrollTop: number;
+    /** Set when the pan started on empty space with the select tool */
+    deselect: boolean;
+    moved: boolean;
+}
+
+/** Wheel zoom steps, matching <dynamic-map> */
+const ZOOM_STEP_IN = 1.03;
+const ZOOM_STEP_OUT = 0.97;
+/** Pointer travel, in px, before a click counts as a drag — as <dynamic-map> */
+const DRAG_THRESHOLD = 5;
+
+const clamp01 = (value: number) => Math.max(0, Math.min(1, value));
+
 @Component({
     selector: 'map-builder-canvas',
     template: `
         <div
             #container
-            class="bg-base-200 relative h-full w-full overflow-auto"
+            class="bg-base-200 relative flex h-full w-full overflow-auto p-4"
             (wheel)="onWheel($event)"
         >
             <svg
@@ -80,11 +98,10 @@ interface EdgeHover {
                 preserveAspectRatio="xMidYMid meet"
                 [style.width.%]="state.zoom() * 100"
                 [style.cursor]="cursor()"
-                class="block"
+                class="m-auto block shrink-0"
                 (mousedown)="onMouseDown($event)"
                 (mousemove)="onMouseMove($event)"
                 (mouseup)="onMouseUp()"
-                (mouseleave)="onMouseUp()"
                 (dblclick)="onDoubleClick($event)"
             >
                 @if (state.grid_enabled()) {
@@ -565,13 +582,8 @@ export class CanvasComponent {
     private readonly _edge_hover = signal<EdgeHover | null>(null);
     private readonly _panning = signal(false);
 
-    private _space_held = false;
-    private _pan_start: {
-        x: number;
-        y: number;
-        scrollLeft: number;
-        scrollTop: number;
-    } | null = null;
+    private readonly _space_held = signal(false);
+    private _pan_start: PanState | null = null;
 
     public readonly width = this.state.canvas_width;
     public readonly height = this.state.canvas_height;
@@ -591,6 +603,7 @@ export class CanvasComponent {
 
     public readonly cursor = computed(() => {
         if (this._panning()) return 'grabbing';
+        if (this._space_held()) return 'grab';
         if (this._dragging()) return 'grabbing';
         const resizing = this._resizing();
         if (resizing) return HANDLE_CURSORS[resizing.handle];
@@ -902,20 +915,13 @@ export class CanvasComponent {
     // ── Pointer interaction ─────────────────────────────────────────────────
 
     public onMouseDown(event: MouseEvent) {
-        if (event.button !== 0) return;
-
-        if (this._space_held) {
-            const container = this._containerEl();
-            this._panning.set(true);
-            this._pan_start = {
-                x: event.clientX,
-                y: event.clientY,
-                scrollLeft: container.scrollLeft,
-                scrollTop: container.scrollTop,
-            };
+        // Middle button and space+drag pan from anywhere, as <dynamic-map> does
+        if (event.button === 1 || (event.button === 0 && this._space_held())) {
+            this._startPan(event, false);
             event.preventDefault();
             return;
         }
+        if (event.button !== 0) return;
 
         const { x, y } = this._toCanvas(event.clientX, event.clientY);
         const tool = this.state.active_tool();
@@ -1013,18 +1019,33 @@ export class CanvasComponent {
             event.preventDefault();
             return;
         }
-        this.state.select(null);
-        this.state.clearMultiSelect();
+        // Empty space: drag pans, a click without travel clears the selection
+        this._startPan(event, true);
+    }
+
+    private _startPan(event: MouseEvent, deselect: boolean) {
+        const container = this._containerEl();
+        this._panning.set(true);
+        this._pan_start = {
+            x: event.clientX,
+            y: event.clientY,
+            scrollLeft: container.scrollLeft,
+            scrollTop: container.scrollTop,
+            deselect,
+            moved: false,
+        };
     }
 
     public onMouseMove(event: MouseEvent) {
-        if (this._panning() && this._pan_start) {
+        const pan = this._pan_start;
+        if (this._panning() && pan) {
+            const dx = event.clientX - pan.x;
+            const dy = event.clientY - pan.y;
+            if (Math.abs(dx) > DRAG_THRESHOLD || Math.abs(dy) > DRAG_THRESHOLD)
+                pan.moved = true;
             const container = this._containerEl();
-            container.scrollLeft =
-                this._pan_start.scrollLeft -
-                (event.clientX - this._pan_start.x);
-            container.scrollTop =
-                this._pan_start.scrollTop - (event.clientY - this._pan_start.y);
+            container.scrollLeft = pan.scrollLeft - dx;
+            container.scrollTop = pan.scrollTop - dy;
             return;
         }
 
@@ -1086,8 +1107,13 @@ export class CanvasComponent {
 
     public onMouseUp() {
         if (this._panning()) {
+            const pan = this._pan_start;
             this._panning.set(false);
             this._pan_start = null;
+            if (pan?.deselect && !pan.moved) {
+                this.state.select(null);
+                this.state.clearMultiSelect();
+            }
             return;
         }
         const rotating = this._rotating();
@@ -1138,10 +1164,33 @@ export class CanvasComponent {
         event.preventDefault();
     }
 
+    /**
+     * Wheel zooms, anchored at the pointer, matching <dynamic-map>. There is no
+     * wheel scrolling — pan by dragging, as the viewer does.
+     */
     public onWheel(event: WheelEvent) {
-        if (!event.ctrlKey && !event.metaKey) return;
         event.preventDefault();
-        this.state.zoomBy(event.deltaY > 0 ? 0.9 : 1.1);
+        const container = this._containerEl();
+        const svg = this._canvas().nativeElement;
+        const rect = container.getBoundingClientRect();
+        const map = svg.getBoundingClientRect();
+        const offset_x = event.clientX - rect.left;
+        const offset_y = event.clientY - rect.top;
+        // Where the cursor sits on the map, as a fraction of it
+        const fraction_x = clamp01((event.clientX - map.left) / map.width);
+        const fraction_y = clamp01((event.clientY - map.top) / map.height);
+        const before = this.state.zoom();
+        this.state.zoomBy(event.deltaY > 0 ? ZOOM_STEP_OUT : ZOOM_STEP_IN);
+        if (this.state.zoom() === before) return;
+        // The canvas resizes on the next frame; scroll once it has.
+        requestAnimationFrame(() => {
+            const next = svg.getBoundingClientRect();
+            const bounds = container.getBoundingClientRect();
+            container.scrollLeft +=
+                next.left - bounds.left + fraction_x * next.width - offset_x;
+            container.scrollTop +=
+                next.top - bounds.top + fraction_y * next.height - offset_y;
+        });
     }
 
     public onRenameInput(event: Event) {
@@ -1504,6 +1553,32 @@ export class CanvasComponent {
         this.editing.set(null);
     }
 
+    // ── Drags that leave the canvas ─────────────────────────────────────────
+
+    /** Interaction continues off-canvas, like <dynamic-map>'s window listeners */
+    private _interacting() {
+        return !!(
+            this._panning() ||
+            this._dragging() ||
+            this._resizing() ||
+            this._rotating() ||
+            this._vertex_drag() ||
+            this.rect_draw()
+        );
+    }
+
+    @HostListener('window:mousemove', ['$event'])
+    public onWindowMouseMove(event: MouseEvent) {
+        const canvas = this._canvas().nativeElement;
+        if (this._interacting() && !canvas.contains(event.target as Node))
+            this.onMouseMove(event);
+    }
+
+    @HostListener('window:mouseup')
+    public onWindowMouseUp() {
+        if (this._interacting()) this.onMouseUp();
+    }
+
     // ── Space-bar panning ───────────────────────────────────────────────────
 
     @HostListener('window:keydown', ['$event'])
@@ -1516,13 +1591,14 @@ export class CanvasComponent {
         )
             return;
         event.preventDefault();
-        this._space_held = true;
+        this._space_held.set(true);
     }
 
     @HostListener('window:keyup', ['$event'])
     public onKeyUp(event: KeyboardEvent) {
         if (event.code !== 'Space') return;
-        this._space_held = false;
+        this._space_held.set(false);
         this._panning.set(false);
+        this._pan_start = null;
     }
 }

@@ -143,24 +143,6 @@ const TOOLS: { id: Tool; label: string; key: string; icon: string }[] = [
                 </button>
 
                 <div class="ml-auto flex shrink-0 items-center gap-2">
-                    <span class="text-base-content/60 text-xs">
-                        {{ zoomPercent() }}%
-                    </span>
-                    <button
-                        class="border-base-300 bg-base-100 hover:bg-base-200 rounded border p-1 text-base"
-                        title="Zoom out"
-                        (click)="state.zoomBy(0.9)"
-                    >
-                        <app-icon>zoom_out</app-icon>
-                    </button>
-                    <button
-                        class="border-base-300 bg-base-100 hover:bg-base-200 rounded border p-1 text-base"
-                        title="Zoom in"
-                        (click)="state.zoomBy(1.1)"
-                    >
-                        <app-icon>zoom_in</app-icon>
-                    </button>
-
                     <label
                         class="border-base-300 bg-base-100 hover:bg-base-200 shrink-0 cursor-pointer rounded border p-1 text-base"
                         title="Upload a background image"
@@ -245,6 +227,32 @@ const TOOLS: { id: Tool; label: string; key: string; icon: string }[] = [
                     <!-- Canvas -->
                     <main class="relative min-w-0 flex-1">
                         <map-builder-canvas />
+                        <!-- Zoom controls, matching <dynamic-map>'s overlay stack -->
+                        <div
+                            class="border-base-300 bg-base-100 absolute top-3 right-3 z-20 flex flex-col overflow-hidden rounded border shadow"
+                        >
+                            <button
+                                class="hover:bg-base-200 border-base-300 border-b p-1 text-base"
+                                title="Zoom in"
+                                (click)="state.zoomBy(1.1)"
+                            >
+                                <app-icon>add</app-icon>
+                            </button>
+                            <button
+                                class="hover:bg-base-200 border-base-300 border-b p-1 text-base"
+                                title="Zoom out"
+                                (click)="state.zoomBy(10 / 11)"
+                            >
+                                <app-icon>remove</app-icon>
+                            </button>
+                            <button
+                                class="hover:bg-base-200 p-1 text-base"
+                                title="Reset zoom"
+                                (click)="resetView()"
+                            >
+                                <app-icon>refresh</app-icon>
+                            </button>
+                        </div>
                         @if (canvas()?.containerEl(); as container) {
                             <map-builder-minimap [container]="container" />
                         }
@@ -300,6 +308,7 @@ const TOOLS: { id: Tool; label: string; key: string; icon: string }[] = [
                         {{ state.canvas_width() }} ×
                         {{ state.canvas_height() }}
                     </span>
+                    <span>{{ zoomPercent() }}%</span>
                     @if (canvas()?.cursor_coords(); as coords) {
                         <span>{{ coords.x }}, {{ coords.y }}</span>
                     }
@@ -379,6 +388,12 @@ export class EditorComponent {
     constructor() {
         const id = this._route.snapshot.paramMap.get('floorplan_id') ?? '';
         this.state.load(id);
+    }
+
+    /** Reset zoom and scroll back to the origin, like <dynamic-map>'s reset. */
+    public resetView() {
+        this.state.setZoom(1);
+        this.canvas()?.containerEl()?.scrollTo({ top: 0, left: 0 });
     }
 
     public pickTool(tool: Tool) {

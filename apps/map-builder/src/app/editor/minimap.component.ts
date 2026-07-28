@@ -2,6 +2,7 @@ import {
     Component,
     ElementRef,
     computed,
+    effect,
     inject,
     input,
     signal,
@@ -25,6 +26,9 @@ const TYPE_COLORS: Record<string, string> = {
 };
 
 const MINIMAP_WIDTH = 180;
+
+const clamp = (value: number, min: number, max: number) =>
+    Math.max(min, Math.min(max, value));
 
 @Component({
     selector: 'map-builder-minimap',
@@ -145,22 +149,45 @@ export class MinimapComponent {
         Math.max((this.state.canvas_width() / MINIMAP_WIDTH) * 1.5, 3),
     );
 
+    /** The canvas SVG, which is centred and padded inside the container */
+    private _mapEl() {
+        return this.container()?.querySelector('svg') ?? null;
+    }
+
     /** Portion of the canvas currently on screen, in canvas units */
     public readonly viewport = computed(() => {
         this._tick();
         const element = this.container();
+        const map = this._mapEl();
         const width = this.state.canvas_width();
         const height = this.state.canvas_height();
-        const zoom = this.state.zoom();
-        if (!element) return { x: 0, y: 0, w: width, h: height };
-        const displayW = width * zoom;
-        const displayH = height * zoom;
-        return {
-            x: (element.scrollLeft / displayW) * width,
-            y: (element.scrollTop / displayH) * height,
-            w: Math.min((element.clientWidth / displayW) * width, width),
-            h: Math.min((element.clientHeight / displayH) * height, height),
-        };
+        if (!element || !map) return { x: 0, y: 0, w: width, h: height };
+        // Measure rather than model the layout — the map is centred and padded
+        const view = element.getBoundingClientRect();
+        const bounds = map.getBoundingClientRect();
+        if (!bounds.width || !bounds.height)
+            return { x: 0, y: 0, w: width, h: height };
+        const left = clamp(
+            ((view.left - bounds.left) / bounds.width) * width,
+            0,
+            width,
+        );
+        const right = clamp(
+            ((view.right - bounds.left) / bounds.width) * width,
+            0,
+            width,
+        );
+        const top = clamp(
+            ((view.top - bounds.top) / bounds.height) * height,
+            0,
+            height,
+        );
+        const bottom = clamp(
+            ((view.bottom - bounds.top) / bounds.height) * height,
+            0,
+            height,
+        );
+        return { x: left, y: top, w: right - left, h: bottom - top };
     });
 
     public readonly colorFor = (object: MapObject) =>
@@ -171,6 +198,11 @@ export class MinimapComponent {
 
     constructor() {
         const refresh = () => this._tick.update((n) => n + 1);
+        // Zooming resizes the canvas with no scroll event — measure once it has
+        effect(() => {
+            this.state.zoom();
+            requestAnimationFrame(refresh);
+        });
         // The container is an input, so wait a tick before subscribing
         queueMicrotask(() => {
             this.container()?.addEventListener('scroll', refresh, {
@@ -189,16 +221,24 @@ export class MinimapComponent {
     public navigate(event: MouseEvent) {
         const element = this.container();
         const frame = this._frame()?.nativeElement;
-        if (!element || !frame) return;
+        const map = this._mapEl();
+        if (!element || !frame || !map) return;
         const rect = frame.getBoundingClientRect();
-        const width = this.state.canvas_width();
-        const height = this.state.canvas_height();
-        const zoom = this.state.zoom();
-        const mx = ((event.clientX - rect.left) / MINIMAP_WIDTH) * width;
-        const my = ((event.clientY - rect.top) / this.minimapHeight()) * height;
+        const view = element.getBoundingClientRect();
+        const bounds = map.getBoundingClientRect();
+        const fraction_x = (event.clientX - rect.left) / MINIMAP_WIDTH;
+        const fraction_y = (event.clientY - rect.top) / this.minimapHeight();
         element.scrollTo({
-            left: (mx / width) * width * zoom - element.clientWidth / 2,
-            top: (my / height) * height * zoom - element.clientHeight / 2,
+            left:
+                element.scrollLeft +
+                (bounds.left - view.left) +
+                fraction_x * bounds.width -
+                element.clientWidth / 2,
+            top:
+                element.scrollTop +
+                (bounds.top - view.top) +
+                fraction_y * bounds.height -
+                element.clientHeight / 2,
             behavior: 'smooth',
         });
     }
