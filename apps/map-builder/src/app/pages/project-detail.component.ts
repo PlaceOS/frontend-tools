@@ -9,7 +9,7 @@ import { StoreService } from '../data/store.service';
 import { Floorplan, Project } from '../data/types';
 
 const BADGE_CLASSES: Record<string, string> = {
-    draft: 'bg-base-200 text-base-content/60',
+    draft: 'border-base-300 text-base-content/60 border',
     published: 'bg-success-light text-success',
     archived: 'bg-warning-light text-warning',
 };

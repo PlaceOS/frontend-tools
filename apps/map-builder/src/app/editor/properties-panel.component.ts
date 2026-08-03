@@ -102,7 +102,7 @@ function generateSvgId(type: MapObjectType, label: string | null): string {
                                 id="pp-x"
                                 type="number"
                                 class="border-base-300 bg-base-200 w-full rounded border px-2 py-1 text-xs"
-                                [value]="object.geometry.x ?? 0"
+                                [value]="rounded(object.geometry.x)"
                                 readonly
                             />
                         </div>
@@ -112,7 +112,7 @@ function generateSvgId(type: MapObjectType, label: string | null): string {
                                 id="pp-y"
                                 type="number"
                                 class="border-base-300 bg-base-200 w-full rounded border px-2 py-1 text-xs"
-                                [value]="object.geometry.y ?? 0"
+                                [value]="rounded(object.geometry.y)"
                                 readonly
                             />
                         </div>
@@ -123,7 +123,7 @@ function generateSvgId(type: MapObjectType, label: string | null): string {
                                 type="number"
                                 min="1"
                                 class="border-base-300 w-full rounded border px-2 py-1 text-xs"
-                                [value]="object.geometry.width ?? 0"
+                                [value]="rounded(object.geometry.width)"
                                 (change)="set(object, 'width', asValue($event))"
                             />
                         </div>
@@ -134,7 +134,7 @@ function generateSvgId(type: MapObjectType, label: string | null): string {
                                 type="number"
                                 min="1"
                                 class="border-base-300 w-full rounded border px-2 py-1 text-xs"
-                                [value]="object.geometry.height ?? 0"
+                                [value]="rounded(object.geometry.height)"
                                 (change)="
                                     set(object, 'height', asValue($event))
                                 "
@@ -150,7 +150,7 @@ function generateSvgId(type: MapObjectType, label: string | null): string {
                             min="0"
                             max="360"
                             class="border-base-300 w-full rounded border px-2 py-1 text-xs"
-                            [value]="object.geometry.rotation ?? 0"
+                            [value]="rounded(object.geometry.rotation)"
                             (change)="set(object, 'rotation', asValue($event))"
                         />
                     </div>
@@ -336,6 +336,10 @@ export class PropertiesPanelComponent {
         (event.target as HTMLInputElement).checked;
 
     public readonly percent = (value: number) => `${Math.round(value * 100)}%`;
+
+    /** Drag-rotation lands on long floats — show something readable */
+    public readonly rounded = (value: number | undefined) =>
+        Math.round(value ?? 0);
 
     public readonly suggestedId = (object: MapObject) =>
         generateSvgId(object.object_type, object.label);

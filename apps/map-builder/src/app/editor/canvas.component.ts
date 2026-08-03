@@ -222,7 +222,7 @@ const clamp01 = (value: number) => Math.max(0, Math.min(1, value));
                                         font-weight="600"
                                         class="pointer-events-none select-none"
                                     >
-                                        {{ object.label }}
+                                        {{ labelText(object) }}
                                     </text>
                                 }
                                 @if (availabilityLabel(object); as badge) {
@@ -598,6 +598,31 @@ export class CanvasComponent {
         return this._container()?.nativeElement as HTMLDivElement;
     }
 
+    /** Centre an object in the viewport — used when picking it from a list */
+    public scrollIntoView(object: MapObject) {
+        const container = this._containerEl();
+        if (!container) return;
+        const svg = this._canvas().nativeElement;
+        const rect = svg.getBoundingClientRect();
+        const bounds = container.getBoundingClientRect();
+        const scale = rect.width / svg.viewBox.baseVal.width;
+        container.scrollTo({
+            left:
+                container.scrollLeft +
+                rect.left -
+                bounds.left +
+                this.centerX(object) * scale -
+                container.clientWidth / 2,
+            top:
+                container.scrollTop +
+                rect.top -
+                bounds.top +
+                this.centerY(object) * scale -
+                container.clientHeight / 2,
+            behavior: 'smooth',
+        });
+    }
+
     public readonly min = Math.min;
     public readonly abs = Math.abs;
 
@@ -727,11 +752,30 @@ export class CanvasComponent {
     }
 
     public centerX(object: MapObject) {
+        const points = object.geometry.points;
+        if (object.geometry.type === 'polygon' && points?.length)
+            return points.reduce((sum, p) => sum + p.x, 0) / points.length;
         return (object.geometry.x ?? 0) + (object.geometry.width ?? 0) / 2;
     }
 
     public centerY(object: MapObject) {
+        const points = object.geometry.points;
+        if (object.geometry.type === 'polygon' && points?.length)
+            return points.reduce((sum, p) => sum + p.y, 0) / points.length;
         return (object.geometry.y ?? 0) + (object.geometry.height ?? 0) / 2;
+    }
+
+    /**
+     * Clip the label to what the shape can hold. Arial's average glyph runs a
+     * little over half the font size, which is close enough to keep text inside
+     * the box without measuring it.
+     */
+    public labelText(object: MapObject) {
+        const label = object.label ?? '';
+        const fits = Math.floor(
+            (object.geometry.width ?? 0) / (this.labelSize(object) * 0.55),
+        );
+        return label.length > fits ? `${label.slice(0, Math.max(1, fits - 1))}…` : label;
     }
 
     public labelSize(object: MapObject) {

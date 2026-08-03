@@ -25,22 +25,18 @@ const ICONS: Record<PickerKind, string> = {
 @Component({
     selector: 'map-builder-asset-picker',
     template: `
-        <div class="flex shrink-0 items-center gap-1">
+        <div class="flex shrink-0 items-center gap-0.5">
             @for (kind of kinds; track kind) {
                 <button
                     customTooltip
                     xPosition="start"
                     [content]="menu"
                     [data]="{ $implicit: kind }"
-                    class="border-base-300 flex shrink-0 items-center rounded border p-1.5"
-                    [class]="
-                        state.placing()?.kind === kind
-                            ? 'bg-primary text-primary-content border-primary'
-                            : 'bg-base-100 hover:bg-base-200'
-                    "
+                    [class]="buttonClass(state.placing()?.kind === kind)"
                     [title]="'Place ' + labelFor(kind)"
                 >
-                    <app-icon class="text-lg">{{ iconFor(kind) }}</app-icon>
+                    <app-icon class="text-base">{{ iconFor(kind) }}</app-icon>
+                    {{ labelFor(kind) }}
                     <app-icon class="text-sm">expand_more</app-icon>
                 </button>
             }
@@ -101,6 +97,13 @@ export class AssetPickerComponent {
         'desk-layout',
     ];
     public readonly desk_layouts = DESK_LAYOUTS;
+
+    /** Same shape as the editor toolbar's buttons */
+    public readonly buttonClass = (active: boolean) =>
+        'inline-flex shrink-0 items-center gap-1 rounded-md border px-2 py-1.5 text-xs font-medium leading-none whitespace-nowrap ' +
+        (active
+            ? 'bg-primary/10 text-primary border-primary/30'
+            : 'text-base-content/60 hover:bg-base-200 hover:text-base-content border-transparent');
 
     public readonly labelFor = (kind: PickerKind) => LABELS[kind];
 

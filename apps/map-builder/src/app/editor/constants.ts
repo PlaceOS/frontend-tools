@@ -617,3 +617,22 @@ export const DESK_LAYOUTS: DeskLayout[] = [
         gap: 1,
     },
 ];
+
+// ── Sidebar sizing ──────────────────────────────────────────────────────────
+
+export const SIDEBAR_MIN = 180;
+export const SIDEBAR_MAX = 520;
+export const SIDEBAR_DEFAULTS = { left: 256, right: 320 };
+
+export const clampSidebar = (width: number) =>
+    Math.min(Math.max(Math.round(width) || 0, SIDEBAR_MIN), SIDEBAR_MAX);
+
+/**
+ * Width a sidebar should take after dragging its handle `delta` pixels right.
+ * The right sidebar grows as the pointer moves left, so its delta inverts.
+ */
+export const nextSidebarWidth = (
+    start: number,
+    delta: number,
+    side: 'left' | 'right',
+) => clampSidebar(start + (side === 'left' ? delta : -delta));

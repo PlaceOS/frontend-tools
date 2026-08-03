@@ -133,7 +133,7 @@ function loadStored(): ImportedId[] {
                             </div>
                             @if (state.selected(); as selected) {
                                 <div
-                                    class="bg-primary-light border-primary text-primary rounded border px-2.5 py-1.5 text-xs font-semibold"
+                                    class="bg-primary/10 border-primary text-primary rounded border px-2.5 py-1.5 text-xs font-semibold"
                                 >
                                     Selected:
                                     {{
@@ -172,7 +172,7 @@ function loadStored(): ImportedId[] {
                             >
                                 @for (item of unassigned(); track item.id) {
                                     <div
-                                        class="border-base-300 hover:bg-primary-light flex items-center gap-2 border-b px-2.5 py-1 text-xs"
+                                        class="border-base-300 hover:bg-primary/10 flex items-center gap-2 border-b px-2.5 py-1 text-xs"
                                         [class.cursor-pointer]="
                                             !!state.selected()
                                         "

@@ -1,5 +1,5 @@
 import { Component, OnDestroy, computed, inject, signal } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { IconComponent } from '@placeos-tools/components';
 
 import { StoreService } from '../data/store.service';
@@ -16,6 +16,7 @@ import { FloorPlan2dComponent } from './floor-plan-2d.component';
 const LEGEND_STATES: AvailabilityState[] = [
     'free',
     'booked',
+    'pending',
     'occupied',
     'checked-in',
     'out-of-service',
@@ -43,20 +44,30 @@ const LEGEND_STATES: AvailabilityState[] = [
                 <header
                     class="bg-base-200 border-base-300 flex shrink-0 items-center gap-4 border-b px-6 py-3"
                 >
-                    <div>
-                        <div class="text-lg font-bold">
+                    @if (project(); as detail) {
+                        <a
+                            class="border-base-300 text-base-content/60 hover:text-base-content shrink-0 rounded-lg border p-2 text-xl no-underline"
+                            title="Back to project"
+                            [routerLink]="['/project', detail.id]"
+                        >
+                            <app-icon>arrow_back</app-icon>
+                        </a>
+                    }
+
+                    <div class="min-w-0">
+                        <div class="truncate text-lg font-bold">
                             {{
                                 project()?.building_name ||
                                     project()?.name ||
                                     'Building'
                             }}
                         </div>
-                        <div class="text-base-content/60 text-sm">
+                        <div class="text-base-content/60 truncate text-sm">
                             {{ floorplan()?.floor_name || 'Level 1' }}
                         </div>
                     </div>
 
-                    <div class="relative mx-auto w-96">
+                    <div class="relative mx-auto w-full max-w-96 min-w-32">
                         <input
                             class="bg-base-100 border-base-300 w-full rounded-lg border px-3 py-2 text-sm"
                             placeholder="Search rooms & desks..."
@@ -75,8 +86,9 @@ const LEGEND_STATES: AvailabilityState[] = [
                                 class="bg-base-200 border-base-300 absolute top-full right-0 left-0 z-20 mt-1 overflow-hidden rounded-lg border shadow-lg"
                             >
                                 @for (result of results(); track result.id) {
-                                    <div
-                                        class="border-base-300 flex items-center gap-2 border-b px-3 py-2 text-sm last:border-b-0"
+                                    <button
+                                        class="border-base-300 hover:bg-base-300 flex w-full items-center gap-2 border-b px-3 py-2 text-left text-sm last:border-b-0"
+                                        (click)="reveal(result)"
                                     >
                                         <span
                                             class="h-2 w-2 shrink-0 rounded-full"
@@ -95,7 +107,7 @@ const LEGEND_STATES: AvailabilityState[] = [
                                                 {{ state }}
                                             </span>
                                         }
-                                    </div>
+                                    </button>
                                 }
                                 @if (!results().length) {
                                     <div
@@ -205,6 +217,7 @@ const LEGEND_STATES: AvailabilityState[] = [
                                 [availability]="polling.states()"
                                 [heatmap_enabled]="heatmap()"
                                 [image_url]="image_url()"
+                                [highlight]="highlight()"
                             />
                         }
 
@@ -273,7 +286,7 @@ const LEGEND_STATES: AvailabilityState[] = [
             }
         </div>
     `,
-    imports: [FloorPlan2dComponent, IconComponent],
+    imports: [FloorPlan2dComponent, IconComponent, RouterLink],
 })
 export class KioskComponent implements OnDestroy {
     private readonly _store = inject(StoreService);
@@ -291,6 +304,8 @@ export class KioskComponent implements OnDestroy {
     public readonly heatmap = signal(false);
     public readonly share_open = signal(false);
     public readonly search = signal('');
+    /** Search hit the map should call out */
+    public readonly highlight = signal<string | null>(null);
     public readonly copied = signal('');
     public readonly clock = signal(this._now());
 
@@ -411,6 +426,7 @@ export class KioskComponent implements OnDestroy {
     private async _openFloor(id: string) {
         if (!id) return;
         this.floorplan_id.set(id);
+        this.highlight.set(null);
         const [floorplan, objects, image_url] = await Promise.all([
             this._store.getFloorplan(id),
             this._store.listObjects(id),
@@ -424,6 +440,12 @@ export class KioskComponent implements OnDestroy {
 
     public pickFloor(id: string) {
         if (id !== this.floorplan_id()) this._openFloor(id);
+    }
+
+    /** Close the search and call the picked space out on the plan */
+    public reveal(object: MapObject) {
+        this.search.set('');
+        this.highlight.set(object.id);
     }
 
     public async copyLink() {

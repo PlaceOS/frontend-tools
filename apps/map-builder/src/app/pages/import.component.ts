@@ -108,7 +108,7 @@ interface ObjectMapping {
                     }
 
                     <label
-                        class="bg-base-100 flex cursor-pointer flex-col items-center rounded-xl border-2 border-dashed px-8 py-16 text-center transition-colors"
+                        class="bg-base-100 focus-within:ring-primary flex cursor-pointer flex-col items-center rounded-xl border-2 border-dashed px-8 py-16 text-center transition-colors focus-within:ring-2"
                         [class]="
                             drag_over() ? 'border-primary' : 'border-base-300'
                         "
@@ -132,10 +132,11 @@ interface ObjectMapping {
                                 or click to browse
                             </p>
                         }
+                        <!-- sr-only, not hidden, so the input stays keyboard reachable -->
                         <input
                             type="file"
                             accept=".svg"
-                            class="hidden"
+                            class="sr-only"
                             (change)="onFileInput($event)"
                         />
                     </label>

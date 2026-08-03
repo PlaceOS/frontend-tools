@@ -16,7 +16,7 @@ const formatDate = (iso: string) =>
     });
 
 const BADGE_CLASSES: Record<Project['status'], string> = {
-    draft: 'bg-base-200 text-base-content/60',
+    draft: 'border-base-300 text-base-content/60 border',
     published: 'bg-success-light text-success',
     archived: 'bg-warning-light text-warning',
 };
@@ -137,18 +137,23 @@ const BADGE_CLASSES: Record<Project['status'], string> = {
                 >
                     @for (project of projects(); track project.id) {
                         <div
-                            class="bg-base-100 border-base-300 cursor-pointer rounded-lg border p-5 shadow-sm transition-shadow hover:shadow-md focus-visible:shadow-md"
-                            role="button"
-                            tabindex="0"
+                            class="bg-base-100 border-base-300 focus-within:ring-primary flex cursor-pointer flex-col rounded-lg border p-5 shadow-sm transition-shadow hover:shadow-md focus-within:ring-2"
                             (click)="open(project)"
-                            (keyup.enter)="open(project)"
                         >
                             <div class="mb-3 flex items-start justify-between">
                                 <div class="min-w-0 flex-1">
                                     <h3
                                         class="mb-1 truncate text-base font-semibold"
                                     >
-                                        {{ project.name }}
+                                        <a
+                                            class="no-underline outline-none"
+                                            [routerLink]="[
+                                                '/project',
+                                                project.id,
+                                            ]"
+                                        >
+                                            {{ project.name }}
+                                        </a>
                                     </h3>
                                     @if (project.building_name) {
                                         <p class="text-base-content/60 text-xs">
@@ -165,7 +170,7 @@ const BADGE_CLASSES: Record<Project['status'], string> = {
                             </div>
 
                             <div
-                                class="border-base-300 mt-3 flex items-center justify-between border-t pt-3"
+                                class="border-base-300 mt-auto flex items-center justify-between border-t pt-3"
                             >
                                 <div
                                     class="text-base-content/60 flex gap-4 text-xs"

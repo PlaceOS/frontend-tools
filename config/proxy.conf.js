@@ -1,5 +1,5 @@
 /** FQDN to proxy requests. i.e. No protocol and path should be in the value */
-const domain = 'pwcme.dev.place.tech';
+const domain = 'placeos-dev.aca.im';
 /** Whether the proxied endpoints use SSL */
 const secure = true;
 /** Whether the SSL certificate used is valid on the internet */

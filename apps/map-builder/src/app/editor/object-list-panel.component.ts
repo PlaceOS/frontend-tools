@@ -69,7 +69,7 @@ const TYPE_ORDER = [
                             class="h-2 w-2 shrink-0 rounded-sm"
                             [style.background]="colorFor(group.type)"
                         ></span>
-                        <span>{{ group.type }}s</span>
+                        <span>{{ plural(group.type) }}</span>
                         <span
                             class="bg-base-100 ml-auto rounded-full px-1.5 text-[0.65rem] font-semibold"
                         >
@@ -81,14 +81,10 @@ const TYPE_ORDER = [
                         @for (object of group.items; track object.id) {
                             <div
                                 class="border-base-300 hover:bg-base-200 flex cursor-pointer items-center gap-2 border-b border-l-2 border-l-transparent py-1.5 pr-3 pl-7 text-xs"
-                                [class.bg-primary-light]="
+                                [class]="
                                     object.id === state.selected_id()
-                                "
-                                [class.border-l-primary]="
-                                    object.id === state.selected_id()
-                                "
-                                [class.font-semibold]="
-                                    object.id === state.selected_id()
+                                        ? 'bg-primary/10 border-l-primary font-semibold'
+                                        : ''
                                 "
                                 (click)="pick(object)"
                                 (keyup.enter)="pick(object)"
@@ -157,6 +153,9 @@ export class ObjectListPanelComponent {
         (event.target as HTMLInputElement).value;
 
     public readonly colorFor = (type: string) => TYPE_COLORS[type] ?? '#6b7280';
+
+    public readonly plural = (type: string) =>
+        type === 'amenity' ? 'amenities' : `${type}s`;
 
     public readonly groups = computed(() => {
         const query = this.filter().trim().toLowerCase();

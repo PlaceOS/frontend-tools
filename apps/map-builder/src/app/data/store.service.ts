@@ -297,8 +297,13 @@ export class StoreService {
 
     /** Object URL for the stored background image, or null if there isn't one */
     public async getSourceImageUrl(id: string): Promise<string | null> {
-        const blob = await this._db.get<Blob>(key.image(id));
+        const blob = await this.getSourceImage(id);
         return blob ? URL.createObjectURL(blob) : null;
+    }
+
+    /** Raw source image used by local processing such as AI analysis. */
+    public async getSourceImage(id: string): Promise<Blob | null> {
+        return (await this._db.get<Blob>(key.image(id))) ?? null;
     }
 
     // ── SVG import ──────────────────────────────────────────────────────────

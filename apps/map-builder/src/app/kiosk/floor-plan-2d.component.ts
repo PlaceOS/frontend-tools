@@ -124,8 +124,8 @@ const DEFAULT_STROKE = '#475569';
                 @for (object of shapes(); track object.id) {
                     <g
                         class="cursor-pointer"
-                        (mouseenter)="hovered.set(object.id)"
-                        (mouseleave)="hovered.set(null)"
+                        (mouseenter)="hover.set(object.id)"
+                        (mouseleave)="hover.set(null)"
                     >
                         @switch (object.geometry.type) {
                             @case ('rect') {
@@ -225,8 +225,8 @@ const DEFAULT_STROKE = '#475569';
                 @for (object of amenities(); track object.id) {
                     <g
                         class="cursor-pointer"
-                        (mouseenter)="hovered.set(object.id)"
-                        (mouseleave)="hovered.set(null)"
+                        (mouseenter)="hover.set(object.id)"
+                        (mouseleave)="hover.set(null)"
                     >
                         <circle
                             [attr.cx]="object.geometry.x ?? 0"
@@ -309,8 +309,13 @@ export class FloorPlan2dComponent {
         input.required<Record<string, AvailabilityState>>();
     public readonly heatmap_enabled = input(false);
     public readonly image_url = input<string | null>(null);
+    /** Object the kiosk wants called out, e.g. a search hit */
+    public readonly highlight = input<string | null>(null);
 
-    public readonly hovered = signal<string | null>(null);
+    public readonly hover = signal<string | null>(null);
+
+    /** Pointer wins, otherwise whatever the kiosk asked us to call out */
+    public readonly hovered = computed(() => this.hover() ?? this.highlight());
 
     public readonly width = computed(
         () => this.floorplan().canvas_width ?? 1000,

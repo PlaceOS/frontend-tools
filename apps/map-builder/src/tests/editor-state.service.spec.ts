@@ -185,4 +185,9 @@ describe('EditorStateService', () => {
         expect(floorplan.canvas_state?.objects).toHaveLength(1);
         expect(editor.dirty()).toBe(false);
     });
+
+    it('limits zoom to 80%', () => {
+        editor.setZoom(0.5);
+        expect(editor.zoom()).toBe(0.8);
+    });
 });

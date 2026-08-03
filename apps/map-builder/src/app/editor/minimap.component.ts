@@ -47,9 +47,6 @@ const clamp = (value: number, min: number, max: number) =>
                 [style.width.px]="minimapWidth"
                 [style.height.px]="minimapHeight()"
                 (click)="navigate($event)"
-                (keyup.enter)="collapsed.set(true)"
-                tabindex="0"
-                role="button"
             >
                 <button
                     class="text-base-content/40 hover:text-base-content absolute top-0.5 right-0.5 z-10 text-sm"

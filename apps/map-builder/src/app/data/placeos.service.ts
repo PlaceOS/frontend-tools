@@ -20,6 +20,15 @@ export interface PlaceOSConfig {
     has_key: boolean;
 }
 
+export interface PlaceOSAiConfig {
+    system_id: string;
+    model: string;
+}
+
+interface LlmChoice {
+    message?: { content?: string };
+}
+
 export interface PlaceOSUser {
     name: string;
     email: string;
@@ -124,6 +133,22 @@ export class PlaceOSService {
         };
     }
 
+    /** Map Builder AI is intentionally available only on configured authorities. */
+    public get aiConfig(): PlaceOSAiConfig | null {
+        if (this._mode() !== 'domain') return null;
+        const config = authority()?.config?.['map_builder'];
+        if (!config || typeof config !== 'object') return null;
+        const values = config as Record<string, unknown>;
+        const system_id = values['llm_system_id'];
+        const model = values['llm_model'];
+        return typeof system_id === 'string' &&
+            system_id &&
+            typeof model === 'string' &&
+            model
+            ? { system_id, model }
+            : null;
+    }
+
     public setConfig(domain: string, api_key: string): void {
         const settings = { domain: domain.replace(/\/$/, ''), api_key };
         this._settings.set(settings);
@@ -210,6 +235,46 @@ export class PlaceOSService {
                 body: JSON.stringify(data),
             },
         );
+    }
+
+    // ── AI ──────────────────────────────────────────────────────────────────
+
+    /** Sends one floor-plan image and prompt through the authority's LLM_1. */
+    public async analyzeImage(
+        prompt: string,
+        image: string,
+        media_type = 'image/jpeg',
+    ): Promise<string> {
+        const config = this.aiConfig;
+        if (!config) throw new Error('Map Builder AI is not configured');
+
+        const choices = await this._request<LlmChoice[]>(
+            `/systems/${encodeURIComponent(config.system_id)}/LLM_1/chat`,
+            {},
+            {
+                method: 'POST',
+                body: JSON.stringify([
+                    config.model,
+                    {
+                        role: 'user',
+                        content: [
+                            { type: 'text', text: prompt },
+                            {
+                                type: 'image_url',
+                                image,
+                                media_type,
+                                detail: 'high',
+                            },
+                        ],
+                    },
+                    { type: 'json_object' },
+                    16_000,
+                ]),
+            },
+        );
+        const content = choices[0]?.message?.content;
+        if (!content) throw new Error('The AI returned no analysis');
+        return content;
     }
 
     // ── Uploads ─────────────────────────────────────────────────────────────

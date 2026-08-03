@@ -247,7 +247,7 @@ export class EditorStateService {
 
             const state = floorplan.canvas_state;
             if (state) {
-                if (state.viewport?.zoom) this._zoom.set(state.viewport.zoom);
+                if (state.viewport?.zoom) this.setZoom(state.viewport.zoom);
                 if (state.gridSize) this._grid_size.set(state.gridSize);
                 this._grid_enabled.set(state.gridEnabled ?? true);
                 this._snap_enabled.set(state.snapEnabled ?? true);
@@ -328,9 +328,10 @@ export class EditorStateService {
         this._selected_id.set(id);
     }
 
+    // View settings ride along with the next real save — on their own they are
+    // not unsaved work, and flagging them makes the leave prompt cry wolf.
     public setZoom(zoom: number) {
-        this._zoom.set(Math.min(Math.max(zoom, 0.2), 10));
-        this._dirty.set(true);
+        this._zoom.set(Math.min(Math.max(zoom, 0.8), 10));
     }
 
     public zoomBy(factor: number) {
@@ -339,12 +340,14 @@ export class EditorStateService {
 
     public toggleGrid() {
         this._grid_enabled.update((v) => !v);
-        this._dirty.set(true);
     }
 
     public toggleSnap() {
         this._snap_enabled.update((v) => !v);
-        this._dirty.set(true);
+    }
+
+    public setGridSize(size: number) {
+        this._grid_size.set(Math.min(Math.max(size || 20, 5), 100));
     }
 
     // ── Layers ──────────────────────────────────────────────────────────────
