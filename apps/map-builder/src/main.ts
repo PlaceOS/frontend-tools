@@ -1,6 +1,8 @@
 import {
     enableProdMode,
     importProvidersFrom,
+    inject,
+    provideAppInitializer,
     provideZonelessChangeDetection,
 } from '@angular/core';
 import { bootstrapApplication } from '@angular/platform-browser';
@@ -8,6 +10,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { provideRouter, Route, withHashLocation } from '@angular/router';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { AppComponent } from './app/app.component';
+import { PlaceOSService } from './app/data/placeos.service';
 import { environment } from './environments/environment';
 
 const routes: Route[] = [
@@ -75,6 +78,7 @@ if (environment.production) {
 bootstrapApplication(AppComponent, {
     providers: [
         provideZonelessChangeDetection(),
+        provideAppInitializer(() => inject(PlaceOSService).init()),
         provideRouter(routes, withHashLocation()),
         importProvidersFrom(
             ServiceWorkerModule.register('ngsw-worker.js', {

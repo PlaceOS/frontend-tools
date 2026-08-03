@@ -1,4 +1,5 @@
 import { Injectable, signal } from '@angular/core';
+import { authority, setup, token } from '@placeos/ts-client';
 
 const SETTINGS_KEY = 'MAP_BUILDER.placeos';
 
@@ -6,6 +7,12 @@ export interface PlaceOSSettings {
     domain: string;
     api_key: string;
 }
+
+/**
+ * `domain` when the app is served by a PlaceOS domain and the user is signed
+ * in through it, `manual` when a domain and API key have to be entered.
+ */
+export type PlaceOSAuthMode = 'checking' | 'domain' | 'manual';
 
 export interface PlaceOSConfig {
     configured: boolean;
@@ -63,20 +70,53 @@ function loadSettings(): PlaceOSSettings {
 /**
  * Talks to the PlaceOS engine API directly from the browser.
  *
- * The reference application proxied these calls through its own server; with
- * no server here the requests go straight out, with the domain and API key
- * held in local storage. Leave the domain blank to use the current origin,
- * which is what the dev proxy in `config/proxy.conf.js` expects.
+ * When the app is served from a PlaceOS domain — the authority resolves on the
+ * current origin — authentication goes through that domain's OAuth flow. Failing
+ * that the requests are signed with a domain and API key held in local storage.
  */
 @Injectable({ providedIn: 'root' })
 export class PlaceOSService {
     private readonly _settings = signal<PlaceOSSettings>(loadSettings());
+    private readonly _mode = signal<PlaceOSAuthMode>('checking');
 
     /** Current connection settings */
     public readonly settings = this._settings.asReadonly();
+    /** How requests to the engine API are being authenticated */
+    public readonly mode = this._mode.asReadonly();
+
+    /**
+     * Works out which authentication method applies, running the domain OAuth
+     * flow if an authority is available on the current origin.
+     */
+    public async init(): Promise<void> {
+        const resolved = await fetch('/auth/authority', {
+            credentials: 'same-origin',
+        })
+            .then((resp) => resp.ok)
+            .catch(() => false);
+        if (!resolved) return this._mode.set('manual');
+        // Redirects to login when there's no session, and comes back here
+        await setup({
+            auth_uri: '/auth/oauth/authorize',
+            token_uri: '/auth/token',
+            redirect_uri: new URL(
+                'oauth-resp.html',
+                document.baseURI,
+            ).toString(),
+            scope: 'public',
+        });
+        this._mode.set('domain');
+    }
 
     public get config(): PlaceOSConfig {
         const { domain, api_key } = this._settings();
+        if (this._mode() === 'domain') {
+            return {
+                configured: true,
+                domain: authority()?.domain || location.host,
+                has_key: false,
+            };
+        }
         return {
             configured: !!api_key,
             domain,
@@ -228,14 +268,17 @@ export class PlaceOSService {
         options: RequestInit = {},
     ): Promise<T> {
         const { domain, api_key } = this._settings();
-        if (!api_key) throw new Error('PlaceOS not configured');
+        const on_domain = this._mode() === 'domain';
+        if (!on_domain && !api_key) throw new Error('PlaceOS not configured');
         const query = new URLSearchParams(params).toString();
         const response = await fetch(
-            `${domain}/api/engine/v2${path}${query ? `?${query}` : ''}`,
+            `${on_domain ? '' : domain}/api/engine/v2${path}${query ? `?${query}` : ''}`,
             {
                 ...options,
                 headers: {
-                    'X-API-Key': api_key,
+                    ...(on_domain
+                        ? { Authorization: `Bearer ${token()}` }
+                        : { 'X-API-Key': api_key }),
                     'Content-Type': 'application/json',
                     ...(options.headers ?? {}),
                 },

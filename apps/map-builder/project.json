@@ -17,6 +17,11 @@
                 "assets": [
                     "apps/map-builder/src/favicon.ico",
                     "apps/map-builder/src/favicon.svg",
+                    {
+                        "glob": "oauth-resp.html",
+                        "input": "node_modules/@placeos/ts-client/src",
+                        "output": "/"
+                    },
                     "apps/map-builder/src/assets",
                     {
                         "glob": "**",

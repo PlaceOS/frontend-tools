@@ -46,66 +46,74 @@ type ConnectionStatus = 'idle' | 'loading' | 'connected' | 'error';
                     </div>
                 }
 
-                <div class="flex flex-col gap-2">
-                    <label for="placeos-domain">PlaceOS Domain</label>
-                    <mat-form-field
-                        appearance="outline"
-                        class="no-subscript w-full"
-                    >
-                        <input
-                            matInput
-                            id="placeos-domain"
-                            name="domain"
-                            placeholder="https://placeos-dev.aca.im"
-                            [ngModel]="domain()"
-                            (ngModelChange)="domain.set($event)"
-                            [ngModelOptions]="{ standalone: true }"
-                        />
-                    </mat-form-field>
-                    <label for="placeos-key">API Key</label>
-                    <mat-form-field
-                        appearance="outline"
-                        class="no-subscript w-full"
-                    >
-                        <input
-                            matInput
-                            id="placeos-key"
-                            type="password"
-                            name="api_key"
-                            placeholder="Enter API key"
-                            [ngModel]="api_key()"
-                            (ngModelChange)="api_key.set($event)"
-                            [ngModelOptions]="{ standalone: true }"
-                        />
-                    </mat-form-field>
-                    <button
-                        btn
-                        class="mt-1"
-                        [disabled]="status() === 'loading' || !api_key()"
-                        (click)="save()"
-                    >
-                        {{
-                            status() === 'loading'
-                                ? 'Connecting...'
-                                : status() === 'connected'
-                                  ? 'Update Connection'
-                                  : 'Connect'
-                        }}
-                    </button>
-                    @if (error(); as message) {
-                        <p class="text-error text-xs">{{ message }}</p>
-                    }
-                    @if (saved()) {
-                        <p class="text-success text-xs">
-                            Connection saved successfully.
-                        </p>
-                    }
-                    <p class="text-base-content/60 mt-2 text-xs">
-                        Leave the domain blank to use the current origin — the
-                        workspace dev proxy already forwards
-                        <code class="text-mono">/api</code> to PlaceOS.
+                @if (mode() === 'domain') {
+                    <p class="text-base-content/60 text-xs">
+                        Signed in through
+                        <span class="font-semibold">{{ domain() }}</span
+                        >. No API key needed.
                     </p>
-                </div>
+                } @else {
+                    <div class="flex flex-col gap-2">
+                        <label for="placeos-domain">PlaceOS Domain</label>
+                        <mat-form-field
+                            appearance="outline"
+                            class="no-subscript w-full"
+                        >
+                            <input
+                                matInput
+                                id="placeos-domain"
+                                name="domain"
+                                placeholder="https://placeos-dev.aca.im"
+                                [ngModel]="domain()"
+                                (ngModelChange)="domain.set($event)"
+                                [ngModelOptions]="{ standalone: true }"
+                            />
+                        </mat-form-field>
+                        <label for="placeos-key">API Key</label>
+                        <mat-form-field
+                            appearance="outline"
+                            class="no-subscript w-full"
+                        >
+                            <input
+                                matInput
+                                id="placeos-key"
+                                type="password"
+                                name="api_key"
+                                placeholder="Enter API key"
+                                [ngModel]="api_key()"
+                                (ngModelChange)="api_key.set($event)"
+                                [ngModelOptions]="{ standalone: true }"
+                            />
+                        </mat-form-field>
+                        <button
+                            btn
+                            class="mt-1"
+                            [disabled]="status() === 'loading' || !api_key()"
+                            (click)="save()"
+                        >
+                            {{
+                                status() === 'loading'
+                                    ? 'Connecting...'
+                                    : status() === 'connected'
+                                      ? 'Update Connection'
+                                      : 'Connect'
+                            }}
+                        </button>
+                        @if (error(); as message) {
+                            <p class="text-error text-xs">{{ message }}</p>
+                        }
+                        @if (saved()) {
+                            <p class="text-success text-xs">
+                                Connection saved successfully.
+                            </p>
+                        }
+                        <p class="text-base-content/60 mt-2 text-xs">
+                            Leave the domain blank to use the current origin —
+                            the workspace dev proxy already forwards
+                            <code class="text-mono">/api</code> to PlaceOS.
+                        </p>
+                    </div>
+                }
             </div>
         </div>
     `,
@@ -114,7 +122,8 @@ type ConnectionStatus = 'idle' | 'loading' | 'connected' | 'error';
 export class SettingsComponent {
     private readonly _placeos = inject(PlaceOSService);
 
-    public readonly domain = signal(this._placeos.settings().domain);
+    public readonly mode = this._placeos.mode;
+    public readonly domain = signal(this._placeos.config.domain);
     public readonly api_key = signal(this._placeos.settings().api_key);
     public readonly status = signal<ConnectionStatus>('idle');
     public readonly user = signal<PlaceOSUser | null>(null);
