@@ -117,10 +117,7 @@ async function prepareImage(source: Blob): Promise<{
     const height = image.naturalHeight;
     if (!width || !height) throw new Error('Could not read source image');
 
-    const scale = Math.min(
-        1,
-        MAX_ANALYSIS_DIMENSION / Math.max(width, height),
-    );
+    const scale = Math.min(1, MAX_ANALYSIS_DIMENSION / Math.max(width, height));
     const send_width = Math.round(width * scale);
     const send_height = Math.round(height * scale);
     const canvas = document.createElement('canvas');
@@ -224,9 +221,8 @@ function distance(
     const dy = end.y - start.y;
     const magnitude = Math.hypot(dx, dy);
     return magnitude
-        ? Math.abs(
-              dx * (start.y - point.y) - (start.x - point.x) * dy,
-          ) / magnitude
+        ? Math.abs(dx * (start.y - point.y) - (start.x - point.x) * dy) /
+              magnitude
         : Math.hypot(point.x - start.x, point.y - start.y);
 }
 
@@ -340,7 +336,10 @@ export function normaliseFloorplanAnalysis(
     let parsed: Record<string, unknown>;
     try {
         const value = JSON.parse(
-            response.trim().replace(/^```(?:json)?\s*/, '').replace(/\s*```$/, ''),
+            response
+                .trim()
+                .replace(/^```(?:json)?\s*/, '')
+                .replace(/\s*```$/, ''),
         );
         parsed = record(value) ?? {};
     } catch {
@@ -393,7 +392,8 @@ export function normaliseFloorplanAnalysis(
                 ? item['label']
                 : `Room ${index + 1}`;
         const candidate =
-            typeof item['type'] === 'string' && ROOM_TYPES.has(item['type'] as DetectedRoom['type'])
+            typeof item['type'] === 'string' &&
+            ROOM_TYPES.has(item['type'] as DetectedRoom['type'])
                 ? (item['type'] as DetectedRoom['type'])
                 : 'other';
         const raw_id =

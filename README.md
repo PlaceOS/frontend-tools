@@ -58,6 +58,23 @@ npm run nx -- serve placeos-setup
 
 Most apps use hash routing. The SVG-based tools start with a bootstrap screen where you enter an SVG URL before opening the editor.
 
+### Map Builder AI
+
+AI outline and room detection are enabled only when the app is served from a
+PlaceOS authority with this configuration:
+
+```json
+{
+    "map_builder": {
+        "llm_system_id": "sys-...",
+        "llm_model": "gpt-5.1"
+    }
+}
+```
+
+`llm_system_id` must contain an `LLM_1` module running the PlaceOS OpenAI GPT
+driver. If either setting is absent, the AI controls are not rendered.
+
 ## Build
 
 Build one project:

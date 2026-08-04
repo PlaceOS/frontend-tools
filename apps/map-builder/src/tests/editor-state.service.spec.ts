@@ -129,6 +129,78 @@ describe('EditorStateService', () => {
         expect(await store.listObjects(floorplan_id)).toHaveLength(1);
     });
 
+    it('adds and updates one AI building outline', async () => {
+        await editor.applyAiOutline([
+            { x: 10, y: 20 },
+            { x: 110, y: 20 },
+            { x: 110, y: 120 },
+        ]);
+        await editor.applyAiOutline([
+            { x: 20, y: 30 },
+            { x: 90, y: 30 },
+            { x: 90, y: 80 },
+        ]);
+
+        const outlines = editor
+            .objects()
+            .filter((object) => object.svg_id === 'ai-outline');
+        expect(outlines).toHaveLength(1);
+        expect(outlines[0].geometry).toMatchObject({
+            type: 'polygon',
+            x: 20,
+            y: 30,
+            width: 70,
+            height: 50,
+        });
+        expect(outlines[0].metadata?.['ai_detected']).toBe(true);
+    });
+
+    it('replaces only rooms created by an earlier AI run', async () => {
+        await editor.replaceAiRooms([
+            {
+                id: 'first-ai-room',
+                label: 'AI Room 1',
+                type: 'meeting',
+                x: 10,
+                y: 10,
+                width: 30,
+                height: 40,
+            },
+        ]);
+        await editor.replaceAiRooms([
+            {
+                id: 'second-ai-room',
+                label: 'AI Room 2',
+                type: 'focus',
+                x: 50,
+                y: 50,
+                width: 20,
+                height: 20,
+            },
+        ]);
+
+        expect(
+            editor.objects().filter((object) => object.object_type === 'room'),
+        ).toHaveLength(2);
+        expect(
+            editor
+                .objects()
+                .find((object) => object.svg_id === 'second-ai-room')?.metadata,
+        ).toEqual({ ai_detected: true, room_type: 'focus' });
+        expect(
+            editor
+                .objects()
+                .some((object) => object.svg_id === 'first-ai-room'),
+        ).toBe(false);
+
+        editor.undo();
+        expect(
+            editor
+                .objects()
+                .some((object) => object.svg_id === 'first-ai-room'),
+        ).toBe(true);
+    });
+
     it('clears the redo stack once a new change lands', async () => {
         const id = editor.objects()[0].id;
         editor.pushHistory();

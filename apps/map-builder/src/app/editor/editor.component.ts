@@ -10,6 +10,8 @@ import {
 import { ActivatedRoute, Router } from '@angular/router';
 import { IconComponent } from '@placeos-tools/components';
 
+import type { DetectedRoom } from '../data/floorplan-ai.service';
+import { FloorplanAiService } from '../data/floorplan-ai.service';
 import { MapObject } from '../data/types';
 import { AssetPickerComponent } from './asset-picker.component';
 import { AvailabilityPanelComponent } from './availability-panel.component';
@@ -23,13 +25,14 @@ import {
     nextSidebarWidth,
 } from './constants';
 import { EditorStateService } from './editor-state.service';
+import { clipRoomRectToOutline, pointInPolygon } from './geometry';
 import { LabellingPanelComponent } from './labelling-panel.component';
 import { LayerPanelComponent } from './layer-panel.component';
 import { MinimapComponent } from './minimap.component';
 import { ObjectListPanelComponent } from './object-list-panel.component';
 import { PropertiesPanelComponent } from './properties-panel.component';
 import { PublishPanelComponent } from './publish-panel.component';
-import { ToastsComponent } from './toast.service';
+import { ToastService, ToastsComponent } from './toast.service';
 import { ValidationPanelComponent } from './validation-panel.component';
 
 /** Toolbar button, styled after the reference app's `.dc-tool-btn` */
@@ -198,6 +201,54 @@ const TOOLS: { id: Tool; label: string; key: string; icon: string }[] = [
                                 (change)="onUpload($event)"
                             />
                         </label>
+                        @if (ai_configured) {
+                            <button
+                                [class]="toolClass(false)"
+                                [title]="
+                                    state.image_url()
+                                        ? 'AI: detect building outline'
+                                        : 'Upload a floor plan image first'
+                                "
+                                [disabled]="!state.image_url() || ai_busy()"
+                                (click)="detectAiOutline()"
+                            >
+                                <app-icon class="text-base">
+                                    {{
+                                        ai_outline_analyzing()
+                                            ? 'progress_activity'
+                                            : 'border_outer'
+                                    }}
+                                </app-icon>
+                                {{
+                                    ai_outline_analyzing()
+                                        ? 'Detecting...'
+                                        : 'AI Outline'
+                                }}
+                            </button>
+                            <button
+                                [class]="toolClass(false)"
+                                [title]="
+                                    state.image_url()
+                                        ? 'AI: detect rooms and add them to the map'
+                                        : 'Upload a floor plan image first'
+                                "
+                                [disabled]="!state.image_url() || ai_busy()"
+                                (click)="detectAiRooms()"
+                            >
+                                <app-icon class="text-base">
+                                    {{
+                                        ai_rooms_analyzing()
+                                            ? 'progress_activity'
+                                            : 'meeting_room'
+                                    }}
+                                </app-icon>
+                                {{
+                                    ai_rooms_analyzing()
+                                        ? 'Detecting...'
+                                        : 'AI Rooms'
+                                }}
+                            </button>
+                        }
                     </div>
 
                     <span class="bg-base-300 mx-1.5 h-6 w-px shrink-0"></span>
@@ -582,6 +633,8 @@ export class EditorComponent {
     public readonly state = inject(EditorStateService);
     private readonly _route = inject(ActivatedRoute);
     private readonly _router = inject(Router);
+    private readonly _ai = inject(FloorplanAiService);
+    private readonly _toasts = inject(ToastService);
 
     public readonly canvas = viewChild(CanvasComponent);
     public readonly searchInput =
@@ -591,6 +644,12 @@ export class EditorComponent {
     public readonly left_tab = signal<'layers' | 'objects'>('layers');
     public readonly search = signal('');
     public readonly show_shortcuts = signal(false);
+    public readonly ai_configured = this._ai.configured;
+    public readonly ai_outline_analyzing = signal(false);
+    public readonly ai_rooms_analyzing = signal(false);
+    public readonly ai_busy = computed(
+        () => this.ai_outline_analyzing() || this.ai_rooms_analyzing(),
+    );
 
     public readonly shortcuts = [
         { key: 'V', label: 'Select' },
@@ -768,6 +827,107 @@ export class EditorComponent {
         const file = input.files?.[0];
         if (file) await this.state.uploadSourceImage(file);
         input.value = '';
+    }
+
+    public async detectAiOutline() {
+        const floorplan_id = this.state.floorplan()?.id;
+        if (!floorplan_id || this.ai_busy()) return;
+        this.ai_outline_analyzing.set(true);
+        try {
+            const result = await this._ai.analyze(floorplan_id, 'outline');
+            if (!result.outline?.points.length) {
+                this._toasts.show('No outline detected. Try again.', 'error');
+                return;
+            }
+            await this.state.applyAiOutline(result.outline.points);
+            this._toasts.show(
+                `Building outline detected (${result.outline.points.length} vertices)`,
+                'success',
+            );
+        } catch (error) {
+            this._toasts.show(
+                this._errorMessage(error, 'Outline detection failed'),
+                'error',
+            );
+        } finally {
+            this.ai_outline_analyzing.set(false);
+        }
+    }
+
+    public async detectAiRooms() {
+        const floorplan_id = this.state.floorplan()?.id;
+        if (!floorplan_id || this.ai_busy()) return;
+        this.ai_rooms_analyzing.set(true);
+        try {
+            const result = await this._ai.analyze(floorplan_id, 'rooms');
+            if (!result.rooms.length) {
+                this._toasts.show('No rooms detected. Try again.', 'error');
+                return;
+            }
+            const rooms = this._confineRoomsToOutline(result.rooms);
+            if (!rooms.length) {
+                this._toasts.show(
+                    'No detected rooms were inside the building outline.',
+                    'error',
+                );
+                return;
+            }
+            const count = await this.state.replaceAiRooms(rooms);
+            this._toasts.show(
+                `${count} room(s) detected and added to the map`,
+                'success',
+            );
+        } catch (error) {
+            this._toasts.show(
+                this._errorMessage(error, 'Room detection failed'),
+                'error',
+            );
+        } finally {
+            this.ai_rooms_analyzing.set(false);
+        }
+    }
+
+    private _confineRoomsToOutline(rooms: DetectedRoom[]): DetectedRoom[] {
+        const outlines = this.state
+            .objects()
+            .filter(
+                (object) =>
+                    object.geometry.type === 'polygon' &&
+                    !!object.geometry.points?.length &&
+                    (object.svg_id === 'ai-outline' ||
+                        object.svg_id === 'floor-outline' ||
+                        object.object_type === 'area'),
+            );
+        const outline =
+            outlines.find((object) => object.svg_id === 'ai-outline') ??
+            outlines.find((object) => object.svg_id === 'floor-outline') ??
+            [...outlines].sort(
+                (a, b) => this._polygonArea(b) - this._polygonArea(a),
+            )[0];
+        const points = outline?.geometry.points;
+        if (!points) return rooms;
+
+        return rooms.flatMap((room): DetectedRoom[] => {
+            const center_x = room.x + room.width / 2;
+            const center_y = room.y + room.height / 2;
+            if (!pointInPolygon(center_x, center_y, points)) return [];
+            const clipped = clipRoomRectToOutline(room, points, 20);
+            return clipped ? [{ ...room, ...clipped }] : [];
+        });
+    }
+
+    private _polygonArea(object: MapObject): number {
+        const points = object.geometry.points ?? [];
+        return Math.abs(
+            points.reduce((sum, point, index) => {
+                const next = points[(index + 1) % points.length];
+                return sum + point.x * next.y - next.x * point.y;
+            }, 0) / 2,
+        );
+    }
+
+    private _errorMessage(error: unknown, fallback: string) {
+        return error instanceof Error ? error.message : fallback;
     }
 
     @HostListener('window:keydown', ['$event'])
