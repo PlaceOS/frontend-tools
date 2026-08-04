@@ -59,7 +59,7 @@ const TOOLS: { id: Tool; label: string; key: string; icon: string }[] = [
         <div class="bg-base-200 absolute inset-0 flex flex-col">
             <!-- Nav bar, matching the reference app's breadcrumb strip -->
             <nav
-                class="bg-secondary text-secondary-content flex h-13 shrink-0 items-center gap-3 px-5"
+                class="bg-secondary text-secondary-content flex h-13 shrink-0 items-center gap-3 overflow-hidden px-5"
             >
                 <button
                     class="flex items-center gap-2 rounded-lg bg-white/15 px-3.5 py-1.5 text-sm font-semibold hover:bg-white/25"
@@ -68,15 +68,57 @@ const TOOLS: { id: Tool; label: string; key: string; icon: string }[] = [
                     <app-icon class="text-base">arrow_back</app-icon>
                     Back
                 </button>
-                <span class="text-lg font-extrabold tracking-tight">
+                <span class="shrink-0 text-lg font-extrabold tracking-tight">
                     PlaceOS
                 </span>
-                <span class="text-sm font-medium opacity-60">
+                <span
+                    class="hidden shrink-0 text-sm font-medium opacity-60 sm:inline"
+                >
                     / Floor Plan Studio
                 </span>
-                <span class="truncate text-sm opacity-45">
+                <span class="min-w-0 truncate text-sm opacity-45">
                     / {{ state.floorplan()?.floor_name || 'Editor' }}
                 </span>
+                <div class="ml-auto flex shrink-0 items-center gap-1">
+                    <button
+                        class="flex size-8 items-center justify-center rounded-md hover:bg-white/15"
+                        [class.bg-white/15]="left_open()"
+                        [attr.aria-expanded]="left_open()"
+                        aria-controls="editor-left-panel"
+                        [attr.aria-label]="
+                            left_open()
+                                ? 'Hide layers and objects panel'
+                                : 'Show layers and objects panel'
+                        "
+                        [title]="
+                            left_open()
+                                ? 'Hide layers and objects panel'
+                                : 'Show layers and objects panel'
+                        "
+                        (click)="left_open.set(!left_open())"
+                    >
+                        <app-icon>left_panel_open</app-icon>
+                    </button>
+                    <button
+                        class="flex size-8 items-center justify-center rounded-md hover:bg-white/15"
+                        [class.bg-white/15]="right_open()"
+                        [attr.aria-expanded]="right_open()"
+                        aria-controls="editor-right-panel"
+                        [attr.aria-label]="
+                            right_open()
+                                ? 'Hide editor details panel'
+                                : 'Show editor details panel'
+                        "
+                        [title]="
+                            right_open()
+                                ? 'Hide editor details panel'
+                                : 'Show editor details panel'
+                        "
+                        (click)="right_open.set(!right_open())"
+                    >
+                        <app-icon>right_panel_open</app-icon>
+                    </button>
+                </div>
             </nav>
 
             <!-- Toolbar. Two fixed rows: what you draw, then how you edit. -->
@@ -329,44 +371,47 @@ const TOOLS: { id: Tool; label: string; key: string; icon: string }[] = [
             } @else {
                 <div class="relative flex min-h-0 flex-1">
                     <!-- Left sidebar -->
-                    <aside
-                        class="bg-base-100 border-base-300 flex shrink-0 flex-col border-r"
-                        [style.width.px]="left_width()"
-                    >
-                        <div class="border-base-300 flex border-b">
-                            <button
-                                class="flex-1 px-3 py-2 text-xs font-semibold"
-                                [class]="
-                                    left_tab() === 'layers'
-                                        ? 'border-primary border-b-2'
-                                        : 'text-base-content/60'
-                                "
-                                (click)="left_tab.set('layers')"
-                            >
-                                Layers
-                            </button>
-                            <button
-                                class="flex-1 px-3 py-2 text-xs font-semibold"
-                                [class]="
-                                    left_tab() === 'objects'
-                                        ? 'border-primary border-b-2'
-                                        : 'text-base-content/60'
-                                "
-                                (click)="left_tab.set('objects')"
-                            >
-                                Objects
-                            </button>
-                        </div>
-                        <div class="min-h-0 flex-1">
-                            @if (left_tab() === 'layers') {
-                                <map-builder-layer-panel />
-                            } @else {
-                                <map-builder-object-list-panel
-                                    (scrollTo)="scrollTo($event)"
-                                />
-                            }
-                        </div>
-                    </aside>
+                    @if (left_open()) {
+                        <aside
+                            id="editor-left-panel"
+                            class="bg-base-100 border-base-300 flex shrink-0 flex-col border-r"
+                            [style.width.px]="left_width()"
+                        >
+                            <div class="border-base-300 flex border-b">
+                                <button
+                                    class="flex-1 px-3 py-2 text-xs font-semibold"
+                                    [class]="
+                                        left_tab() === 'layers'
+                                            ? 'border-primary border-b-2'
+                                            : 'text-base-content/60'
+                                    "
+                                    (click)="left_tab.set('layers')"
+                                >
+                                    Layers
+                                </button>
+                                <button
+                                    class="flex-1 px-3 py-2 text-xs font-semibold"
+                                    [class]="
+                                        left_tab() === 'objects'
+                                            ? 'border-primary border-b-2'
+                                            : 'text-base-content/60'
+                                    "
+                                    (click)="left_tab.set('objects')"
+                                >
+                                    Objects
+                                </button>
+                            </div>
+                            <div class="min-h-0 flex-1">
+                                @if (left_tab() === 'layers') {
+                                    <map-builder-layer-panel />
+                                } @else {
+                                    <map-builder-object-list-panel
+                                        (scrollTo)="scrollTo($event)"
+                                    />
+                                }
+                            </div>
+                        </aside>
+                    }
 
                     <!-- Canvas -->
                     <main class="relative min-w-0 flex-1">
@@ -378,6 +423,7 @@ const TOOLS: { id: Tool; label: string; key: string; icon: string }[] = [
                             <button
                                 class="hover:bg-base-200 border-base-300 border-b p-1 text-base"
                                 title="Zoom in"
+                                aria-label="Zoom in"
                                 (click)="state.zoomBy(1.1)"
                             >
                                 <app-icon>add</app-icon>
@@ -385,6 +431,7 @@ const TOOLS: { id: Tool; label: string; key: string; icon: string }[] = [
                             <button
                                 class="hover:bg-base-200 border-base-300 border-b p-1 text-base"
                                 title="Zoom out"
+                                aria-label="Zoom out"
                                 (click)="state.zoomBy(10 / 11)"
                             >
                                 <app-icon>remove</app-icon>
@@ -392,6 +439,7 @@ const TOOLS: { id: Tool; label: string; key: string; icon: string }[] = [
                             <button
                                 class="hover:bg-base-200 p-1 text-base"
                                 title="Reset zoom"
+                                aria-label="Reset zoom"
                                 (click)="resetView()"
                             >
                                 <app-icon>refresh</app-icon>
@@ -403,78 +451,85 @@ const TOOLS: { id: Tool; label: string; key: string; icon: string }[] = [
                     </main>
 
                     <!-- Right sidebar -->
-                    <aside
-                        class="bg-base-100 border-base-300 flex shrink-0 flex-col border-l"
-                        [style.width.px]="right_width()"
-                    >
-                        <div class="border-base-300 flex border-b">
-                            @for (tab of right_tabs; track tab.id) {
-                                <button
-                                    class="flex-1 px-1 py-2 text-xs font-semibold"
-                                    [class]="
-                                        right_tab() === tab.id
-                                            ? 'border-primary border-b-2'
-                                            : 'text-base-content/60'
-                                    "
-                                    [title]="tab.title"
-                                    (click)="right_tab.set(tab.id)"
-                                >
-                                    {{ tab.label }}
-                                </button>
-                            }
-                        </div>
-                        <div class="min-h-0 flex-1">
-                            @switch (right_tab()) {
-                                @case ('properties') {
-                                    <map-builder-properties-panel />
+                    @if (right_open()) {
+                        <aside
+                            id="editor-right-panel"
+                            class="bg-base-100 border-base-300 flex shrink-0 flex-col border-l"
+                            [style.width.px]="right_width()"
+                        >
+                            <div class="border-base-300 flex border-b">
+                                @for (tab of right_tabs; track tab.id) {
+                                    <button
+                                        class="flex-1 px-1 py-2 text-xs font-semibold"
+                                        [class]="
+                                            right_tab() === tab.id
+                                                ? 'border-primary border-b-2'
+                                                : 'text-base-content/60'
+                                        "
+                                        [title]="tab.title"
+                                        (click)="right_tab.set(tab.id)"
+                                    >
+                                        {{ tab.label }}
+                                    </button>
                                 }
-                                @case ('label') {
-                                    <map-builder-labelling-panel />
+                            </div>
+                            <div class="min-h-0 flex-1">
+                                @switch (right_tab()) {
+                                    @case ('properties') {
+                                        <map-builder-properties-panel />
+                                    }
+                                    @case ('label') {
+                                        <map-builder-labelling-panel />
+                                    }
+                                    @case ('validate') {
+                                        <map-builder-validation-panel />
+                                    }
+                                    @case ('preview') {
+                                        <map-builder-availability-panel />
+                                    }
+                                    @case ('publish') {
+                                        <map-builder-publish-panel />
+                                    }
                                 }
-                                @case ('validate') {
-                                    <map-builder-validation-panel />
-                                }
-                                @case ('preview') {
-                                    <map-builder-availability-panel />
-                                }
-                                @case ('publish') {
-                                    <map-builder-publish-panel />
-                                }
-                            }
-                        </div>
-                    </aside>
+                            </div>
+                        </aside>
+                    }
 
                     <!-- Resize handles. Overlaid on the sidebar borders rather
                          than placed in the flow, so they take no layout space
                          and never paint a strip beside the canvas. -->
-                    <div
-                        role="separator"
-                        tabindex="0"
-                        aria-orientation="vertical"
-                        aria-label="Resize the layers and objects panel"
-                        [attr.aria-valuenow]="left_width()"
-                        [attr.aria-valuemin]="sidebar_min"
-                        [attr.aria-valuemax]="sidebar_max"
-                        class="hover:bg-primary/40 focus-visible:bg-primary/40 absolute inset-y-0 z-30 w-1 cursor-col-resize"
-                        [style.left.px]="left_width() - 2"
-                        (pointerdown)="startResize($event, 'left')"
-                        (keydown.arrowleft)="nudge($event, 'left', -16)"
-                        (keydown.arrowright)="nudge($event, 'left', 16)"
-                    ></div>
-                    <div
-                        role="separator"
-                        tabindex="0"
-                        aria-orientation="vertical"
-                        aria-label="Resize the properties panel"
-                        [attr.aria-valuenow]="right_width()"
-                        [attr.aria-valuemin]="sidebar_min"
-                        [attr.aria-valuemax]="sidebar_max"
-                        class="hover:bg-primary/40 focus-visible:bg-primary/40 absolute inset-y-0 z-30 w-1 cursor-col-resize"
-                        [style.right.px]="right_width() - 2"
-                        (pointerdown)="startResize($event, 'right')"
-                        (keydown.arrowleft)="nudge($event, 'right', -16)"
-                        (keydown.arrowright)="nudge($event, 'right', 16)"
-                    ></div>
+                    @if (left_open()) {
+                        <div
+                            role="separator"
+                            tabindex="0"
+                            aria-orientation="vertical"
+                            aria-label="Resize the layers and objects panel"
+                            [attr.aria-valuenow]="left_width()"
+                            [attr.aria-valuemin]="sidebar_min"
+                            [attr.aria-valuemax]="sidebar_max"
+                            class="hover:bg-primary/40 focus-visible:bg-primary/40 absolute inset-y-0 z-30 w-1 cursor-col-resize"
+                            [style.left.px]="left_width() - 2"
+                            (pointerdown)="startResize($event, 'left')"
+                            (keydown.arrowleft)="nudge($event, 'left', -16)"
+                            (keydown.arrowright)="nudge($event, 'left', 16)"
+                        ></div>
+                    }
+                    @if (right_open()) {
+                        <div
+                            role="separator"
+                            tabindex="0"
+                            aria-orientation="vertical"
+                            aria-label="Resize the properties panel"
+                            [attr.aria-valuenow]="right_width()"
+                            [attr.aria-valuemin]="sidebar_min"
+                            [attr.aria-valuemax]="sidebar_max"
+                            class="hover:bg-primary/40 focus-visible:bg-primary/40 absolute inset-y-0 z-30 w-1 cursor-col-resize"
+                            [style.right.px]="right_width() - 2"
+                            (pointerdown)="startResize($event, 'right')"
+                            (keydown.arrowleft)="nudge($event, 'right', -16)"
+                            (keydown.arrowright)="nudge($event, 'right', 16)"
+                        ></div>
+                    }
                 </div>
 
                 <!-- Status bar -->
@@ -669,6 +724,8 @@ export class EditorComponent {
     public readonly sidebar_max = SIDEBAR_MAX;
     public readonly left_width = signal(SIDEBAR_DEFAULTS.left);
     public readonly right_width = signal(SIDEBAR_DEFAULTS.right);
+    public readonly left_open = signal(window.innerWidth >= 720);
+    public readonly right_open = signal(window.innerWidth >= 1100);
 
     public readonly toolClass = (active: boolean) =>
         `${TOOL_BTN} ${active ? TOOL_BTN_ACTIVE : TOOL_BTN_IDLE}`;
@@ -820,6 +877,12 @@ export class EditorComponent {
     @HostListener('window:beforeunload', ['$event'])
     public onBeforeUnload(event: BeforeUnloadEvent) {
         if (this.state.dirty()) event.preventDefault();
+    }
+
+    @HostListener('window:resize')
+    public onResize() {
+        if (window.innerWidth < 720) this.left_open.set(false);
+        if (window.innerWidth < 1100) this.right_open.set(false);
     }
 
     public async onUpload(event: Event) {

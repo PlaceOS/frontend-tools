@@ -34,10 +34,15 @@ import { EditorStateService } from './editor-state.service';
                     >
                         <div class="flex items-center gap-1">
                             <button
-                                class="text-base-content/60 hover:text-base-content text-base"
+                                class="text-base-content/60 hover:bg-base-300 hover:text-base-content flex size-7 shrink-0 items-center justify-center rounded text-base"
                                 [class.opacity-40]="!layer.visible"
                                 [title]="
                                     layer.visible ? 'Hide layer' : 'Show layer'
+                                "
+                                [attr.aria-label]="
+                                    (layer.visible ? 'Hide ' : 'Show ') +
+                                    layer.name +
+                                    ' layer'
                                 "
                                 (click)="
                                     toggle($event, layer.id, {
@@ -54,10 +59,62 @@ import { EditorStateService } from './editor-state.service';
                                 </app-icon>
                             </button>
                             <button
-                                class="text-base-content/60 hover:text-base-content text-base"
+                                class="min-w-0 flex-1 truncate text-left text-xs font-medium"
+                                title="Make this the active layer"
+                                (click)="state.setActiveLayer(layer.id)"
+                            >
+                                {{ layer.name }}
+                            </button>
+                            <div class="flex items-center">
+                            <button
+                                class="hover:bg-base-300 flex size-7 shrink-0 items-center justify-center rounded text-base"
+                                [class]="
+                                    confirm_delete() === layer.id
+                                        ? 'text-error font-bold'
+                                        : 'text-base-content/40 hover:text-error'
+                                "
+                                [title]="
+                                    confirm_delete() === layer.id
+                                        ? 'Confirm deleting ' + layer.name
+                                        : 'Delete ' + layer.name
+                                "
+                                [attr.aria-label]="
+                                    confirm_delete() === layer.id
+                                        ? 'Confirm deleting ' +
+                                          layer.name +
+                                          ' layer'
+                                        : 'Delete ' + layer.name + ' layer'
+                                "
+                                (click)="remove($event, layer.id)"
+                                (blur)="confirm_delete.set('')"
+                            >
+                                <app-icon>close</app-icon>
+                            </button>
+                            <button
+                                class="text-base-content/40 hover:bg-base-300 hover:text-base-content flex size-7 shrink-0 items-center justify-center rounded text-base disabled:opacity-20"
+                                [title]="'Move ' + layer.name + ' up'"
+                                [attr.aria-label]="'Move ' + layer.name + ' up'"
+                                [disabled]="i === 0"
+                                (click)="move($event, layer.id, 'up')"
+                            >
+                                <app-icon>arrow_upward</app-icon>
+                            </button>
+                            </div>
+                        </div>
+
+                        <!-- Secondary row, indented past the toggles as in the
+                             reference panel, so opacity reads as a detail -->
+                        <div class="flex items-center gap-1">
+                            <button
+                                class="text-base-content/60 hover:bg-base-300 hover:text-base-content flex size-7 shrink-0 items-center justify-center rounded text-base"
                                 [class.text-primary]="layer.locked"
                                 [title]="
                                     layer.locked ? 'Unlock layer' : 'Lock layer'
+                                "
+                                [attr.aria-label]="
+                                    (layer.locked ? 'Unlock ' : 'Lock ') +
+                                    layer.name +
+                                    ' layer'
                                 "
                                 (click)="
                                     toggle($event, layer.id, {
@@ -69,61 +126,33 @@ import { EditorStateService } from './editor-state.service';
                                     {{ layer.locked ? 'lock' : 'lock_open' }}
                                 </app-icon>
                             </button>
-                            <button
-                                class="min-w-0 flex-1 truncate text-left text-xs font-medium"
-                                title="Make this the active layer"
-                                (click)="state.setActiveLayer(layer.id)"
-                            >
-                                {{ layer.name }}
-                            </button>
-                        </div>
-
-                        <!-- Secondary row, indented past the toggles as in the
-                             reference panel, so opacity reads as a detail -->
-                        <div class="mt-1 flex items-center gap-1 pl-7">
                             <input
                                 type="range"
-                                class="accent-primary h-3.5 w-15"
+                                class="accent-primary h-3.5 min-w-0 flex-1"
                                 min="0"
                                 max="1"
                                 step="0.05"
                                 [value]="layer.opacity"
                                 [title]="opacityLabel(layer.opacity)"
                                 [attr.aria-label]="
-                                    layer.name + ' ' + opacityLabel(layer.opacity)
+                                    layer.name +
+                                    ' ' +
+                                    opacityLabel(layer.opacity)
                                 "
                                 (input)="setOpacity($event, layer.id)"
                             />
                             <button
-                                class="text-base-content/40 hover:text-base-content ml-auto text-base disabled:opacity-20"
-                                title="Move up"
-                                [disabled]="i === 0"
-                                (click)="move($event, layer.id, 'up')"
-                            >
-                                <app-icon>arrow_upward</app-icon>
-                            </button>
-                            <button
-                                class="text-base-content/40 hover:text-base-content text-base disabled:opacity-20"
-                                title="Move down"
+                                class="text-base-content/40 hover:bg-base-300 hover:text-base-content flex size-7 shrink-0 items-center justify-center rounded text-base disabled:opacity-20"
+                                [title]="'Move ' + layer.name + ' down'"
+                                [attr.aria-label]="
+                                    'Move ' + layer.name + ' down'
+                                "
                                 [disabled]="
                                     i === state.sorted_layers().length - 1
                                 "
                                 (click)="move($event, layer.id, 'down')"
                             >
                                 <app-icon>arrow_downward</app-icon>
-                            </button>
-                            <button
-                                class="text-base"
-                                [class]="
-                                    confirm_delete() === layer.id
-                                        ? 'text-error font-bold'
-                                        : 'text-base-content/40 hover:text-error'
-                                "
-                                title="Delete layer"
-                                (click)="remove($event, layer.id)"
-                                (blur)="confirm_delete.set('')"
-                            >
-                                <app-icon>close</app-icon>
                             </button>
                         </div>
                     </div>
@@ -134,6 +163,7 @@ import { EditorStateService } from './editor-state.service';
                 <input
                     class="border-base-300 min-w-0 flex-1 rounded border px-2 py-1 text-xs"
                     placeholder="New layer name..."
+                    aria-label="New layer name"
                     [value]="new_name()"
                     (input)="new_name.set(asValue($event))"
                     (keydown.enter)="add()"
