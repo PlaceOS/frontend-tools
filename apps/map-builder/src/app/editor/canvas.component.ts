@@ -52,7 +52,29 @@ interface RotateState {
     startRotation: number;
 }
 
+interface GroupTransformState {
+    bounds: { x: number; y: number; width: number; height: number };
+    objects: MapObject[];
+}
+
+interface GroupResizeState extends GroupTransformState {
+    handle: Handle;
+}
+
+interface GroupRotateState extends GroupTransformState {
+    centerX: number;
+    centerY: number;
+    startAngle: number;
+}
+
 interface RectDrawState {
+    startX: number;
+    startY: number;
+    currentX: number;
+    currentY: number;
+}
+
+interface SelectionBox {
     startX: number;
     startY: number;
     currentX: number;
@@ -264,7 +286,10 @@ const clamp01 = (value: number) => Math.max(0, Math.min(1, value));
                                         class="pointer-events-none"
                                     />
                                 }
-                                @if (object.id === state.selected_id()) {
+                                @if (
+                                    object.id === state.selected_id() &&
+                                    state.multi_select().length < 2
+                                ) {
                                     @for (handle of handles; track handle) {
                                         <circle
                                             [attr.cx]="handleX(object, handle)"
@@ -401,6 +426,68 @@ const clamp01 = (value: number) => Math.max(0, Math.min(1, value));
                             />
                         }
                     }
+                }
+
+                @if (groupBounds(); as group) {
+                    <g>
+                        <rect
+                            [attr.x]="group.x"
+                            [attr.y]="group.y"
+                            [attr.width]="group.width"
+                            [attr.height]="group.height"
+                            fill="none"
+                            stroke="#3b82f6"
+                            [attr.stroke-width]="state.stroke_width()"
+                            stroke-dasharray="6 3"
+                            class="pointer-events-none"
+                        />
+                        @for (handle of handles; track handle) {
+                            <circle
+                                [attr.cx]="groupHandleX(group, handle)"
+                                [attr.cy]="groupHandleY(group, handle)"
+                                [attr.r]="state.handle_radius()"
+                                fill="#3b82f6"
+                                stroke="#fff"
+                                [attr.stroke-width]="
+                                    state.stroke_width() * 0.75
+                                "
+                                [style.cursor]="cursorFor(handle)"
+                            />
+                        }
+                        <line
+                            [attr.x1]="group.x + group.width / 2"
+                            [attr.y1]="group.y"
+                            [attr.x2]="group.x + group.width / 2"
+                            [attr.y2]="groupRotateY(group)"
+                            stroke="#3b82f6"
+                            [attr.stroke-width]="state.stroke_width() * 0.5"
+                            class="pointer-events-none"
+                        />
+                        <circle
+                            [attr.cx]="group.x + group.width / 2"
+                            [attr.cy]="groupRotateY(group)"
+                            [attr.r]="state.handle_radius() * 0.8"
+                            fill="#3b82f6"
+                            stroke="#fff"
+                            [attr.stroke-width]="state.stroke_width() * 0.5"
+                            class="cursor-grab"
+                            (mousedown)="startGroupRotate($event, group)"
+                        />
+                    </g>
+                }
+
+                @if (selection_box(); as box) {
+                    <rect
+                        [attr.x]="min(box.startX, box.currentX)"
+                        [attr.y]="min(box.startY, box.currentY)"
+                        [attr.width]="abs(box.currentX - box.startX)"
+                        [attr.height]="abs(box.currentY - box.startY)"
+                        fill="rgba(59,130,246,0.12)"
+                        stroke="#3b82f6"
+                        [attr.stroke-width]="state.stroke_width()"
+                        stroke-dasharray="6 3"
+                        class="pointer-events-none"
+                    />
                 }
 
                 @if (selectedRect(); as sel) {
@@ -560,6 +647,7 @@ export class CanvasComponent {
     public readonly handles = HANDLES;
 
     public readonly rect_draw = signal<RectDrawState | null>(null);
+    public readonly selection_box = signal<SelectionBox | null>(null);
     public readonly outline_points = signal<Point[]>([]);
     public readonly wall_start = signal<Point | null>(null);
     public readonly wall_preview = signal<Point | null>(null);
@@ -576,6 +664,8 @@ export class CanvasComponent {
     private readonly _dragging = signal<DragState | null>(null);
     private readonly _resizing = signal<ResizeState | null>(null);
     private readonly _rotating = signal<RotateState | null>(null);
+    private readonly _group_resizing = signal<GroupResizeState | null>(null);
+    private readonly _group_rotating = signal<GroupRotateState | null>(null);
     private readonly _vertex_drag = signal<{ id: string; idx: number } | null>(
         null,
     );
@@ -667,6 +757,7 @@ export class CanvasComponent {
     );
 
     public readonly selectedRect = computed(() => {
+        if (this.state.multi_select().length > 1) return null;
         const selected = this.state.selected();
         if (!selected || selected.geometry.type !== 'rect') return null;
         return {
@@ -675,6 +766,21 @@ export class CanvasComponent {
             width: selected.geometry.width ?? 50,
             height: selected.geometry.height ?? 50,
         };
+    });
+
+    public readonly groupBounds = computed(() => {
+        const ids = this.state.multi_select();
+        if (ids.length < 2) return null;
+        const objects = this.state
+            .objects()
+            .filter((object) => ids.includes(object.id));
+        if (objects.length < 2) return null;
+        const bounds = objects.map((object) => this._objectBounds(object));
+        const x = Math.min(...bounds.map((item) => item.x));
+        const y = Math.min(...bounds.map((item) => item.y));
+        const right = Math.max(...bounds.map((item) => item.x + item.width));
+        const bottom = Math.max(...bounds.map((item) => item.y + item.height));
+        return { x, y, width: right - x, height: bottom - y };
     });
 
     public readonly outlinePointsAttr = computed(() =>
@@ -775,7 +881,9 @@ export class CanvasComponent {
         const fits = Math.floor(
             (object.geometry.width ?? 0) / (this.labelSize(object) * 0.55),
         );
-        return label.length > fits ? `${label.slice(0, Math.max(1, fits - 1))}…` : label;
+        return label.length > fits
+            ? `${label.slice(0, Math.max(1, fits - 1))}…`
+            : label;
     }
 
     public labelSize(object: MapObject) {
@@ -810,6 +918,30 @@ export class CanvasComponent {
 
     public cursorFor(handle: Handle) {
         return HANDLE_CURSORS[handle];
+    }
+
+    public groupHandleX(group: GroupTransformState['bounds'], handle: Handle) {
+        return getHandlePos(
+            handle,
+            group.x,
+            group.y,
+            group.width,
+            group.height,
+        )[0];
+    }
+
+    public groupHandleY(group: GroupTransformState['bounds'], handle: Handle) {
+        return getHandlePos(
+            handle,
+            group.x,
+            group.y,
+            group.width,
+            group.height,
+        )[1];
+    }
+
+    public groupRotateY(group: GroupTransformState['bounds']) {
+        return group.y - 25 / (this.state.stroke_width() / 2);
     }
 
     public furnitureArt(object: MapObject): SafeHtml | null {
@@ -1026,7 +1158,7 @@ export class CanvasComponent {
             return;
         }
 
-        if (this._startResize(x, y)) {
+        if (this._startGroupResize(x, y) || this._startResize(x, y)) {
             event.preventDefault();
             return;
         }
@@ -1043,9 +1175,10 @@ export class CanvasComponent {
                 event.preventDefault();
                 return;
             }
-            if (event.shiftKey) {
+            if (event.shiftKey || event.ctrlKey || event.metaKey) {
                 this.state.toggleMultiSelect(hit.id);
-                this.state.select(hit.id);
+                const selection = this.state.multi_select();
+                this.state.select(selection.at(-1) ?? null);
                 event.preventDefault();
                 return;
             }
@@ -1064,6 +1197,16 @@ export class CanvasComponent {
             return;
         }
         // Empty space: drag pans, a click without travel clears the selection
+        if (event.shiftKey) {
+            this.selection_box.set({
+                startX: x,
+                startY: y,
+                currentX: x,
+                currentY: y,
+            });
+            event.preventDefault();
+            return;
+        }
         this._startPan(event, true);
     }
 
@@ -1115,6 +1258,12 @@ export class CanvasComponent {
             return;
         }
 
+        const groupRotating = this._group_rotating();
+        if (groupRotating) {
+            this._applyGroupRotate(groupRotating, x, y, event.shiftKey);
+            return;
+        }
+
         const dragging = this._dragging();
         if (dragging) {
             this._applyDrag(dragging, x, y);
@@ -1127,6 +1276,12 @@ export class CanvasComponent {
             return;
         }
 
+        const groupResizing = this._group_resizing();
+        if (groupResizing) {
+            this._applyGroupResize(groupResizing, x, y);
+            return;
+        }
+
         const vertex = this._vertex_drag();
         if (vertex) {
             this._applyVertexDrag(vertex, x, y);
@@ -1136,6 +1291,12 @@ export class CanvasComponent {
         const draw = this.rect_draw();
         if (draw) {
             this.rect_draw.set({ ...draw, currentX: x, currentY: y });
+            return;
+        }
+
+        const selection = this.selection_box();
+        if (selection) {
+            this.selection_box.set({ ...selection, currentX: x, currentY: y });
             return;
         }
 
@@ -1166,6 +1327,13 @@ export class CanvasComponent {
             this._rotating.set(null);
             return;
         }
+        const groupRotating = this._group_rotating();
+        if (groupRotating) {
+            for (const object of groupRotating.objects)
+                this.state.commitGeometry(object.id);
+            this._group_rotating.set(null);
+            return;
+        }
         const dragging = this._dragging();
         if (dragging) {
             for (const id of this.state.movingIds(dragging.id))
@@ -1178,6 +1346,12 @@ export class CanvasComponent {
             this.state.commitGeometry(resizing.id);
             this._resizing.set(null);
         }
+        const groupResizing = this._group_resizing();
+        if (groupResizing) {
+            for (const object of groupResizing.objects)
+                this.state.commitGeometry(object.id);
+            this._group_resizing.set(null);
+        }
         const vertex = this._vertex_drag();
         if (vertex) {
             this.state.commitGeometry(vertex.id);
@@ -1187,6 +1361,11 @@ export class CanvasComponent {
         if (draw) {
             this._finishRectDraw(draw);
             this.rect_draw.set(null);
+        }
+        const selection = this.selection_box();
+        if (selection) {
+            this._finishSelectionBox(selection);
+            this.selection_box.set(null);
         }
     }
 
@@ -1265,6 +1444,26 @@ export class CanvasComponent {
         });
     }
 
+    public startGroupRotate(
+        event: MouseEvent,
+        bounds: GroupTransformState['bounds'],
+    ) {
+        event.stopPropagation();
+        event.preventDefault();
+        this.state.pushHistory();
+        const centerX = bounds.x + bounds.width / 2;
+        const centerY = bounds.y + bounds.height / 2;
+        this._group_rotating.set({
+            bounds,
+            objects: this._selectedSnapshots(),
+            centerX,
+            centerY,
+            startAngle:
+                (Math.atan2(this.groupRotateY(bounds) - centerY, 0) * 180) /
+                Math.PI,
+        });
+    }
+
     public onVertexDown(event: MouseEvent, object: MapObject, index: number) {
         event.stopPropagation();
         event.preventDefault();
@@ -1291,11 +1490,21 @@ export class CanvasComponent {
     private _applyDrag(dragging: DragState, x: number, y: number) {
         const object = this.state.objects().find((o) => o.id === dragging.id);
         if (!object) return;
-        const rawX = Math.max(0, x - dragging.offsetX);
-        const rawY = Math.max(0, y - dragging.offsetY);
+        const moving = new Set(this.state.movingIds(dragging.id));
+        const group = moving.size > 1 ? this.groupBounds() : null;
+        const currentX = object.geometry.x ?? 0;
+        const currentY = object.geometry.y ?? 0;
+        const rawX = Math.max(
+            currentX - (group?.x ?? currentX),
+            x - dragging.offsetX,
+        );
+        const rawY = Math.max(
+            currentY - (group?.y ?? currentY),
+            y - dragging.offsetY,
+        );
         const others = this.state
             .objects()
-            .filter((o) => o.id !== dragging.id && o.visible)
+            .filter((o) => !moving.has(o.id) && o.visible)
             .map((o) => ({
                 x: o.geometry.x ?? 0,
                 y: o.geometry.y ?? 0,
@@ -1317,7 +1526,7 @@ export class CanvasComponent {
         const dx = x0 - (object.geometry.x ?? 0);
         const dy = y0 - (object.geometry.y ?? 0);
         // Everything in the multi-selection moves by the same delta
-        for (const id of this.state.movingIds(dragging.id)) {
+        for (const id of moving) {
             const target = this.state.objects().find((o) => o.id === id);
             if (!target) continue;
             const nx = id === dragging.id ? x0 : (target.geometry.x ?? 0) + dx;
@@ -1365,6 +1574,171 @@ export class CanvasComponent {
                 height: nh,
             },
         });
+    }
+
+    private _applyGroupResize(
+        resizing: GroupResizeState,
+        x: number,
+        y: number,
+    ) {
+        const { bounds, handle } = resizing;
+        let left = bounds.x;
+        let top = bounds.y;
+        let right = bounds.x + bounds.width;
+        let bottom = bounds.y + bounds.height;
+        if (handle.includes('w')) left = Math.min(x, right - 20);
+        if (handle.includes('e')) right = Math.max(x, left + 20);
+        if (handle.includes('n')) top = Math.min(y, bottom - 20);
+        if (handle.includes('s')) bottom = Math.max(y, top + 20);
+        const sx = (right - left) / bounds.width;
+        const sy = (bottom - top) / bounds.height;
+        for (const object of resizing.objects) {
+            const geometry = structuredClone(object.geometry);
+            if (geometry.points) {
+                geometry.points = geometry.points.map((point) => ({
+                    x: left + (point.x - bounds.x) * sx,
+                    y: top + (point.y - bounds.y) * sy,
+                }));
+                Object.assign(geometry, boundsOf(geometry.points));
+            } else if (geometry.type === 'circle') {
+                geometry.x = left + ((geometry.x ?? 0) - bounds.x) * sx;
+                geometry.y = top + ((geometry.y ?? 0) - bounds.y) * sy;
+                geometry.r =
+                    ((geometry.r ?? 12) * (Math.abs(sx) + Math.abs(sy))) / 2;
+            } else {
+                geometry.x = left + ((geometry.x ?? 0) - bounds.x) * sx;
+                geometry.y = top + ((geometry.y ?? 0) - bounds.y) * sy;
+                if (geometry.width != null) geometry.width *= sx;
+                if (geometry.height != null) geometry.height *= sy;
+            }
+            this.state.patchLocal(object.id, { geometry });
+        }
+    }
+
+    private _applyGroupRotate(
+        rotating: GroupRotateState,
+        x: number,
+        y: number,
+        snap: boolean,
+    ) {
+        const angle =
+            (Math.atan2(y - rotating.centerY, x - rotating.centerX) * 180) /
+            Math.PI;
+        let delta = angle - rotating.startAngle;
+        if (snap) delta = Math.round(delta / 15) * 15;
+        const radians = (delta * Math.PI) / 180;
+        const transform = (point: Point): Point => ({
+            x:
+                rotating.centerX +
+                (point.x - rotating.centerX) * Math.cos(radians) -
+                (point.y - rotating.centerY) * Math.sin(radians),
+            y:
+                rotating.centerY +
+                (point.x - rotating.centerX) * Math.sin(radians) +
+                (point.y - rotating.centerY) * Math.cos(radians),
+        });
+        for (const object of rotating.objects) {
+            const geometry = structuredClone(object.geometry);
+            if (geometry.points) {
+                geometry.points = geometry.points.map(transform);
+                Object.assign(geometry, boundsOf(geometry.points));
+            } else {
+                const bounds = this._objectBounds(object);
+                const center = transform({
+                    x: bounds.x + bounds.width / 2,
+                    y: bounds.y + bounds.height / 2,
+                });
+                if (geometry.type === 'circle') {
+                    geometry.x = center.x;
+                    geometry.y = center.y;
+                } else {
+                    geometry.x = center.x - bounds.width / 2;
+                    geometry.y = center.y - bounds.height / 2;
+                    geometry.rotation =
+                        ((geometry.rotation ?? 0) + delta + 360) % 360;
+                }
+            }
+            this.state.patchLocal(object.id, { geometry });
+        }
+    }
+
+    private _startGroupResize(x: number, y: number): boolean {
+        const bounds = this.groupBounds();
+        if (!bounds) return false;
+        const tolerance = Math.max(
+            15,
+            Math.max(this.width(), this.height()) * 0.008,
+        );
+        for (const handle of HANDLES) {
+            const [hx, hy] = getHandlePos(
+                handle,
+                bounds.x,
+                bounds.y,
+                bounds.width,
+                bounds.height,
+            );
+            if (Math.abs(x - hx) < tolerance && Math.abs(y - hy) < tolerance) {
+                this.state.pushHistory();
+                this._group_resizing.set({
+                    bounds,
+                    handle,
+                    objects: this._selectedSnapshots(),
+                });
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private _finishSelectionBox(box: SelectionBox) {
+        const left = Math.min(box.startX, box.currentX);
+        const top = Math.min(box.startY, box.currentY);
+        const right = Math.max(box.startX, box.currentX);
+        const bottom = Math.max(box.startY, box.currentY);
+        if (right - left < 4 && bottom - top < 4) return;
+        const activeLayer = this.state.active_layer_id();
+        const ids = this.state
+            .visible_objects()
+            .filter((object) => {
+                if (object.layer !== activeLayer || object.locked) return false;
+                const bounds = this._objectBounds(object);
+                return (
+                    bounds.x >= left &&
+                    bounds.y >= top &&
+                    bounds.x + bounds.width <= right &&
+                    bounds.y + bounds.height <= bottom
+                );
+            })
+            .map((object) => object.id);
+        this.state.setMultiSelect(ids);
+    }
+
+    private _selectedSnapshots(): MapObject[] {
+        const ids = this.state.multi_select();
+        return this.state
+            .objects()
+            .filter((object) => ids.includes(object.id))
+            .map((object) => structuredClone(object));
+    }
+
+    private _objectBounds(object: MapObject) {
+        const geometry = object.geometry;
+        if (geometry.points?.length) return boundsOf(geometry.points);
+        if (geometry.type === 'circle') {
+            const r = geometry.r ?? 12;
+            return {
+                x: (geometry.x ?? 0) - r,
+                y: (geometry.y ?? 0) - r,
+                width: r * 2,
+                height: r * 2,
+            };
+        }
+        return {
+            x: geometry.x ?? 0,
+            y: geometry.y ?? 0,
+            width: geometry.width ?? 0,
+            height: geometry.height ?? 0,
+        };
     }
 
     private _applyVertexDrag(
@@ -1606,8 +1980,11 @@ export class CanvasComponent {
             this._dragging() ||
             this._resizing() ||
             this._rotating() ||
+            this._group_resizing() ||
+            this._group_rotating() ||
             this._vertex_drag() ||
-            this.rect_draw()
+            this.rect_draw() ||
+            this.selection_box()
         );
     }
 

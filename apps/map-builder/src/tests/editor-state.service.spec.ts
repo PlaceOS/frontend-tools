@@ -248,6 +248,28 @@ describe('EditorStateService', () => {
         expect(editor.visible_objects()).toHaveLength(0);
     });
 
+    it('keeps multi-selection on one layer', async () => {
+        const room = editor.objects()[0];
+        const secondRoom = await editor.createObject({
+            object_type: 'room',
+            label: 'Room 2',
+            layer: 'rooms',
+            geometry: { type: 'rect', x: 60, y: 0, width: 50, height: 50 },
+        });
+        const desk = await editor.createObject({
+            object_type: 'desk',
+            label: 'Desk 1',
+            layer: 'desks',
+            geometry: { type: 'rect', x: 10, y: 10, width: 20, height: 20 },
+        });
+
+        editor.setMultiSelect([room.id, secondRoom.id, desk.id]);
+        expect(editor.multi_select()).toEqual([room.id, secondRoom.id]);
+
+        editor.toggleMultiSelect(desk.id);
+        expect(editor.multi_select()).toEqual([room.id, secondRoom.id]);
+    });
+
     it('saves the canvas state back to the floorplan', async () => {
         editor.setZoom(2);
         await editor.save();

@@ -708,6 +708,8 @@ export class EditorComponent {
 
     public readonly shortcuts = [
         { key: 'V', label: 'Select' },
+        { key: 'Shift/Ctrl/⌘ click', label: 'Add or remove from selection' },
+        { key: 'Shift drag', label: 'Select objects in an area' },
         { key: 'R', label: 'Rectangle' },
         { key: 'O', label: 'Polygon' },
         { key: 'P', label: 'Place object' },

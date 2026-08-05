@@ -788,14 +788,34 @@ export class EditorStateService {
     // ── Multi-select ────────────────────────────────────────────────────────
 
     public setMultiSelect(ids: string[]) {
-        this._multi_select.set(ids);
-        if (ids.length) this._selected_id.set(ids[0]);
+        const objects = this._objects();
+        const layer = objects.find((object) => ids.includes(object.id))?.layer;
+        const selection = layer
+            ? ids.filter(
+                  (id, index) =>
+                      ids.indexOf(id) === index &&
+                      objects.some(
+                          (object) =>
+                              object.id === id && object.layer === layer,
+                      ),
+              )
+            : [];
+        this._multi_select.set(selection);
+        this._selected_id.set(selection[0] ?? null);
     }
 
     public toggleMultiSelect(id: string) {
-        this._multi_select.update((ids) =>
-            ids.includes(id) ? ids.filter((i) => i !== id) : [...ids, id],
-        );
+        const object = this._objects().find((item) => item.id === id);
+        if (!object) return;
+        this._multi_select.update((ids) => {
+            if (ids.includes(id)) return ids.filter((item) => item !== id);
+            const selected = this._objects().find((item) =>
+                ids.includes(item.id),
+            );
+            return selected && selected.layer !== object.layer
+                ? ids
+                : [...ids, id];
+        });
     }
 
     public clearMultiSelect() {
