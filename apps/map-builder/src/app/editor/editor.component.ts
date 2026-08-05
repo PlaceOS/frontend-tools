@@ -155,7 +155,7 @@ const TOOLS: { id: Tool; label: string; key: string; icon: string }[] = [
                     <div class="relative ml-auto shrink-0">
                         <input
                             #search_input
-                            class="border-base-300 w-36 rounded border px-2 py-1 text-xs"
+                            class="border-base-300 w-36 rounded border p-2 text-xs"
                             placeholder="Search (Ctrl+F)"
                             aria-label="Search objects"
                             [value]="search()"
@@ -296,41 +296,10 @@ const TOOLS: { id: Tool; label: string; key: string; icon: string }[] = [
                     <span class="bg-base-300 mx-1.5 h-6 w-px shrink-0"></span>
 
                     <!-- View -->
-                    <div class="flex shrink-0 items-center gap-0.5">
-                        <button
-                            [class]="toolClass(state.grid_enabled())"
-                            title="Toggle grid (G)"
-                            (click)="state.toggleGrid()"
-                        >
-                            <app-icon class="text-base">grid_on</app-icon>
-                            Grid
-                        </button>
-                        @if (state.grid_enabled()) {
-                            <input
-                                type="number"
-                                min="5"
-                                max="100"
-                                step="5"
-                                class="border-base-300 w-11 rounded border px-1 py-0.5 text-center text-xs"
-                                title="Grid size (px)"
-                                aria-label="Grid size in pixels"
-                                [value]="state.grid_size()"
-                                (change)="state.setGridSize(+asValue($event))"
-                            />
-                        }
-                        <button
-                            [class]="toolClass(state.snap_enabled())"
-                            title="Toggle snapping"
-                            (click)="state.toggleSnap()"
-                        >
-                            <app-icon class="text-base"
-                                >grid_goldenratio</app-icon
-                            >
-                            Snap
-                        </button>
+                    <div class="flex shrink-0 items-center gap-1">
                         <select
                             id="active-layer"
-                            class="border-base-300 ml-1 shrink-0 rounded border px-2 py-1 text-xs"
+                            class="border-base-300 shrink-0 rounded border p-2 text-xs"
                             title="Active layer"
                             aria-label="Active layer"
                             (change)="state.setActiveLayer(asValue($event))"
@@ -349,6 +318,37 @@ const TOOLS: { id: Tool; label: string; key: string; icon: string }[] = [
                                 </option>
                             }
                         </select>
+                        <button
+                            [class]="toolClass(state.snap_enabled())"
+                            title="Toggle snapping"
+                            (click)="state.toggleSnap()"
+                        >
+                            <app-icon class="text-base"
+                                >grid_goldenratio</app-icon
+                            >
+                            Snap
+                        </button>
+                        <button
+                            [class]="toolClass(state.grid_enabled())"
+                            title="Toggle grid (G)"
+                            (click)="state.toggleGrid()"
+                        >
+                            <app-icon class="text-base">grid_on</app-icon>
+                            Grid
+                        </button>
+                        @if (state.grid_enabled()) {
+                            <input
+                                type="number"
+                                min="5"
+                                max="100"
+                                step="5"
+                                class="border-base-300 w-16 rounded border p-2 text-center text-xs"
+                                title="Grid size (px)"
+                                aria-label="Grid size in pixels"
+                                [value]="state.grid_size()"
+                                (change)="state.setGridSize(+asValue($event))"
+                            />
+                        }
                     </div>
                 </div>
             </header>

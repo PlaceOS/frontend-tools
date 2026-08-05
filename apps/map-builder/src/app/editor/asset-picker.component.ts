@@ -55,8 +55,28 @@ const ICONS: Record<PickerKind, string> = {
                             class="hover:bg-base-200 flex w-full items-center gap-2 rounded px-2 py-1.5 text-left text-xs"
                             (click)="pick(kind, layout.id)"
                         >
-                            <span class="font-medium">{{ layout.label }}</span>
-                            <span class="text-base-content/60 ml-auto">
+                            <span class="flex min-w-0 flex-1 flex-col gap-1">
+                                <span class="font-medium">
+                                    {{ layout.label }}
+                                </span>
+                                <span
+                                    class="inline-grid w-fit gap-px"
+                                    [style.grid-template-columns]="
+                                        'repeat(' + layout.cols + ', 0.5rem)'
+                                    "
+                                    aria-hidden="true"
+                                >
+                                    @for (cell of layout.cells; track $index) {
+                                        <span
+                                            class="bg-primary block h-1.5 w-2 rounded-[1px]"
+                                            [class.opacity-40]="
+                                                $index >= layout.cols
+                                            "
+                                        ></span>
+                                    }
+                                </span>
+                            </span>
+                            <span class="text-base-content/60 shrink-0">
                                 {{ layout.cols * layout.rows }} desks
                             </span>
                         </button>
@@ -96,7 +116,10 @@ export class AssetPickerComponent {
         'furniture',
         'desk-layout',
     ];
-    public readonly desk_layouts = DESK_LAYOUTS;
+    public readonly desk_layouts = DESK_LAYOUTS.map((layout) => ({
+        ...layout,
+        cells: Array.from({ length: layout.cols * layout.rows }),
+    }));
 
     /** Same shape as the editor toolbar's buttons */
     public readonly buttonClass = (active: boolean) =>
