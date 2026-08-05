@@ -93,7 +93,7 @@
             "inputs": [
                 "default",
                 "^default",
-                "{workspaceRoot}/.eslintrc.json",
+                "{workspaceRoot}/eslint.config.mjs",
                 "{workspaceRoot}/tools/eslint-rules/**/*"
             ],
             "cache": true
@@ -123,7 +123,11 @@
             "{workspaceRoot}/tslint.json",
             "{workspaceRoot}/nx.json"
         ],
-        "production": ["default", "!{projectRoot}/src/test-setup.[jt]s"]
+        "production": [
+            "default",
+            "!{projectRoot}/src/test-setup.[jt]s",
+            "!{projectRoot}/eslint.config.mjs"
+        ]
     },
     "parallel": 1,
     "useInferencePlugins": false,
