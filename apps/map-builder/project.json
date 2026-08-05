@@ -8,6 +8,7 @@
     "targets": {
         "build": {
             "executor": "@angular/build:application",
+            "defaultConfiguration": "",
             "options": {
                 "baseHref": "./",
                 "outputPath": "dist/apps/map-builder",
@@ -87,11 +88,11 @@
                     ],
                     "serviceWorker": "apps/map-builder/ngsw-config.json"
                 }
-            },
-            "defaultConfiguration": ""
+            }
         },
         "serve": {
             "executor": "@angular/build:dev-server",
+            "continuous": true,
             "options": {
                 "proxyConfig": "config/proxy.conf.js",
                 "buildTarget": "map-builder:build"
@@ -100,8 +101,7 @@
                 "production": {
                     "buildTarget": "map-builder:build:production"
                 }
-            },
-            "continuous": true
+            }
         },
         "extract-i18n": {
             "executor": "@angular/build:extract-i18n",

@@ -8,6 +8,7 @@
     "targets": {
         "build": {
             "executor": "@angular/build:application",
+            "defaultConfiguration": "production",
             "options": {
                 "baseHref": "./",
                 "outputPath": "dist/apps/placeos-setup",
@@ -66,11 +67,12 @@
                     "sourceMap": true,
                     "namedChunks": true
                 }
-            },
-            "defaultConfiguration": "production"
+            }
         },
         "serve": {
             "executor": "@angular/build:dev-server",
+            "defaultConfiguration": "development",
+            "continuous": true,
             "configurations": {
                 "production": {
                     "buildTarget": "placeos-setup:build:production"
@@ -78,9 +80,7 @@
                 "development": {
                     "buildTarget": "placeos-setup:build:development"
                 }
-            },
-            "defaultConfiguration": "development",
-            "continuous": true
+            }
         },
         "extract-i18n": {
             "executor": "@angular/build:extract-i18n",

@@ -8,6 +8,7 @@
     "targets": {
         "build": {
             "executor": "@angular/build:application",
+            "defaultConfiguration": "",
             "options": {
                 "baseHref": "./",
                 "outputPath": "dist/apps/map-regions",
@@ -69,11 +70,11 @@
                     ],
                     "serviceWorker": "apps/map-regions/ngsw-config.json"
                 }
-            },
-            "defaultConfiguration": ""
+            }
         },
         "serve": {
             "executor": "@angular/build:dev-server",
+            "continuous": true,
             "options": {
                 "buildTarget": "map-regions:build"
             },
@@ -81,8 +82,7 @@
                 "production": {
                     "buildTarget": "map-regions:build:production"
                 }
-            },
-            "continuous": true
+            }
         },
         "extract-i18n": {
             "executor": "@angular/build:extract-i18n",
