@@ -1,7 +1,7 @@
 const { gitDescribeSync } = require('git-describe');
 const { version, core_version } = require('../package.json');
 const { resolve, relative } = require('path');
-const { writeFileSync } = require('fs-extra');
+const { writeFileSync } = require('fs');
 
 let gitInfo = {};
 
